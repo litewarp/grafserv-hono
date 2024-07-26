@@ -1,0 +1,19 @@
+{
+  "extends": "@vercel/style-guide/typescript",
+  "compilerOptions": {
+    "moduleResolution": "Bundler",
+    "noEmit": true,
+    "strict": true,
+    "target": "ES2022",
+    "allowSyntheticDefaultImports": true,
+    "types": ["node", "jest"]
+  },
+  "include": [
+    "src/**/*",
+    "*.config.ts",
+    "*.config.js",
+    "tests/**/*",
+    "jest.config.cjs"
+  ],
+  "exclude": ["node_modules", "dist"]
+}

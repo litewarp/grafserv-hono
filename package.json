@@ -5,12 +5,15 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "sync:list": "syncpack list",
+    "sync:fix": "syncpack fix-mismatches"
   },
   "devDependencies": {
     "prettier": "^3.2.5",
+    "syncpack": "^12.4.0",
     "turbo": "^2.0.9",
-    "typescript": "^5.4.5"
+    "typescript": "^5.5.4"
   },
   "packageManager": "pnpm@9.6.0",
   "engines": {

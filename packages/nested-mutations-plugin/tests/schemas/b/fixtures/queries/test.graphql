@@ -1,0 +1,25 @@
+mutation {
+  createJob(
+    input: {
+      job: { jobRelationshipsToIdUsingToJobId: { create: [{ type: "test" }] } }
+    }
+  ) {
+    job {
+      id
+      jobRelationshipsByToJobId {
+        nodes {
+          type
+          toJobId
+          fromJobId
+        }
+      }
+      jobRelationshipsByFromJobId {
+        nodes {
+          type
+          toJobId
+          fromJobId
+        }
+      }
+    }
+  }
+}

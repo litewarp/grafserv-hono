@@ -1,0 +1,162 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`a query=forward-connect-by-id.graphql 1`] = `
+{
+  "data": {
+    "createParent": {
+      "parent": {
+        "childrenByDadParentId": {
+          "edges": [
+            {
+              "node": {
+                "id": "WyJDaGlsZCIsMl0=",
+                "name": "child 2",
+              },
+            },
+          ],
+        },
+        "id": "WyJQYXJlbnQiLDNd",
+        "parentName": "Daddy-O",
+      },
+    },
+  },
+}
+`;
+
+exports[`a query=forward-create.graphql 1`] = `
+{
+  "data": {
+    "createChild": {
+      "child": {
+        "dadParent": {
+          "id": "WyJQYXJlbnQiLDNd",
+          "parentName": "my father this of thee",
+        },
+        "id": "WyJDaGlsZCIsM10=",
+        "momParent": null,
+        "name": "Me first but what about required constraints",
+      },
+    },
+  },
+}
+`;
+
+exports[`a query=forward-update-by-id.graphql 1`] = `
+{
+  "data": {
+    "updateChild": {
+      "child": {
+        "dadParent": {
+          "id": "WyJQYXJlbnQiLDJd",
+          "parentName": "revised daddy",
+        },
+        "id": "WyJDaGlsZCIsMV0=",
+        "momParent": {
+          "id": "WyJQYXJlbnQiLDFd",
+        },
+        "name": "Charlie Hustle",
+      },
+    },
+  },
+}
+`;
+
+exports[`a query=reverse-connect-by-id.graphql 1`] = `
+{
+  "data": {
+    "createChild": {
+      "child": {
+        "dadParent": {
+          "id": "WyJQYXJlbnQiLDJd",
+          "parentName": "dad",
+        },
+        "id": "WyJDaGlsZCIsM10=",
+        "name": "My baby",
+      },
+    },
+  },
+}
+`;
+
+exports[`a query=reverse-create.graphql 1`] = `
+{
+  "data": {
+    "createParent": {
+      "parent": {
+        "childrenByDadParentId": {
+          "nodes": [
+            {
+              "dadParent": {
+                "id": "WyJQYXJlbnQiLDNd",
+              },
+              "id": "WyJDaGlsZCIsM10=",
+              "momParent": null,
+              "name": "child 1 of test f1",
+            },
+          ],
+        },
+        "childrenByMomParentId": {
+          "nodes": [
+            {
+              "id": "WyJDaGlsZCIsNF0=",
+              "momParent": {
+                "id": "WyJQYXJlbnQiLDNd",
+              },
+              "name": "child 2 of test f1",
+            },
+          ],
+        },
+        "id": "WyJQYXJlbnQiLDNd",
+        "parentName": "test f1",
+      },
+    },
+  },
+}
+`;
+
+exports[`a query=reverse-update-by-id.graphql 1`] = `
+{
+  "data": {
+    "updateParent": {
+      "parent": {
+        "childrenByMomParentId": {
+          "edges": [
+            {
+              "node": {
+                "id": "WyJDaGlsZCIsMV0=",
+                "name": "new kiddo",
+              },
+            },
+          ],
+        },
+        "id": "WyJQYXJlbnQiLDFd",
+        "parentName": "new mommy",
+      },
+    },
+  },
+}
+`;
+
+exports[`b query=test.graphql 1`] = `
+{
+  "data": {
+    "createJob": {
+      "job": {
+        "id": "WyJKb2IiLDFd",
+        "jobRelationshipsByFromJobId": {
+          "nodes": [],
+        },
+        "jobRelationshipsByToJobId": {
+          "nodes": [
+            {
+              "fromJobId": null,
+              "toJobId": 1,
+              "type": "test",
+            },
+          ],
+        },
+      },
+    },
+  },
+}
+`;

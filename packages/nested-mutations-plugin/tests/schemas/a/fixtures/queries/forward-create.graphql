@@ -1,0 +1,25 @@
+# test creation of a related table that does not contain the foreign keys for the relationship
+mutation AddParentFromChild {
+  createChild(
+    input: {
+      child: {
+        name: "Me first but what about required constraints"
+        parentToDadParentId: {
+          create: { parentName: "my father this of thee" }
+        }
+      }
+    }
+  ) {
+    child {
+      id
+      name
+      dadParent {
+        id
+        parentName
+      }
+      momParent {
+        id
+      }
+    }
+  }
+}
