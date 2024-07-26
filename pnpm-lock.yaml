@@ -55,6 +55,9 @@ importers:
       '@dataplan/pg':
         specifier: 0.0.1-beta.24
         version: 0.0.1-beta.24(@dataplan/json@0.0.1-beta.22(grafast@0.1.1-beta.13(graphile-config@0.0.1-beta.9)(graphql@16.9.0)(tamedevil@0.0.0-beta.7)))(grafast@0.1.1-beta.13(graphile-config@0.0.1-beta.9)(graphql@16.9.0)(tamedevil@0.0.0-beta.7))(graphile-config@0.0.1-beta.9)(pg-sql2@5.0.0-beta.6)(pg@8.12.0)
+      '@litewarp/grafserv-hono-adapter':
+        specifier: workspace:*
+        version: link:../../packages/hono-adapter
       graphile-build:
         specifier: 5.0.0-beta.23
         version: 5.0.0-beta.23(grafast@0.1.1-beta.13(graphile-config@0.0.1-beta.9)(graphql@16.9.0)(tamedevil@0.0.0-beta.7))(graphile-config@0.0.1-beta.9)(graphql@16.9.0)
@@ -97,13 +100,6 @@ importers:
         version: 5.5.4
 
   packages/hono-adapter:
-    dependencies:
-      graphql-ws:
-        specifier: ^5.16.0
-        version: 5.16.0(graphql@16.9.0)
-      hono:
-        specifier: ^4.5.1
-        version: 4.5.1
     devDependencies:
       '@dataplan/json':
         specifier: 0.0.1-beta.22
@@ -123,6 +119,9 @@ importers:
       bun:
         specifier: ^1.1.20
         version: 1.1.20
+      bun-plugin-dts-auto:
+        specifier: ^0.11.1
+        version: 0.11.1
       bun-types:
         specifier: ^1.1.20
         version: 1.1.20
@@ -135,6 +134,12 @@ importers:
       graphile-config:
         specifier: 0.0.1-beta.9
         version: 0.0.1-beta.9
+      graphql-ws:
+        specifier: ^5.16.0
+        version: 5.16.0(graphql@16.9.0)
+      hono:
+        specifier: ^4.5.1
+        version: 4.5.1
       postgraphile:
         specifier: 5.0.0-beta.28
         version: 5.0.0-beta.28(6i7ibgla2n3bjzgni44o6hixua)
@@ -1385,6 +1390,9 @@ packages:
   builtin-modules@3.3.0:
     resolution: {integrity: sha512-zhaCDicdLuWN5UbN5IMnFqNMhNfo919sH85y2/ea+5Yg9TsTkeZxpL+JLbp6cgYFS4sRLp3YV4S6yDuqVWHYOw==}
     engines: {node: '>=6'}
+
+  bun-plugin-dts-auto@0.11.1:
+    resolution: {integrity: sha512-X4SABeXv/Csix6VRbMYB5AzWdPDaL61KGr9bjjwj6ZnW1iIz6xc9Sh6WiHyeG6CZ4hWgi+vLPX5pctsUk1khxA==}
 
   bun-types@1.1.20:
     resolution: {integrity: sha512-2u84HciDR3E7Uc0t0AEeXHmQAWe9uzRKTz120D3silIJOQlbGIMJMJiGaM8Yx7nEvMyfV0LfSdkEGnb77AN5AA==}
@@ -5228,6 +5236,8 @@ snapshots:
   buffer-from@1.1.2: {}
 
   builtin-modules@3.3.0: {}
+
+  bun-plugin-dts-auto@0.11.1: {}
 
   bun-types@1.1.20:
     dependencies:

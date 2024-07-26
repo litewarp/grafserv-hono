@@ -2,7 +2,8 @@
   "extends": "@repo/typescript-config/base.json",
   "compilerOptions": {
     "noEmit": true,
-    "types": ["bun-types"]
+    "types": ["bun-types"],
+    "outDir": "dist"
   },
   "include": ["./**/*.ts", ".eslintrc.mjs"],
   "exclude": ["node_modules"]

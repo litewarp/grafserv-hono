@@ -1,8 +1,7 @@
 import preset from "./graphile.config.ts";
 import { postgraphile } from "postgraphile";
-import { grafserv } from "./graphile/hono-adapter.ts";
+import { grafserv, websocket } from "@litewarp/grafserv-hono-adapter";
 import { Hono } from "hono";
-import { websocket } from "./graphile/hono-bun-ws.ts";
 import { cors } from "hono/cors";
 
 const PORT = preset.grafserv?.port ?? 5678;

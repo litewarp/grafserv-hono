@@ -1,7 +1,7 @@
 {
   "extends": "@repo/typescript-config/base.json",
   "compilerOptions": {
-    "moduleResolution": "Bundler",
+    "moduleResolution": "NodeNext",
     "noEmit": true,
     "strict": true,
     "target": "ES2022",

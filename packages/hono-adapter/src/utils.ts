@@ -1,6 +1,3 @@
-import type { Context } from "hono";
-import { HonoRequest } from "hono";
-
 // Designed to be equivalent to `import('node:http').IncomingHttpHeaders` but without the import
 type IncomingHttpHeaders = Record<
   string,
