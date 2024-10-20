@@ -1,8 +1,8 @@
-import { type GraphileBuild } from 'graphile-build';
-import { type __InputListStep, type __InputObjectStep } from 'grafast';
-import type { PgNestedMutationRelationship } from '../interfaces';
-import { isInsertOrUpdate } from '../helpers';
-import { nestedCreateStep } from '../steps/nested-create-step';
+import { type GraphileBuild } from "graphile-build";
+import { type __InputListStep, type __InputObjectStep } from "grafast";
+import type { PgNestedMutationRelationship } from "../interfaces";
+import { isInsertOrUpdate } from "../helpers";
+import { nestedCreateStep } from "../steps/nested-create-step";
 
 export function buildCreateField(
   relationship: PgNestedMutationRelationship,
@@ -39,9 +39,9 @@ export function buildCreateField(
       description: build.wrapDescription(
         `A \`${build.getGraphQLTypeNameByPgCodec(
           rightTable.codec,
-          'input',
+          "input",
         )}\` object that will be created and connected to this object.`,
-        'field',
+        "field",
       ),
       type:
         !isReverse || isUnique

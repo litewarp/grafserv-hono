@@ -1,14 +1,14 @@
-import type { PgTableResource } from '@graphile-contrib/pg-many-to-many';
+import type { PgTableResource } from "@graphile-contrib/pg-many-to-many";
 import type {
   PgNestedMutationRelationship,
   PgNestedTableMutationFields,
-} from './interfaces';
+} from "./interfaces.js";
 
 export const pgNestedMutationFields = [
-  'input',
-  'create',
-  'connectByKeys',
-  'connectByNodeId',
+  "input",
+  "create",
+  "connectByKeys",
+  "connectByNodeId",
 ] as const;
 
 export function getNestedRelationships(
@@ -55,7 +55,7 @@ export function getNestedRelationships(
       {},
     );
 
-    const relationship: Omit<PgNestedMutationRelationship, 'mutationFields'> = {
+    const relationship: Omit<PgNestedMutationRelationship, "mutationFields"> = {
       leftTable,
       rightTable,
       relationName,
@@ -79,7 +79,7 @@ export function getNestedRelationships(
     // todo - remove non-null assertion
 
     if (!build.getNodeIdHandler) {
-      throw new Error('getNodeIdHandler not found on build');
+      throw new Error("getNodeIdHandler not found on build");
     }
 
     const nodeIdHandler = build.getNodeIdHandler(
@@ -99,7 +99,7 @@ export function getNestedRelationships(
        * TYpe that
        */
       create: {
-        fieldName: 'create',
+        fieldName: "create",
         typeName: inflection.nestedCreateInputType(relationship),
       },
 

@@ -6,9 +6,10 @@ import { cors } from "hono/cors";
 
 const PORT = preset.grafserv?.port ?? 5678;
 
-const ORIGIN = process.env.NODE_ENV === "production"
-  ? process.env.CLIENT_ORIGIN!
-  : "http://localhost:3000";
+const ORIGIN =
+  process.env.NODE_ENV === "production"
+    ? process.env.CLIENT_ORIGIN!
+    : "http://localhost:3000";
 
 const hono = new Hono({});
 

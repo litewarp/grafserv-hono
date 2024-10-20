@@ -1,8 +1,8 @@
-import type { __InputObjectStep } from 'grafast';
-import { __InputListStep, specFromNodeId } from 'grafast';
-import { pgUpdateSingle } from '@dataplan/pg';
-import type { PgNestedMutationRelationship } from '../interfaces';
-import { isInsertOrUpdate } from '../helpers';
+import type { __InputObjectStep } from "grafast";
+import { __InputListStep, specFromNodeId } from "grafast";
+import { pgUpdateSingle } from "@dataplan/pg";
+import type { PgNestedMutationRelationship } from "../interfaces";
+import { isInsertOrUpdate } from "../helpers";
 
 export function buildConnectByNodeIdField(
   relationship: PgNestedMutationRelationship,
@@ -55,7 +55,7 @@ export function buildConnectByNodeIdField(
     {
       description: build.wrapDescription(
         `A \`${rightTable.name}\` object that will be connected by its ID.`,
-        'field',
+        "field",
       ),
       type:
         !isReverse || isUnique
@@ -124,7 +124,7 @@ export function buildConnectByNodeIdField(
               } else {
                 // key is on the object being updated or created
                 // find the node_id and update the foreign key column
-                const $nodeId = args.get('id');
+                const $nodeId = args.get("id");
                 const spec = specFromNodeId(rightHandler, $nodeId);
 
                 for (let i = 0; i < remoteAttributes.length; i++) {

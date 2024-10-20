@@ -4,11 +4,11 @@ This is a rough attempt at constructing a Grafserv adapter for [Hono](https://ho
 
 Hono supports a variety of different environments and frameworks, so full support will likely depend on where you will be deploying the server.
 
-This particular implementation uses [Bun](https://bun.sh) as the server runtime to add support for websockets. 
+This particular implementation uses [Bun](https://bun.sh) as the server runtime to add support for websockets.
 
-One of the next steps will be to separate the concerns into a core grafserv module that translates requests to hono and then include a variety of adapters for websockets or other runtimes (e.g., [cloudfare workers](https://hono.dev/docs/getting-started/cloudflare-workers) or [supabase functions](https://hono.dev/docs/getting-started/supabase-functions)). 
+One of the next steps will be to separate the concerns into a core grafserv module that translates requests to hono and then include a variety of adapters for websockets or other runtimes (e.g., [cloudfare workers](https://hono.dev/docs/getting-started/cloudflare-workers) or [supabase functions](https://hono.dev/docs/getting-started/supabase-functions)).
 
-Any input is appreciated! You can leave an issue here or find me on discord @litewarp. 
+Any input is appreciated! You can leave an issue here or find me on discord @litewarp.
 
 ## Example Usage
 

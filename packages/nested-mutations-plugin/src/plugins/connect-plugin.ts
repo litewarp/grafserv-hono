@@ -4,16 +4,16 @@
  * Should be run first, since it gathers all the relations
  */
 
-import { getNestedRelationships } from '../get-nested-relationships';
-import { isPgTableResource } from '../helpers';
+import { getNestedRelationships } from "../get-nested-relationships";
+import { isPgTableResource } from "../helpers";
 
 export const PostGraphileNestedMutationsConnectPlugin: GraphileConfig.Plugin = {
-  name: 'PgNestedMutationConnectPlugin',
-  description: 'Adds connectById and connectByKeys input types to schema',
+  name: "PgNestedMutationConnectPlugin",
+  description: "Adds connectById and connectByKeys input types to schema",
   /* eslint-disable-next-line @typescript-eslint/no-var-requires */
-  version: require('../../package.json').version,
-  after: ['PgTableNodePlugin'],
-  before: ['PgNestedMutationTypesPlugin'],
+  version: require("../../package.json").version,
+  after: ["PgTableNodePlugin"],
+  before: ["PgNestedMutationTypesPlugin"],
 
   inflection: {
     add: {
@@ -32,7 +32,7 @@ export const PostGraphileNestedMutationsConnectPlugin: GraphileConfig.Plugin = {
           this.attribute({ attributeName, codec: leftTable.codec }),
         );
 
-        const keyName = localUnique.isPrimary ? 'pk' : attributes.join('_');
+        const keyName = localUnique.isPrimary ? "pk" : attributes.join("_");
 
         return this.upperCamelCase(`${tableFieldName}_${keyName}_connect`);
       },
@@ -43,7 +43,7 @@ export const PostGraphileNestedMutationsConnectPlugin: GraphileConfig.Plugin = {
           this.attribute({ attributeName, codec: leftTable.codec }),
         );
 
-        return this.camelCase(`connect_by_${attributes.join('_and_')}`);
+        return this.camelCase(`connect_by_${attributes.join("_and_")}`);
       },
     },
   },
@@ -98,7 +98,7 @@ export const PostGraphileNestedMutationsConnectPlugin: GraphileConfig.Plugin = {
                     () => ({
                       description: build.wrapDescription(
                         `The globally unique \`ID\` to be used in the connection.`,
-                        'type',
+                        "type",
                       ),
                       fields: ({ fieldWithHooks }) => ({
                         [nodeIdField]: fieldWithHooks(

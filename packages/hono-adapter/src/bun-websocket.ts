@@ -36,9 +36,7 @@ export const createBunWsMiddleware = (server: Server<{ socket: WSContext }>) =>
       onOpen: (_evt, ws) => {
         const client: WsClient = {
           handleMessage: () => {
-            throw new Error(
-              `Message received before handler was registered`,
-            );
+            throw new Error(`Message received before handler was registered`);
           },
           closed: () => {
             throw new Error(`Closed before handler was registered`);

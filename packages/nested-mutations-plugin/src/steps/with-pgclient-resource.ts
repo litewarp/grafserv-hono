@@ -3,8 +3,8 @@ import {
   type PgClient,
   type PgCodec,
   type WithPgClient,
-} from '@dataplan/pg';
-import type { PgTableResource } from '@graphile-contrib/pg-many-to-many';
+} from "@dataplan/pg";
+import type { PgTableResource } from "@graphile-contrib/pg-many-to-many";
 import {
   ExecutableStep,
   type AccessStep,
@@ -15,10 +15,10 @@ import {
   type SetterStep,
   setter,
   type SetterCapableStep,
-} from 'grafast';
+} from "grafast";
 
 type PgResourceAttributes<TResource extends PgTableResource> =
-  keyof TResource['codec']['attributes'];
+  keyof TResource["codec"]["attributes"];
 
 interface ContextValues {
   pgSettings: Record<string, string>;
@@ -40,8 +40,8 @@ export class WithTypedResourcePgClientStep<
   implements SetterCapableStep<Record<PgResourceAttributes<TResource>, any>>
 {
   static $$export = {
-    moduleName: '@litewarp/graphile-nested-mutations',
-    exportName: 'WithTypedResourcePgClientStep',
+    moduleName: "@litewarp/graphile-nested-mutations",
+    exportName: "WithTypedResourcePgClientStep",
   };
 
   isSyncAndSafe = false;

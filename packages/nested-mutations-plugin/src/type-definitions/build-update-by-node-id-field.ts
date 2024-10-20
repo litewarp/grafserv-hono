@@ -3,10 +3,10 @@ import {
   type __InputListStep,
   type __InputObjectStep,
   type ExecutableStep,
-} from 'grafast';
-import {} from '@dataplan/pg';
-import type { PgNestedMutationRelationship } from '../interfaces';
-import { nestedUpdateById } from '../steps/nested-update-by-id-step';
+} from "grafast";
+import {} from "@dataplan/pg";
+import type { PgNestedMutationRelationship } from "../interfaces";
+import { nestedUpdateById } from "../steps/nested-update-by-id-step";
 
 export function buildUpdateByNodeIdField(
   relationship: PgNestedMutationRelationship,
@@ -56,7 +56,7 @@ export function buildUpdateByNodeIdField(
     {
       description: build.wrapDescription(
         `The primary keys and patch data for ${rightTable.name} for the far side of the relationship`,
-        'field',
+        "field",
       ),
       type:
         !isReverse || isUnique
@@ -71,7 +71,7 @@ export function buildUpdateByNodeIdField(
             if (!isReverse || isUnique) {
               nestedUpdateById(relationship, {
                 ...getSpec(args.get(idField)),
-                patch: args.get('patch'),
+                patch: args.get("patch"),
               });
             } else {
               const $inputObj = args.getRaw() as __InputListStep;
@@ -83,7 +83,7 @@ export function buildUpdateByNodeIdField(
 
                 nestedUpdateById(relationship, {
                   ...getSpec(dep.get(idField)),
-                  patch: dep.get('patch'),
+                  patch: dep.get("patch"),
                 });
               }
             }

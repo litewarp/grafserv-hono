@@ -1,31 +1,31 @@
-import { readFile, writeFile } from 'node:fs/promises';
-import { existsSync, readdirSync } from 'node:fs';
-import path from 'node:path';
-import type { SchemaResult } from 'graphile-build';
-import { makeSchema } from 'graphile-build';
-import { PostGraphileAmberPreset } from 'postgraphile/presets/amber';
-import { PgManyToManyPreset } from '@graphile-contrib/pg-many-to-many';
-import { hookArgs, execute } from 'grafast';
-import type { ExecutionArgs } from 'graphql';
-import { parse, validate } from 'graphql';
-import { PgSimplifyInflectionPreset } from '@graphile/simplify-inflection';
-import type { Pool } from 'pg';
-import { makeWithPgClientViaPgClientAlreadyInTransaction } from 'postgraphile/adaptors/pg';
-import { NestedMutationPreset } from '../src';
-import { withPgClient, withPgPool } from './helpers';
-import { printOrderedSchema } from './print-ordered-schema';
+import { readFile, writeFile } from "node:fs/promises";
+import { existsSync, readdirSync } from "node:fs";
+import path from "node:path";
+import type { SchemaResult } from "graphile-build";
+import { makeSchema } from "graphile-build";
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
+import { PgManyToManyPreset } from "@graphile-contrib/pg-many-to-many";
+import { hookArgs, execute } from "grafast";
+import type { ExecutionArgs } from "graphql";
+import { parse, validate } from "graphql";
+import { PgSimplifyInflectionPreset } from "@graphile/simplify-inflection";
+import type { Pool } from "pg";
+import { makeWithPgClientViaPgClientAlreadyInTransaction } from "postgraphile/adaptors/pg";
+import { NestedMutationPreset } from "../src";
+import { withPgClient, withPgPool } from "./helpers";
+import { printOrderedSchema } from "./print-ordered-schema";
 
 const readFixtureForSqlSchema = async (sqlSchema: string, fixture: string) =>
   readFile(
     path.resolve(
       __dirname,
-      'schemas',
+      "schemas",
       sqlSchema,
-      'fixtures',
-      'queries',
+      "fixtures",
+      "queries",
       fixture,
     ),
-    'utf8',
+    "utf8",
   );
 
 const createPostGraphileSchema = async (pgPool: Pool, sqlSchema: string) => {
@@ -38,10 +38,10 @@ const createPostGraphileSchema = async (pgPool: Pool, sqlSchema: string) => {
     ],
     pgServices: [
       {
-        name: 'main',
-        adaptor: '@dataplan/pg/adaptors/pg',
-        withPgClientKey: 'withPgClient',
-        pgSettingsKey: 'pgSettings',
+        name: "main",
+        adaptor: "@dataplan/pg/adaptors/pg",
+        withPgClientKey: "withPgClient",
+        pgSettingsKey: "pgSettings",
         pgSettingsForIntrospection: {},
         schemas: [sqlSchema],
         adaptorSettings: {
@@ -53,22 +53,22 @@ const createPostGraphileSchema = async (pgPool: Pool, sqlSchema: string) => {
   await writeFile(
     `./tmp/${sqlSchema}.graphql`,
     printOrderedSchema(gs.schema),
-    'utf8',
+    "utf8",
   );
   return gs;
 };
 
 const getFixturesForSqlSchema = (sqlSchema: string) =>
   existsSync(
-    path.resolve(__dirname, 'schemas', sqlSchema, 'fixtures', 'queries'),
+    path.resolve(__dirname, "schemas", sqlSchema, "fixtures", "queries"),
   )
     ? readdirSync(
-        path.resolve(__dirname, 'schemas', sqlSchema, 'fixtures', 'queries'),
+        path.resolve(__dirname, "schemas", sqlSchema, "fixtures", "queries"),
       ).sort()
     : [];
 
 const getSqlSchemas = () =>
-  readdirSync(path.resolve(__dirname, 'schemas')).sort();
+  readdirSync(path.resolve(__dirname, "schemas")).sort();
 
 const sqlSchemas = getSqlSchemas();
 
@@ -78,24 +78,24 @@ beforeAll(async () => {
   // Ensure process.env.TEST_DATABASE_URL is set
   if (!process.env.TEST_DATABASE_URL) {
     console.error(
-      'ERROR: No test database configured; aborting. To resolve this, ensure environmental variable TEST_DATABASE_URL is set.',
+      "ERROR: No test database configured; aborting. To resolve this, ensure environmental variable TEST_DATABASE_URL is set.",
     );
     process.exit(1);
   }
 });
 
-describe.each(sqlSchemas)('%s', (sqlSchema) => {
+describe.each(sqlSchemas)("%s", (sqlSchema) => {
   beforeEach(async () => {
     // reset db
     await withPgClient(async (pgClient) => {
       const schema = await readFile(
-        path.resolve(__dirname, 'schemas', sqlSchema, 'schema.sql'),
-        'utf8',
+        path.resolve(__dirname, "schemas", sqlSchema, "schema.sql"),
+        "utf8",
       );
       await pgClient.query(schema);
       const data = await readFile(
-        path.resolve(__dirname, 'schemas', sqlSchema, 'data.sql'),
-        'utf8',
+        path.resolve(__dirname, "schemas", sqlSchema, "data.sql"),
+        "utf8",
       );
       await pgClient.query(data);
     });
@@ -106,7 +106,7 @@ describe.each(sqlSchemas)('%s', (sqlSchema) => {
   });
   const fixtures = getFixturesForSqlSchema(sqlSchema);
   if (fixtures.length > 0) {
-    test.each(fixtures)('query=%s', async (fixture) => {
+    test.each(fixtures)("query=%s", async (fixture) => {
       const { schema, resolvedPreset } = gqlSchema;
       const query = await readFixtureForSqlSchema(sqlSchema, fixture);
       const document = parse(query);
@@ -115,7 +115,7 @@ describe.each(sqlSchemas)('%s', (sqlSchema) => {
         throw new Error(
           `GraphQL validation errors:\n${errors
             .map((e) => e.message)
-            .join('\n')}`,
+            .join("\n")}`,
         );
       }
       const args: ExecutionArgs = {

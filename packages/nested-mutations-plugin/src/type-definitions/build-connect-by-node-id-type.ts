@@ -1,4 +1,4 @@
-import type { PgNestedMutationRelationship } from '../interfaces';
+import type { PgNestedMutationRelationship } from "../interfaces";
 
 export function buildConnectByNodeIdType(
   rel: PgNestedMutationRelationship,
@@ -30,7 +30,7 @@ export function buildConnectByNodeIdType(
     () => ({
       description: build.wrapDescription(
         `The globally unique \`ID\` to be used in the connection.`,
-        'type',
+        "type",
       ),
       fields: ({ fieldWithHooks }) => ({
         [inflection.nodeIdFieldName()]: fieldWithHooks(

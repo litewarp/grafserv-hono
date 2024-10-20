@@ -1,25 +1,25 @@
-import type { GraphileConfig } from 'graphile-build';
+import type { GraphileConfig } from "graphile-build";
 import type {
   GrafastInputFieldConfigMap,
   ObjectStep,
   __InputObjectStep,
-} from 'grafast';
-import { __InputListStep } from 'grafast';
-import { isPgTableResource } from '../helpers';
-import { buildCreateField } from '../type-definitions/build-create-field';
-import { buildConnectByNodeIdField } from '../type-definitions/build-connect-by-node-id-field';
-import { buildUpdateByNodeIdField } from '../type-definitions/build-update-by-node-id-field';
+} from "grafast";
+import { __InputListStep } from "grafast";
+import { isPgTableResource } from "../helpers";
+import { buildCreateField } from "../type-definitions/build-create-field";
+import { buildConnectByNodeIdField } from "../type-definitions/build-connect-by-node-id-field";
+import { buildUpdateByNodeIdField } from "../type-definitions/build-update-by-node-id-field";
 
 /**
  * adds the relationship input field to the parent object
  */
 export const PostGraphileNestedTypesPlugin: GraphileConfig.Plugin = {
-  name: 'PgNestedMutationTypesPlugin',
+  name: "PgNestedMutationTypesPlugin",
   description:
-    'Builds and adds nested mutation input field with plans to parent object',
+    "Builds and adds nested mutation input field with plans to parent object",
   /* eslint-disable-next-line @typescript-eslint/no-var-requires */
-  version: require('../../package.json').version,
-  after: ['PgNestedMutationConnectPlugin'],
+  version: require("../../package.json").version,
+  after: ["PgNestedMutationConnectPlugin"],
 
   inflection: {
     add: {
@@ -45,12 +45,12 @@ export const PostGraphileNestedTypesPlugin: GraphileConfig.Plugin = {
           [
             this.tableFieldName(isReverse ? rightTable : leftTable),
             [...(isReverse ? remoteAttributes : localAttributes)],
-            'fKey',
-            isReverse ? 'inverse' : null,
-            'input',
+            "fKey",
+            isReverse ? "inverse" : null,
+            "input",
           ]
             .filter(Boolean)
-            .join('_'),
+            .join("_"),
         );
       },
       nestedConnectorFieldName(options, details) {
@@ -73,22 +73,22 @@ export const PostGraphileNestedTypesPlugin: GraphileConfig.Plugin = {
 
         if (!isReverse) {
           return this.camelCase(
-            `${tableFieldName}_to_${localAttributes.join('_and_')}`,
+            `${tableFieldName}_to_${localAttributes.join("_and_")}`,
           );
         }
 
         if (!multipleFks) {
           return this.camelCase(
             `${computedReverseMutationName}_using_${localAttributes.join(
-              '_and_ ',
+              "_and_ ",
             )}`,
           );
         }
 
         return this.camelCase(
           `${computedReverseMutationName}_to_${localAttributes.join(
-            '_and_',
-          )}_using_${remoteAttributes.join('_and_')}`,
+            "_and_",
+          )}_using_${remoteAttributes.join("_and_")}`,
         );
       },
     },
@@ -153,7 +153,7 @@ export const PostGraphileNestedTypesPlugin: GraphileConfig.Plugin = {
              */
 
             const hasNestedFields =
-              Object.keys(mutationFields).filter((k) => k !== 'input').length >
+              Object.keys(mutationFields).filter((k) => k !== "input").length >
               0;
 
             // register the connectType
@@ -172,7 +172,7 @@ export const PostGraphileNestedTypesPlugin: GraphileConfig.Plugin = {
                     () => ({
                       description: build.wrapDescription(
                         `Input for the nested mutation of \`${relationship.leftTable.name}\` `,
-                        'type',
+                        "type",
                       ),
                       fields: ({ fieldWithHooks }) => ({
                         ...(mutationFields.create
@@ -224,11 +224,11 @@ export const PostGraphileNestedTypesPlugin: GraphileConfig.Plugin = {
 
         const fieldKey = build.pgNestedMutationInputObjMap.get(fieldName);
         const behaviors = build.behavior.parseBehaviorString(
-          fieldBehaviorScope ?? '',
+          fieldBehaviorScope ?? "",
         );
 
         const isUpdate = Boolean(
-          behaviors.find((b) => b.scope.includes('update')),
+          behaviors.find((b) => b.scope.includes("update")),
         );
 
         if (
@@ -244,7 +244,7 @@ export const PostGraphileNestedTypesPlugin: GraphileConfig.Plugin = {
               [string, string][]
             >((acc, [key, o]) => {
               if (
-                ['input', 'connectByKeys', 'updateByKeys'].includes(key) ||
+                ["input", "connectByKeys", "updateByKeys"].includes(key) ||
                 !o.fieldName
               ) {
                 return acc;
@@ -260,15 +260,15 @@ export const PostGraphileNestedTypesPlugin: GraphileConfig.Plugin = {
             plan(parent, args, info) {
               // only applying to create?
               const previousPlan = field.plan!(parent, args, info);
-              const inputPlan = previousPlan.get('result') as ObjectStep;
-              const patchOrField = isUpdate ? 'patch' : fieldKey.field;
+              const inputPlan = previousPlan.get("result") as ObjectStep;
+              const patchOrField = isUpdate ? "patch" : fieldKey.field;
               for (const [connectorField, action] of fieldPathsToApplyArgs) {
                 // don't apply the path if the key is not present in the input object
-                const inputObj = args.getRaw(['input', patchOrField]).eval();
+                const inputObj = args.getRaw(["input", patchOrField]).eval();
 
                 if (inputObj[connectorField]) {
                   args.apply(inputPlan, [
-                    'input',
+                    "input",
                     patchOrField,
                     connectorField,
                     action,
@@ -316,7 +316,7 @@ export const PostGraphileNestedTypesPlugin: GraphileConfig.Plugin = {
                   {
                     description: build.wrapDescription(
                       `Input for the nested mutation of \`${rightTable.name}\ in the \`${Self.name}\` mutation`,
-                      'field',
+                      "field",
                     ),
                     type: nestedType,
                     autoApplyAfterParentApplyPlan: true,
@@ -324,7 +324,7 @@ export const PostGraphileNestedTypesPlugin: GraphileConfig.Plugin = {
                       () =>
                         function plan($parent, args, _info) {
                           const $inputObj = args.getRaw() as __InputObjectStep;
-                          if ($inputObj.evalHas('updateById')) {
+                          if ($inputObj.evalHas("updateById")) {
                             args.apply($parent);
                           }
                         },
@@ -337,7 +337,7 @@ export const PostGraphileNestedTypesPlugin: GraphileConfig.Plugin = {
             {},
           );
 
-          return build.extend(fields, addedFields, 'test');
+          return build.extend(fields, addedFields, "test");
         }
 
         return fields;

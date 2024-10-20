@@ -4,20 +4,20 @@
  * Should be run after connect-plugin, since it gathers all the relations
  */
 
-import { isPgTableResource } from '../helpers';
+import { isPgTableResource } from "../helpers.js";
 
 export const PostGraphileNestedMutationsCreatePlugin: GraphileConfig.Plugin = {
-  name: 'PgNestedMutationCreatePlugin',
-  description: 'Adds create nested object input types to schema',
+  name: "PgNestedMutationCreatePlugin",
+  description: "Adds create nested object input types to schema",
   /* eslint-disable-next-line @typescript-eslint/no-var-requires */
-  version: require('../../package.json').version,
-  after: ['PgNestedMutationConnectPlugin'],
-  before: ['PgNestedMutationTypesPlugin'],
+  version: require("../../package.json").version,
+  after: ["PgNestedMutationConnectPlugin"],
+  before: ["PgNestedMutationTypesPlugin"],
 
   inflection: {
     add: {
       nestedCreateFieldName(_options) {
-        return 'create';
+        return "create";
       },
       nestedCreateInputType(options, details) {
         // Same as fieldType except no 'inverse' and then add rightTableName + 'create'
@@ -33,13 +33,13 @@ export const PostGraphileNestedMutationsCreatePlugin: GraphileConfig.Plugin = {
           [
             this.tableFieldName(isReverse ? rightTable : leftTable),
             [...(isReverse ? remoteAttributes : localAttributes)],
-            'fkey',
+            "fkey",
             this.tableFieldName(rightTable),
-            'create',
-            'input',
+            "create",
+            "input",
           ]
             .filter(Boolean)
-            .join('_'),
+            .join("_"),
         );
       },
     },
@@ -88,7 +88,7 @@ export const PostGraphileNestedMutationsCreatePlugin: GraphileConfig.Plugin = {
                     () => ({
                       description: build.wrapDescription(
                         `The \`${rightTable.name}\` to be created by this mutation.`,
-                        'type',
+                        "type",
                       ),
                       fields: ({ fieldWithHooks }) => {
                         return Object.entries(
@@ -96,7 +96,7 @@ export const PostGraphileNestedMutationsCreatePlugin: GraphileConfig.Plugin = {
                         ).reduce((memo, [attributeName, attribute]) => {
                           const attributeType = build.getGraphQLTypeByPgCodec(
                             attribute.codec,
-                            'input',
+                            "input",
                           );
                           if (!attributeType) {
                             return memo;

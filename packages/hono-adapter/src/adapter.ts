@@ -94,11 +94,9 @@ export class HonoGrafserv extends GrafservBase {
               //
             }
             // set the headers
-            Object.entries(processHeaders(headers)).forEach(
-              ([key, value]) => {
-                c.header(key, value);
-              },
-            );
+            Object.entries(processHeaders(headers)).forEach(([key, value]) => {
+              c.header(key, value);
+            });
             c.status(statusCode as StatusCode);
 
             try {
@@ -176,10 +174,7 @@ export class HonoGrafserv extends GrafservBase {
     if (exposeGetRoute) {
       app.get(graphqlPath, graphqlHandler);
       if (wsHandler) {
-        app.get(
-          graphqlPath,
-          createBunWsMiddleware(wsHandler),
-        );
+        app.get(graphqlPath, createBunWsMiddleware(wsHandler));
       }
     }
 

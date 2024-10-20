@@ -1,13 +1,13 @@
-import { EXPORTABLE } from 'postgraphile/tamedevil';
-import { isPgTableResource } from '../helpers';
+import { EXPORTABLE } from "postgraphile/tamedevil";
+import { isPgTableResource } from "../helpers";
 
 export const PostGraphileNestedMutationsUpdatePlugin: GraphileConfig.Plugin = {
-  name: 'PgNestedMutationUpdatePlugin',
-  description: 'Adds updateById and updateByKeys input types to schema',
+  name: "PgNestedMutationUpdatePlugin",
+  description: "Adds updateById and updateByKeys input types to schema",
   /* eslint-disable-next-line @typescript-eslint/no-var-requires */
-  version: require('../../package.json').version,
-  after: ['PgNestedMutationConnectPlugin'],
-  before: ['PgNestedMutationTypesPlugin'],
+  version: require("../../package.json").version,
+  after: ["PgNestedMutationConnectPlugin"],
+  before: ["PgNestedMutationTypesPlugin"],
 
   inflection: {
     add: {
@@ -33,24 +33,24 @@ export const PostGraphileNestedMutationsUpdatePlugin: GraphileConfig.Plugin = {
         return this.upperCamelCase(
           [
             rightTableFieldName,
-            'on',
+            "on",
             tableFieldName,
-            'for',
+            "for",
             ...constraintName,
-            'node',
-            'id',
-            'update',
-          ].join('_'),
+            "node",
+            "id",
+            "update",
+          ].join("_"),
         );
       },
       nestedUpdateByKeyFieldName(options, relationship) {
-        return '';
+        return "";
       },
       nestedUpdateByKeyInputType(options, relationship) {
-        return '';
+        return "";
       },
       nestedUpdatePatchType(options, relationship) {
-        return '';
+        return "";
       },
     },
   },
@@ -98,12 +98,12 @@ export const PostGraphileNestedMutationsUpdatePlugin: GraphileConfig.Plugin = {
                     () => ({
                       description: build.wrapDescription(
                         `The globally unique \`ID\` look up for the row to update`,
-                        'type',
+                        "type",
                       ),
                       fields: ({ fieldWithHooks }) => {
                         const patchType = build.getGraphQLTypeByPgCodec(
                           rightTable.codec,
-                          'patch',
+                          "patch",
                         );
 
                         if (!patchType) {
@@ -118,32 +118,32 @@ export const PostGraphileNestedMutationsUpdatePlugin: GraphileConfig.Plugin = {
                             () => ({
                               description: build.wrapDescription(
                                 `The globally unique \`ID\` which identifies a signle \`${rightTable.name}\` to be connected`,
-                                'field',
+                                "field",
                               ),
                               type: new GraphQLNonNull(GraphQLID),
                               autoApplyAfterParentApplyPlan: true,
                               applyPlan: EXPORTABLE(
                                 (nodeIdField) =>
                                   function plan($parent, args, info) {
-                                    console.log('CONSOLE2');
+                                    console.log("CONSOLE2");
                                     $parent.set(nodeIdField, args.get());
                                   },
                                 [nodeIdField],
                               ),
                             }),
                           ),
-                          patch: fieldWithHooks({ fieldName: 'patch' }, () => ({
+                          patch: fieldWithHooks({ fieldName: "patch" }, () => ({
                             description: build.wrapDescription(
-                              `The nested patch object for ${build.getGraphQLTypeNameByPgCodec(rightTable.codec, 'input')}`,
-                              'field',
+                              `The nested patch object for ${build.getGraphQLTypeNameByPgCodec(rightTable.codec, "input")}`,
+                              "field",
                             ),
                             type: new GraphQLNonNull(patchType),
                             autoApplyAfterParentApplyPlan: true,
                             applyPlan: EXPORTABLE(
                               () =>
                                 function plan($parent, args, info) {
-                                  console.log('CONSOLE');
-                                  $parent.set('patch', args.get());
+                                  console.log("CONSOLE");
+                                  $parent.set("patch", args.get());
                                 },
                               [],
                             ),

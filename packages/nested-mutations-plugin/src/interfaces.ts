@@ -6,22 +6,22 @@ import type {
   PgInsertSingleStep,
   PgResourceUnique,
   PgUpdateSingleStep,
-} from '@dataplan/pg';
-import type { PgTableResource } from '@graphile-contrib/pg-many-to-many';
-import type {} from 'postgraphile';
-import type { pgNestedMutationFields } from './get-nested-relationships';
+} from "@dataplan/pg";
+import type { PgTableResource } from "@graphile-contrib/pg-many-to-many";
+import type {} from "postgraphile";
+import type { pgNestedMutationFields } from "./get-nested-relationships";
 
 export type PgNestedConnectorsInflectionFn = (
   this: GraphileBuild.Inflection,
-  details: Omit<PgNestedMutationRelationship, 'mutationFields'>,
+  details: Omit<PgNestedMutationRelationship, "mutationFields">,
 ) => string;
 
 export type PgTableRelationship = ReturnType<
-  PgTableResource['getRelations']
+  PgTableResource["getRelations"]
 >[1];
 
 export type BuildInputObjectArguments = Parameters<
-  GraphileBuild.Build['registerInputObjectType']
+  GraphileBuild.Build["registerInputObjectType"]
 >;
 
 export interface PgNestedUniqueAttributeCodecs<
