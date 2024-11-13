@@ -2,7 +2,7 @@ import type {PgTableResource} from '@graphile-contrib/pg-many-to-many';
 import type {
   PgNestedMutationRelationship,
   PgNestedTableMutationFields,
-} from './interfaces.js';
+} from './interfaces.ts';
 
 export const pgNestedMutationFields = [
   'input',

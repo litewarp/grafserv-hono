@@ -11,10 +11,10 @@ import {
   type GrafastValuesList,
   type PromiseOrDirect,
   isDev,
-} from 'grafast';
+} from 'postgraphile/grafast';
 import {type SQL, sql} from 'postgraphile/pg-sql2';
-import {inspect} from '../helpers';
-import type {PgNestedMutationRelationship} from '../interfaces';
+import {inspect} from '../helpers.ts';
+import type {PgNestedMutationRelationship} from '../interfaces.ts';
 
 type PgNestedAttributeMap<TResource extends PgTableResource = PgTableResource> =
   {

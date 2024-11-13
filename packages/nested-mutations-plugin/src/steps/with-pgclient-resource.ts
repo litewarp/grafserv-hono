@@ -15,7 +15,7 @@ import {
   type SetterStep,
   access,
   setter,
-} from 'grafast';
+} from 'postgraphile/grafast';
 
 type PgResourceAttributes<TResource extends PgTableResource> =
   keyof TResource['codec']['attributes'];

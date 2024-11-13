@@ -4,9 +4,9 @@ import {
   type __InputListStep,
   type __InputObjectStep,
   specFromNodeId,
-} from 'grafast';
-import type {PgNestedMutationRelationship} from '../interfaces';
-import {nestedUpdateById} from '../steps/nested-update-by-id-step';
+} from 'postgraphile/grafast';
+import type {PgNestedMutationRelationship} from '../interfaces.ts';
+import {nestedUpdateById} from '../steps/nested-update-by-id-step.ts';
 
 export function buildUpdateByNodeIdField(
   relationship: PgNestedMutationRelationship,

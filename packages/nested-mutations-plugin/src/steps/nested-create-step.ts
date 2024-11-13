@@ -1,10 +1,10 @@
 import type {PgCodec} from '@dataplan/pg';
 import type {PgTableResource} from '@graphile-contrib/pg-many-to-many';
-import type {ExecutableStep} from 'grafast';
 import {constantCase} from 'graphile-build';
+import type {ExecutableStep} from 'postgraphile/grafast';
 import {type SQL, sql} from 'postgraphile/pg-sql2';
-import {inspect} from '../helpers';
-import {withPgClientResource} from './with-pgclient-resource';
+import {inspect} from '../helpers.ts';
+import {withPgClientResource} from './with-pgclient-resource.ts';
 
 export function nestedCreateStep(
   rightTable: PgTableResource,

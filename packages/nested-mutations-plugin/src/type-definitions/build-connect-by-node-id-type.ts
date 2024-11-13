@@ -1,4 +1,4 @@
-import type {PgNestedMutationRelationship} from '../interfaces';
+import type {PgNestedMutationRelationship} from '../interfaces.ts';
 
 export function buildConnectByNodeIdType(
   rel: PgNestedMutationRelationship,
