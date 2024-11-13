@@ -5,9 +5,7 @@ mutation ReverseUpdateByNodeId {
       patch: {
         parentName: "new mommy"
         childrenToIdUsingMomParentId: {
-          updateById: [
-            { id: "WyJDaGlsZCIsMV0==", patch: { name: "new kiddo" } }
-          ]
+          updateById: [{id: "WyJDaGlsZCIsMV0==", patch: {name: "new kiddo"}}]
         }
       }
     }

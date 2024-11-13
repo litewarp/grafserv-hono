@@ -7,7 +7,7 @@ mutation ForwardUpdateByNodeId {
         parentToDadParentId: {
           updateById: {
             id: "WyJQYXJlbnQiLDJd"
-            patch: { parentName: "revised daddy" }
+            patch: {parentName: "revised daddy"}
           }
         }
       }

@@ -1,21 +1,21 @@
-import type { PgTableResource } from "@graphile-contrib/pg-many-to-many";
+import type {PgTableResource} from '@graphile-contrib/pg-many-to-many';
 import type {
   PgNestedMutationRelationship,
   PgNestedTableMutationFields,
-} from "./interfaces.js";
+} from './interfaces.js';
 
 export const pgNestedMutationFields = [
-  "input",
-  "create",
-  "connectByKeys",
-  "connectByNodeId",
+  'input',
+  'create',
+  'connectByKeys',
+  'connectByNodeId',
 ] as const;
 
 export function getNestedRelationships(
   leftTable: PgTableResource,
-  build: GraphileBuild.Build,
+  build: GraphileBuild.Build
 ): PgNestedMutationRelationship[] {
-  const { inflection } = build;
+  const {inflection} = build;
 
   return Object.entries(leftTable.getRelations()).reduce<
     PgNestedMutationRelationship[]
@@ -32,30 +32,30 @@ export function getNestedRelationships(
     const isReverse = isReferencee;
 
     const localUnique = leftTable.uniques.find((u) =>
-      u.attributes.every((a) => localAttributes.includes(a)),
+      u.attributes.every((a) => localAttributes.includes(a))
     );
 
     const remoteUnique = rightTable.uniques.find((u) =>
-      u.attributes.every((a) => remoteAttributes.includes(a)),
+      u.attributes.every((a) => remoteAttributes.includes(a))
     );
 
     const localCodecs = Object.entries(leftTable.codec.attributes).reduce(
       (memoCodec, [k, v]) =>
         localUnique?.attributes.includes(k)
-          ? { ...memoCodec, [k]: v }
+          ? {...memoCodec, [k]: v}
           : memoCodec,
-      {},
+      {}
     );
 
     const remoteCodecs = Object.entries(rightTable.codec.attributes).reduce(
       (memoCodec, [k, v]) =>
         remoteUnique?.attributes.includes(k)
-          ? { ...memoCodec, [k]: v }
+          ? {...memoCodec, [k]: v}
           : memoCodec,
-      {},
+      {}
     );
 
-    const relationship: Omit<PgNestedMutationRelationship, "mutationFields"> = {
+    const relationship: Omit<PgNestedMutationRelationship, 'mutationFields'> = {
       leftTable,
       rightTable,
       relationName,
@@ -79,11 +79,11 @@ export function getNestedRelationships(
     // todo - remove non-null assertion
 
     if (!build.getNodeIdHandler) {
-      throw new Error("getNodeIdHandler not found on build");
+      throw new Error('getNodeIdHandler not found on build');
     }
 
     const nodeIdHandler = build.getNodeIdHandler(
-      inflection.tableType(rightTable.codec),
+      inflection.tableType(rightTable.codec)
     );
 
     const mutationFields: PgNestedTableMutationFields = {
@@ -99,7 +99,7 @@ export function getNestedRelationships(
        * TYpe that
        */
       create: {
-        fieldName: "create",
+        fieldName: 'create',
         typeName: inflection.nestedCreateInputType(relationship),
       },
 

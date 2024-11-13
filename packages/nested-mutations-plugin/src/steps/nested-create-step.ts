@@ -1,24 +1,24 @@
-import type { PgCodec } from "@dataplan/pg";
-import type { PgTableResource } from "@graphile-contrib/pg-many-to-many";
-import type { ExecutableStep } from "grafast";
-import { constantCase } from "graphile-build";
-import { sql, type SQL } from "postgraphile/pg-sql2";
-import { inspect } from "../helpers";
-import { withPgClientResource } from "./with-pgclient-resource";
+import type {PgCodec} from '@dataplan/pg';
+import type {PgTableResource} from '@graphile-contrib/pg-many-to-many';
+import type {ExecutableStep} from 'grafast';
+import {constantCase} from 'graphile-build';
+import {type SQL, sql} from 'postgraphile/pg-sql2';
+import {inspect} from '../helpers';
+import {withPgClientResource} from './with-pgclient-resource';
 
 export function nestedCreateStep(
   rightTable: PgTableResource,
-  args: ExecutableStep,
+  args: ExecutableStep
 ) {
   return withPgClientResource(
     rightTable,
     args,
-    async (client, data, { attributes, values: addedVals }) => {
+    async (client, data, {attributes, values: addedVals}) => {
       const resourceSource = rightTable.from;
 
       if (!sql.isSQL(resourceSource)) {
         throw new Error(
-          `Error in nested create field: can only insert into resources defined as SQL, however ${rightTable.name} has ${inspect(resourceSource)}`,
+          `Error in nested create field: can only insert into resources defined as SQL, however ${rightTable.name} has ${inspect(resourceSource)}`
         );
       }
 
@@ -35,7 +35,7 @@ export function nestedCreateStep(
         const codec = rightTable.codec.attributes[attrib]?.codec;
         if (!codec) {
           throw new Error(
-            `Could not find codec for attribute ${attrib} on ${rightTable.name}`,
+            `Could not find codec for attribute ${attrib} on ${rightTable.name}`
           );
         }
 
@@ -51,14 +51,14 @@ export function nestedCreateStep(
 
         if (v && addedVals.find(([key, _]) => key === snaked)) {
           console.warn(
-            `Passed both a step for attribute ${snaked} and a value on the insert objection for it. Defaulting to the value resolved from the step`,
+            `Passed both a step for attribute ${snaked} and a value on the insert objection for it. Defaulting to the value resolved from the step`
           );
           return;
         }
 
         // skip the non-node-id if enabled (e.g., "rowId")
         const codec = rightTable.codec.attributes[snaked]?.codec;
-        if (k === "rowId" || !v || !codec) {
+        if (k === 'rowId' || !v || !codec) {
           return;
         }
 
@@ -72,7 +72,7 @@ export function nestedCreateStep(
         const codec = rightTable.codec.attributes[k]?.codec;
         if (!codec) {
           throw new Error(
-            `Could not find codec for attribute ${k} on ${rightTable.name}`,
+            `Could not find codec for attribute ${k} on ${rightTable.name}`
           );
         }
         if (v) {
@@ -91,11 +91,11 @@ export function nestedCreateStep(
 
       const returning =
         frags.length > 0
-          ? sql`returning\n${sql.indent(sql.join(frags, ",\n"))}`
+          ? sql`returning\n${sql.indent(sql.join(frags, ',\n'))}`
           : sql.blank;
 
-      const insertedAttrs = sql.join(attrs, ", ");
-      const values = sql.join(vals, ", ");
+      const insertedAttrs = sql.join(attrs, ', ');
+      const values = sql.join(vals, ', ');
 
       const query = sql`insert into ${table} (${insertedAttrs}) values (${values})${returning}`;
 
@@ -103,11 +103,11 @@ export function nestedCreateStep(
         .withTransaction((tx) =>
           tx.query({
             ...sql.compile(query),
-          }),
+          })
         )
         .then((res) => res.rows[0] ?? Object.create(null));
 
       return res;
-    },
+    }
   );
 }

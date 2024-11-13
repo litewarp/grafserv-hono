@@ -1,23 +1,23 @@
-import type { PgNestedMutationRelationship } from "../interfaces";
+import type {PgNestedMutationRelationship} from '../interfaces';
 
 export function buildConnectByNodeIdType(
   rel: PgNestedMutationRelationship,
-  build: GraphileBuild.Build,
+  build: GraphileBuild.Build
 ): void {
   const {
     inflection,
-    graphql: { GraphQLNonNull, GraphQLID },
+    graphql: {GraphQLNonNull, GraphQLID},
   } = build;
 
   const {
-    mutationFields: { connectByNodeId },
+    mutationFields: {connectByNodeId},
     rightTable,
     relationName,
   } = rel;
 
   if (!connectByNodeId) {
     throw new Error(
-      `Could not find connectByNodeId field and type names for relation ${relationName}`,
+      `Could not find connectByNodeId field and type names for relation ${relationName}`
     );
   }
 
@@ -30,18 +30,18 @@ export function buildConnectByNodeIdType(
     () => ({
       description: build.wrapDescription(
         `The globally unique \`ID\` to be used in the connection.`,
-        "type",
+        'type'
       ),
-      fields: ({ fieldWithHooks }) => ({
+      fields: ({fieldWithHooks}) => ({
         [inflection.nodeIdFieldName()]: fieldWithHooks(
-          { fieldName: inflection.nodeIdFieldName() },
+          {fieldName: inflection.nodeIdFieldName()},
           () => ({
             description: `The globally unique \`ID\` which identifies a single \`${rightTable.name}\` to be connected.`,
             type: new GraphQLNonNull(GraphQLID),
-          }),
+          })
         ),
       }),
     }),
-    `Adding connect by nodeId input type for ${rightTable.name}`,
+    `Adding connect by nodeId input type for ${rightTable.name}`
   );
 }

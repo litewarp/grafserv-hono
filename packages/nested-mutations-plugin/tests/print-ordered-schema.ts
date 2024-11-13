@@ -1,10 +1,10 @@
-import type { GraphQLSchema } from "graphql";
+import type {GraphQLSchema} from 'graphql';
 import {
-  parse,
   buildASTSchema,
-  printSchema,
   lexicographicSortSchema,
-} from "graphql";
+  parse,
+  printSchema,
+} from 'graphql';
 
 export function printOrderedSchema(originalSchema: GraphQLSchema): string {
   // Clone schema so we don't damage anything

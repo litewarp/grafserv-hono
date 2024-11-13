@@ -1,24 +1,24 @@
 import {
-  PgResource,
   type PgClient,
   type PgCodec,
+  PgResource,
   type WithPgClient,
-} from "@dataplan/pg";
-import type { PgTableResource } from "@graphile-contrib/pg-many-to-many";
+} from '@dataplan/pg';
+import type {PgTableResource} from '@graphile-contrib/pg-many-to-many';
 import {
-  ExecutableStep,
   type AccessStep,
+  ExecutableStep,
   type ExecutionExtra,
   type GrafastResultsList,
   type GrafastValuesList,
-  access,
-  type SetterStep,
-  setter,
   type SetterCapableStep,
-} from "grafast";
+  type SetterStep,
+  access,
+  setter,
+} from 'grafast';
 
 type PgResourceAttributes<TResource extends PgTableResource> =
-  keyof TResource["codec"]["attributes"];
+  keyof TResource['codec']['attributes'];
 
 interface ContextValues {
   pgSettings: Record<string, string>;
@@ -40,8 +40,8 @@ export class WithTypedResourcePgClientStep<
   implements SetterCapableStep<Record<PgResourceAttributes<TResource>, any>>
 {
   static $$export = {
-    moduleName: "@litewarp/graphile-nested-mutations",
-    exportName: "WithTypedResourcePgClientStep",
+    moduleName: '@litewarp/graphile-nested-mutations',
+    exportName: 'WithTypedResourcePgClientStep',
   };
 
   isSyncAndSafe = false;
@@ -69,7 +69,7 @@ export class WithTypedResourcePgClientStep<
    */
   private writeAttributes = new Map<
     PgResourceAttributes<TResource>,
-    { name: string; depId: number; pgCodec: PgCodec }
+    {name: string; depId: number; pgCodec: PgCodec}
   >();
 
   /**
@@ -77,7 +77,7 @@ export class WithTypedResourcePgClientStep<
    */
   private attributes = new Map<
     PgResourceAttributes<TResource>,
-    { name: string; depId: null; pgCodec: PgCodec }
+    {name: string; depId: null; pgCodec: PgCodec}
   >();
 
   constructor(
@@ -89,8 +89,8 @@ export class WithTypedResourcePgClientStep<
       selections: {
         attributes: PgResourceAttributes<TResource>[];
         values: [PgResourceAttributes<TResource>, any][];
-      },
-    ) => Promise<TResult>,
+      }
+    ) => Promise<TResult>
   ) {
     super();
     this.resource = resource;
@@ -118,16 +118,16 @@ export class WithTypedResourcePgClientStep<
   execute(
     _count: number,
     values: GrafastValuesList<ContextValues | TData | TResult>[],
-    _extra: ExecutionExtra,
+    _extra: ExecutionExtra
   ): GrafastResultsList<TResult> {
     const contexts = values[this.contextId] as ContextValues[];
     const datas = values[this.dataId] as TData[];
 
-    return contexts.map(async ({ pgSettings, withPgClient }, i) => {
+    return contexts.map(async ({pgSettings, withPgClient}, i) => {
       const data = datas[i] as TData;
 
       const setValues = [...this.writeAttributes.values()]
-        .map(({ name, depId }) => {
+        .map(({name, depId}) => {
           const val = values[depId] && values[depId]?.[i];
           return val ? [name, val] : null;
         })
@@ -137,7 +137,7 @@ export class WithTypedResourcePgClientStep<
         this.callback(client, data, {
           values: setValues,
           attributes: [...this.attributes.keys()],
-        }),
+        })
       );
     });
   }
@@ -145,7 +145,7 @@ export class WithTypedResourcePgClientStep<
   setPlan(): SetterStep<Record<PgResourceAttributes<TResource>, any>, this> {
     if (this.locked) {
       throw new Error(
-        `${this}: cannot set values once plan is locked ('setPlan')`,
+        `${this}: cannot set values once plan is locked ('setPlan')`
       );
     }
     return setter(this);
@@ -161,23 +161,23 @@ export class WithTypedResourcePgClientStep<
 
   private _setAttribute(
     attr: PgResourceAttributes<TResource>,
-    depId?: number | null,
+    depId?: number | null
   ): void {
     const attribute = Object.entries(this.resource.codec.attributes).find(
-      ([name, _]) => name === attr,
+      ([name, _]) => name === attr
     );
 
     if (!attribute) {
       throw new Error(
-        `${this.resource.name} does not define an attribute named '${String(attr)}'`,
+        `${this.resource.name} does not define an attribute named '${String(attr)}'`
       );
     }
 
-    const { via, codec } = attribute[1];
+    const {via, codec} = attribute[1];
 
     if (via) {
       throw new Error(
-        `Cannot set or select a 'via' attribute from WithTypedResourcePgClientStep`,
+        `Cannot set or select a 'via' attribute from WithTypedResourcePgClientStep`
       );
     }
 
@@ -211,12 +211,12 @@ export function withPgClientResource<
     selections: {
       attributes: PgResourceAttributes<TResource>[];
       values: [PgResourceAttributes<TResource>, any][];
-    },
-  ) => Promise<Record<PgResourceAttributes<TResource>, any>>,
+    }
+  ) => Promise<Record<PgResourceAttributes<TResource>, any>>
 ): WithTypedResourcePgClientStep<TResource> {
   return new WithTypedResourcePgClientStep(
     resource,
     $data,
-    (client, data, selections) => callback(client, data, selections),
+    (client, data, selections) => callback(client, data, selections)
   );
 }

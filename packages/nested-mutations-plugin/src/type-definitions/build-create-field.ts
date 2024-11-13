@@ -1,20 +1,20 @@
-import { type GraphileBuild } from "graphile-build";
-import { type __InputListStep, type __InputObjectStep } from "grafast";
-import type { PgNestedMutationRelationship } from "../interfaces";
-import { isInsertOrUpdate } from "../helpers";
-import { nestedCreateStep } from "../steps/nested-create-step";
+import type {__InputListStep, __InputObjectStep} from 'grafast';
+import type {GraphileBuild} from 'graphile-build';
+import {isInsertOrUpdate} from '../helpers';
+import type {PgNestedMutationRelationship} from '../interfaces';
+import {nestedCreateStep} from '../steps/nested-create-step';
 
 export function buildCreateField(
   relationship: PgNestedMutationRelationship,
-  build: GraphileBuild.Build,
+  build: GraphileBuild.Build
 ): Parameters<GraphileBuild.InputFieldWithHooksFunction> {
   const {
     EXPORTABLE,
-    graphql: { GraphQLList, GraphQLNonNull },
+    graphql: {GraphQLList, GraphQLNonNull},
   } = build;
 
   const {
-    mutationFields: { create },
+    mutationFields: {create},
     rightTable,
     isReverse,
     isUnique,
@@ -23,7 +23,7 @@ export function buildCreateField(
 
   if (!create) {
     throw new Error(
-      `Could not find create field and type names for relation ${relationName}`,
+      `Could not find create field and type names for relation ${relationName}`
     );
   }
 
@@ -39,9 +39,9 @@ export function buildCreateField(
       description: build.wrapDescription(
         `A \`${build.getGraphQLTypeNameByPgCodec(
           rightTable.codec,
-          "input",
+          'input'
         )}\` object that will be created and connected to this object.`,
-        "field",
+        'field'
       ),
       type:
         !isReverse || isUnique
@@ -100,7 +100,7 @@ export function buildCreateField(
             }
           },
 
-        [isInsertOrUpdate, nestedCreateStep, relationship],
+        [isInsertOrUpdate, nestedCreateStep, relationship]
       ),
     },
   ];

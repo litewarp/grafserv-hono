@@ -5,7 +5,7 @@ test(
   'prints a schema with the nested mutations plugin',
   core.test(['p'], {
     appendPlugins: [require('../../../index.js')],
-  }),
+  })
 );
 
 test(
@@ -15,5 +15,5 @@ test(
       nestedMutationsSimpleFieldNames: true,
     },
     appendPlugins: [require('../../../index.js')],
-  }),
+  })
 );

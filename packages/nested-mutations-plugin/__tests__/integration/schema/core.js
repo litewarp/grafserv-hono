@@ -1,6 +1,6 @@
-const { createPostGraphileSchema } = require('postgraphile-core');
+const {createPostGraphileSchema} = require('postgraphile-core');
 const printSchemaOrdered = require('../../printSchemaOrdered');
-const { withPgClient } = require('../../helpers');
+const {withPgClient} = require('../../helpers');
 
 exports.test = (schemas, options, setup) => () =>
   withPgClient(async (client) => {

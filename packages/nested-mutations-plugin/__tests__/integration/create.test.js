@@ -1,5 +1,5 @@
-const { graphql } = require('graphql');
-const { withSchema } = require('../helpers');
+const {graphql} = require('graphql');
+const {withSchema} = require('../helpers');
 
 test(
   'table with no relations is not affected by plugin',
@@ -9,7 +9,7 @@ test(
       id serial primary key,
       name text not null
     );`,
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           createParent(
@@ -28,10 +28,10 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).not.toHaveProperty('errors');
     },
-  }),
+  })
 );
 
 test(
@@ -51,7 +51,7 @@ test(
           references p.parent (id)
       );   
     `,
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           createParent(
@@ -84,16 +84,16 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).not.toHaveProperty('errors');
 
       const data = result.data.createParent.parent;
       expect(data.childrenByParentId.nodes).toHaveLength(2);
       data.childrenByParentId.nodes.map((n) =>
-        expect(n.parentId).toBe(data.id),
+        expect(n.parentId).toBe(data.id)
       );
     },
-  }),
+  })
 );
 
 test(
@@ -115,7 +115,7 @@ test(
 
       insert into p.child values(1, null, 'test child 1');
     `,
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           createParent(
@@ -150,13 +150,13 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).not.toHaveProperty('errors');
 
       const data = result.data.createParent.parent;
       expect(data.childrenByParentId.nodes).toHaveLength(0);
     },
-  }),
+  })
 );
 
 test(
@@ -178,7 +178,7 @@ test(
 
       insert into p.child values(1, null, 'test child 1');
     `,
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           createParent(
@@ -213,13 +213,13 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).not.toHaveProperty('errors');
 
       const data = result.data.createParent.parent;
       expect(data.childrenByParentId.nodes).toHaveLength(0);
     },
-  }),
+  })
 );
 
 test(
@@ -241,7 +241,7 @@ test(
 
       insert into p.child values(6, null, 'test child 1');
     `,
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           a1: createParent(
@@ -280,10 +280,10 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).not.toHaveProperty('errors');
     },
-  }),
+  })
 );
 test(
   'forward deeply nested mutation creates records',
@@ -310,7 +310,7 @@ test(
           references p.child (id)
       );
     `,
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           createParent(
@@ -360,16 +360,16 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).not.toHaveProperty('errors');
 
       const data = result.data.createParent.parent;
       expect(data.childrenByParentId.nodes).toHaveLength(2);
       data.childrenByParentId.nodes.map((n) =>
-        expect(n.parentId).toBe(data.id),
+        expect(n.parentId).toBe(data.id)
       );
     },
-  }),
+  })
 );
 
 test(
@@ -393,7 +393,7 @@ test(
       insert into p.child values (124, null, 'unattached child');
       insert into p.child values (125, null, 'unattached child');
     `,
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const lookupQuery = `
         query {
           childById(id: 125) {
@@ -404,7 +404,7 @@ test(
       const lookupResult = await graphql(schema, lookupQuery, null, {
         pgClient,
       });
-      const { nodeId } = lookupResult.data.childById;
+      const {nodeId} = lookupResult.data.childById;
       expect(nodeId).not.toBeUndefined();
 
       const query = `
@@ -447,16 +447,16 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).not.toHaveProperty('errors');
 
       const data = result.data.createParent.parent;
       expect(data.childrenByParentId.nodes).toHaveLength(5);
       data.childrenByParentId.nodes.map((n) =>
-        expect(n.parentId).toBe(data.id),
+        expect(n.parentId).toBe(data.id)
       );
     },
-  }),
+  })
 );
 
 test(
@@ -476,7 +476,7 @@ test(
           references p.parent (id)
       );
     `,
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           createParent(
@@ -507,11 +507,11 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).toHaveProperty('errors');
       expect(result.errors[0].message).toMatch(/Mismatched type/);
     },
-  }),
+  })
 );
 
 test(
@@ -531,7 +531,7 @@ test(
           references p.parent (id)
       );   
     `,
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           createChild(
@@ -560,13 +560,13 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).not.toHaveProperty('errors');
 
       const data = result.data.createChild.child;
       expect(data.parentByParentId.id).toEqual(data.parentId);
     },
-  }),
+  })
 );
 
 test(
@@ -587,7 +587,7 @@ test(
       );
       insert into p.parent values (1000, 'parent 1');
     `,
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           createChild(
@@ -616,14 +616,14 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).not.toHaveProperty('errors');
 
       const data = result.data.createChild.child;
       expect(data.parentId).toEqual(1000);
       expect(data.parentByParentId.id).toEqual(data.parentId);
     },
-  }),
+  })
 );
 
 test(
@@ -644,7 +644,7 @@ test(
       );
       insert into p.parent values (1000, 'parent 1');
     `,
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const lookupQuery = `
         query {
           parentById(id: 1000) {
@@ -655,7 +655,7 @@ test(
       const lookupResult = await graphql(schema, lookupQuery, null, {
         pgClient,
       });
-      const { nodeId } = lookupResult.data.parentById;
+      const {nodeId} = lookupResult.data.parentById;
       expect(nodeId).not.toBeUndefined();
 
       const query = `
@@ -686,14 +686,14 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).not.toHaveProperty('errors');
 
       const data = result.data.createChild.child;
       expect(data.parentId).toEqual(1000);
       expect(data.parentByParentId.id).toEqual(data.parentId);
     },
-  }),
+  })
 );
 
 test(
@@ -713,7 +713,7 @@ test(
           references p.parent (id)
       );
     `,
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           createParent(
@@ -749,16 +749,16 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).not.toHaveProperty('errors');
 
       const data = result.data.createParent.parent;
       expect(data.childrenByParentId.nodes).toHaveLength(2);
       data.childrenByParentId.nodes.map((n) =>
-        expect(n.parentId).toEqual(data.id),
+        expect(n.parentId).toEqual(data.id)
       );
     },
-  }),
+  })
 );
 
 test(
@@ -780,7 +780,7 @@ test(
           references p.parent (id, name)
       );
     `,
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           createParent(
@@ -814,16 +814,16 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).not.toHaveProperty('errors');
 
       const data = result.data.createParent.parent;
       expect(data.childrenByParentIdAndParentName.nodes).toHaveLength(2);
       data.childrenByParentIdAndParentName.nodes.map((n) =>
-        expect([n.parentId, n.parentName]).toEqual([data.id, data.name]),
+        expect([n.parentId, n.parentName]).toEqual([data.id, data.name])
       );
     },
-  }),
+  })
 );
 
 // https://github.com/mlipscombe/postgraphile-plugin-nested-mutations/issues/1
@@ -845,7 +845,7 @@ test(
         foreign key (parent_id) references p.parent (id)
       );
     `,
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           createParent(
@@ -880,16 +880,16 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).not.toHaveProperty('errors');
 
       const data = result.data.createParent.parent;
       expect(data.childrenByParentId.nodes).toHaveLength(2);
       data.childrenByParentId.nodes.map((n) =>
-        expect(n.parentId).toBe(data.id),
+        expect(n.parentId).toBe(data.id)
       );
     },
-  }),
+  })
 );
 
 // https://github.com/mlipscombe/postgraphile-plugin-nested-mutations/issues/9
@@ -907,7 +907,7 @@ test(
       to_job_id integer references p.job(id)
     );
         `,
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           createJob(
@@ -943,14 +943,14 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).not.toHaveProperty('errors');
 
       const data = result.data.createJob.job;
       expect(data.jobRelationshipsByToJobId.nodes).toHaveLength(1);
       expect(data.jobRelationshipsByFromJobId.nodes).toHaveLength(0);
     },
-  }),
+  })
 );
 
 // https://github.com/mlipscombe/postgraphile-plugin-nested-mutations/issues/33
@@ -966,7 +966,7 @@ test(
           references p.person(id)
       );
     `,
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           createPerson(
@@ -1006,13 +1006,13 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).not.toHaveProperty('errors');
 
       const data = result.data.createPerson.person;
       expect(data.personByParentId).toHaveProperty('id');
     },
-  }),
+  })
 );
 
 // https://github.com/mlipscombe/postgraphile-plugin-nested-mutations/issues/31
@@ -1024,7 +1024,7 @@ test(
       CREATE TABLE p.b (b_id SERIAL PRIMARY KEY, name TEXT);
       CREATE TABLE p.a_b (a_id INT REFERENCES p.a(a_id), b_id INT REFERENCES p.b(b_id), PRIMARY KEY (a_id, b_id));
     `,
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation  {
           createA(
@@ -1036,13 +1036,13 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).not.toHaveProperty('errors');
 
       // const data = result.data.createPerson.person;
       // expect(data.personByParentId).toHaveProperty('id');
     },
-  }),
+  })
 );
 
 test(
@@ -1062,7 +1062,7 @@ test(
           references p.parent (id)
       );
     `,
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           createChild(
@@ -1093,13 +1093,13 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).not.toHaveProperty('errors');
 
       const data = result.data.createChild.child;
       expect(data.parentByParentId.id).toEqual(data.parentId);
     },
-  }),
+  })
 );
 
 test(
@@ -1119,7 +1119,7 @@ test(
           references p.parent (parent_id)
       );
     `,
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           createChild(
@@ -1149,11 +1149,11 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).not.toHaveProperty('errors');
 
       const data = result.data.createChild.child;
       expect(data.parentByParentId.parentId).toEqual(data.parentId);
     },
-  }),
+  })
 );

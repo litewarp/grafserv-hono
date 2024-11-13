@@ -1,7 +1,7 @@
-const { readFile } = require('node:fs');
+const {readFile} = require('node:fs');
 const pg = require('pg');
 const pgConnectionString = require('pg-connection-string');
-const { createPostGraphileSchema } = require('postgraphile-core');
+const {createPostGraphileSchema} = require('postgraphile-core');
 
 function readFilePromise(filename, encoding) {
   return new Promise((resolve, reject) => {
@@ -12,7 +12,7 @@ function readFilePromise(filename, encoding) {
   });
 }
 
-const kitchenSinkData = () => readFilePromise(`${__dirname}/data.sql`, 'utf8');
+const _kitchenSinkData = () => readFilePromise(`${__dirname}/data.sql`, 'utf8');
 
 const withPgClient = async (url, fn) => {
   if (!fn) {
@@ -62,7 +62,7 @@ const withPrepopulatedDb = async (fn) => {
   if (!prepopulatedDBKeepalive) {
     throw new Error('You must call setup and teardown to use this');
   }
-  const { client, vars } = prepopulatedDBKeepalive;
+  const {client, vars} = prepopulatedDBKeepalive;
   if (!vars) {
     throw new Error('No prepopulated vars');
   }
@@ -117,7 +117,7 @@ withPrepopulatedDb.teardown = () => {
 };
 
 const withSchema =
-  ({ setup, test, options = {} }) =>
+  ({setup, test, options = {}}) =>
   () =>
     withPgClient(async (client) => {
       if (setup) {
@@ -137,7 +137,7 @@ const withSchema =
       const schema = await createPostGraphileSchema(
         client,
         ['p'],
-        schemaOptions,
+        schemaOptions
       );
       return test({
         schema,

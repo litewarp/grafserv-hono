@@ -1,7 +1,7 @@
-import type { PgResource } from "@dataplan/pg";
-import { PgInsertSingleStep, PgUpdateSingleStep } from "@dataplan/pg";
-import type { PgTableResource } from "@graphile-contrib/pg-many-to-many";
-import type { ExecutableStep } from "grafast";
+import type {PgResource} from '@dataplan/pg';
+import {PgInsertSingleStep, PgUpdateSingleStep} from '@dataplan/pg';
+import type {PgTableResource} from '@graphile-contrib/pg-many-to-many';
+import type {ExecutableStep} from 'grafast';
 
 export function isPgTableResource(r: PgResource): r is PgTableResource {
   return Boolean(r.codec.attributes) && !r.parameters;
@@ -9,42 +9,42 @@ export function isPgTableResource(r: PgResource): r is PgTableResource {
 
 export const isInsertable = (
   build: GraphileBuild.Build,
-  resource: PgResource<any, any, any, any, any>,
+  resource: PgResource<any, any, any, any, any>
 ) => {
   if (resource.parameters) return false;
   if (!resource.codec.attributes) return false;
   if (resource.codec.polymorphism) return false;
   if (resource.codec.isAnonymous) return false;
-  return build.behavior.pgResourceMatches(resource, "resource:insert") === true;
+  return build.behavior.pgResourceMatches(resource, 'resource:insert') === true;
 };
 
 export const isUpdatable = (
   build: GraphileBuild.Build,
-  resource: PgResource<any, any, any, any, any>,
+  resource: PgResource<any, any, any, any, any>
 ) => {
   if (resource.parameters) return false;
   if (!resource.codec.attributes) return false;
   if (resource.codec.polymorphism) return false;
   if (resource.codec.isAnonymous) return false;
   if (!resource.uniques || resource.uniques.length < 1) return false;
-  return Boolean(build.behavior.pgResourceMatches(resource, "resource:update"));
+  return Boolean(build.behavior.pgResourceMatches(resource, 'resource:update'));
 };
 
 export const isDeletable = (
   build: GraphileBuild.Build,
-  resource: PgResource<any, any, any, any, any>,
+  resource: PgResource<any, any, any, any, any>
 ) => {
   if (resource.parameters) return false;
   if (!resource.codec.attributes) return false;
   if (resource.codec.polymorphism) return false;
   if (resource.codec.isAnonymous) return false;
   if (!resource.uniques || resource.uniques.length < 1) return false;
-  return Boolean(build.behavior.pgResourceMatches(resource, "resource:delete"));
+  return Boolean(build.behavior.pgResourceMatches(resource, 'resource:delete'));
 };
 
 export const getCRUDBehavior = (
   build: GraphileBuild.Build,
-  resource: PgResource<any, any, any, any, any>,
+  resource: PgResource<any, any, any, any, any>
 ) => {
   if (resource.parameters) return {};
   if (!resource.codec.attributes) return {};
@@ -61,7 +61,7 @@ export const getCRUDBehavior = (
 };
 
 export function isInsertOrUpdate(
-  $step: ExecutableStep,
+  $step: ExecutableStep
 ): $step is PgInsertSingleStep | PgUpdateSingleStep {
   return (
     $step instanceof PgInsertSingleStep || $step instanceof PgUpdateSingleStep
@@ -70,13 +70,13 @@ export function isInsertOrUpdate(
 
 export let inspect: (
   obj: any,
-  options?: { colors?: boolean; depth?: number },
+  options?: {colors?: boolean; depth?: number}
 ) => string;
 
 try {
-  inspect = require("node:util").inspect;
-  if (typeof inspect !== "function") {
-    throw new Error("Failed to load inspect");
+  inspect = require('node:util').inspect;
+  if (typeof inspect !== 'function') {
+    throw new Error('Failed to load inspect');
   }
 } catch {
   inspect = (obj) => {

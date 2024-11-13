@@ -5,7 +5,7 @@ type IncomingHttpHeaders = Record<
 >;
 
 export function processHeaders(
-  headers: IncomingHttpHeaders,
+  headers: IncomingHttpHeaders
 ): Record<string, string> {
   const headerDigest: Record<string, string> = Object.create(null);
   for (const key in headers) {
@@ -13,12 +13,12 @@ export function processHeaders(
     if (val == null) {
       continue;
     }
-    if (typeof val === "string") {
+    if (typeof val === 'string') {
       headerDigest[key] = val;
-    } else if (typeof val === "number") {
+    } else if (typeof val === 'number') {
       headerDigest[key] = val.toString();
     } else {
-      headerDigest[key] = val.join("\n");
+      headerDigest[key] = val.join('\n');
     }
   }
   return headerDigest;

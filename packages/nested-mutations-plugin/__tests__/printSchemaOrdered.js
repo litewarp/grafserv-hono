@@ -1,5 +1,5 @@
-const { parse, buildASTSchema } = require('graphql');
-const { printSchema } = require('graphql/utilities');
+const {parse, buildASTSchema} = require('graphql');
+const {printSchema} = require('graphql/utilities');
 
 module.exports = function printSchemaOrdered(originalSchema) {
   // Clone schema so we don't damage anything

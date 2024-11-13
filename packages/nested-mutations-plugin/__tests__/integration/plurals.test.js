@@ -1,5 +1,5 @@
-const { graphql } = require('graphql');
-const { withSchema } = require('../helpers');
+const {graphql} = require('graphql');
+const {withSchema} = require('../helpers');
 
 test(
   'plural when one-to-many, singular in reverse',
@@ -18,7 +18,7 @@ test(
           references p.parent (id)
       );   
     `,
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           c1: createParent(
@@ -58,10 +58,10 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).not.toHaveProperty('errors');
     },
-  }),
+  })
 );
 
 test(
@@ -80,7 +80,7 @@ test(
           references p.parent (id)
       );   
     `,
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           c1: createParent(
@@ -120,10 +120,10 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).not.toHaveProperty('errors');
     },
-  }),
+  })
 );
 
 // https://github.com/mlipscombe/postgraphile-plugin-nested-mutations/issues/7
@@ -142,7 +142,7 @@ test(
         url TEXT NOT NULL
       );
     `,
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           c1: createPost(
@@ -182,10 +182,10 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).not.toHaveProperty('errors');
     },
-  }),
+  })
 );
 
 test(
@@ -203,7 +203,7 @@ test(
         url TEXT NOT NULL
       );
     `,
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           c1: createPost(
@@ -249,11 +249,11 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).toHaveProperty('errors');
       expect(result.errors[0].message).toMatch(
-        /may only create or connect a single row/,
+        /may only create or connect a single row/
       );
     },
-  }),
+  })
 );

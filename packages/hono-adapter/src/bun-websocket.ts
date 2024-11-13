@@ -1,21 +1,17 @@
-import { ConnectionInitMessage, makeServer, type Server } from "graphql-ws";
-import { createBunWebSocket } from "hono/bun";
-import type {
-  BunWebSocketData,
-  BunWebSocketHandler,
-  WsClient,
-} from "./types.js";
-import type { WSContext } from "hono/ws";
-import { type GrafservBase, makeGraphQLWSConfig } from "postgraphile/grafserv";
+import {type ConnectionInitMessage, type Server, makeServer} from 'graphql-ws';
+import {createBunWebSocket} from 'hono/bun';
+import type {WSContext} from 'hono/ws';
+import {type GrafservBase, makeGraphQLWSConfig} from 'postgraphile/grafserv';
+import type {BunWebSocketData, BunWebSocketHandler, WsClient} from './types.js';
 
-const { upgradeWebSocket, websocket: bunWs } = createBunWebSocket();
+const {upgradeWebSocket, websocket: bunWs} = createBunWebSocket();
 
 /**
  * The WebSocket sub-protocol used for the [GraphQL over WebSocket Protocol](https://github.com/graphql/graphql-over-http/blob/main/rfcs/GraphQLOverWebSocket.md).
  *
  * @category Common
  */
-export const GRAPHQL_TRANSPORT_WS_PROTOCOL = "graphql-transport-ws";
+export const GRAPHQL_TRANSPORT_WS_PROTOCOL = 'graphql-transport-ws';
 
 /*
  * Export the websocket transport for Bun
@@ -24,11 +20,11 @@ export const GRAPHQL_TRANSPORT_WS_PROTOCOL = "graphql-transport-ws";
 export const websocket: BunWebSocketHandler<BunWebSocketData> = bunWs;
 
 export const makeBunServer = (instance: GrafservBase) =>
-  makeServer<ConnectionInitMessage["payload"], { socket: WSContext }>(
-    makeGraphQLWSConfig(instance),
+  makeServer<ConnectionInitMessage['payload'], {socket: WSContext}>(
+    makeGraphQLWSConfig(instance)
   );
 
-export const createBunWsMiddleware = (server: Server<{ socket: WSContext }>) =>
+export const createBunWsMiddleware = (server: Server<{socket: WSContext}>) =>
   upgradeWebSocket((_c) => {
     const clients = new WeakMap<WSContext, WsClient>();
 
@@ -60,7 +56,7 @@ export const createBunWsMiddleware = (server: Server<{ socket: WSContext }>) =>
             },
             onMessage: (cb) => (client.handleMessage = cb),
           },
-          { socket: ws },
+          {socket: ws}
         );
 
         clients.set(ws, client);
@@ -79,8 +75,8 @@ export const createBunWsMiddleware = (server: Server<{ socket: WSContext }>) =>
         }
         return client.closed(evt.code, evt.reason);
       },
-      onError: (evt, ws) => {
-        console.log("WebSocket error", evt);
+      onError: (evt, _ws) => {
+        console.log('WebSocket error', evt);
       },
     };
   });

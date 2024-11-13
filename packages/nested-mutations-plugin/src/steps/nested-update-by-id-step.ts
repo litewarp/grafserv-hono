@@ -1,25 +1,25 @@
-import {
-  ExecutableStep,
-  isDev,
-  type ExecutionExtra,
-  type GrafastResultsList,
-  type GrafastValuesList,
-  type PromiseOrDirect,
-} from "grafast";
 import type {
   GetPgResourceAttributes,
   PgCodec,
   PgTypedExecutableStep,
-} from "@dataplan/pg";
-import type { PgTableResource } from "@graphile-contrib/pg-many-to-many";
-import { sql, type SQL } from "postgraphile/pg-sql2";
-import type { PgNestedMutationRelationship } from "../interfaces";
-import { inspect } from "../helpers";
+} from '@dataplan/pg';
+import type {PgTableResource} from '@graphile-contrib/pg-many-to-many';
+import {
+  ExecutableStep,
+  type ExecutionExtra,
+  type GrafastResultsList,
+  type GrafastValuesList,
+  type PromiseOrDirect,
+  isDev,
+} from 'grafast';
+import {type SQL, sql} from 'postgraphile/pg-sql2';
+import {inspect} from '../helpers';
+import type {PgNestedMutationRelationship} from '../interfaces';
 
 type PgNestedAttributeMap<TResource extends PgTableResource = PgTableResource> =
   {
-    [key in keyof GetPgResourceAttributes<TResource> | "patch"]?:
-      | PgTypedExecutableStep<GetPgResourceAttributes<TResource>[key]["codec"]>
+    [key in keyof GetPgResourceAttributes<TResource> | 'patch']?:
+      | PgTypedExecutableStep<GetPgResourceAttributes<TResource>[key]['codec']>
       | ExecutableStep;
   };
 
@@ -27,8 +27,8 @@ export class PgNestedMutationUpdateByIdStep<
   TNestedResource extends PgTableResource = PgTableResource,
 > extends ExecutableStep {
   static $$export = {
-    moduleName: "postgraphile-plugin-nested-mutations",
-    exportName: "PgNestedMutationUpdateByIdStep",
+    moduleName: 'postgraphile-plugin-nested-mutations',
+    exportName: 'PgNestedMutationUpdateByIdStep',
   };
 
   isSyncAndSafe = false;
@@ -42,14 +42,14 @@ export class PgNestedMutationUpdateByIdStep<
   private locked = false;
 
   private attributes: {
-    name: keyof GetPgResourceAttributes<TNestedResource> | "patch";
+    name: keyof GetPgResourceAttributes<TNestedResource> | 'patch';
     depId: number;
     pgCodec: PgCodec;
   }[] = [];
 
   constructor(
     rel: PgNestedMutationRelationship,
-    args: PgNestedAttributeMap<TNestedResource>,
+    args: PgNestedAttributeMap<TNestedResource>
   ) {
     super();
     this.rightTable = rel.rightTable;
@@ -66,7 +66,7 @@ export class PgNestedMutationUpdateByIdStep<
   async execute(
     count: number,
     values: readonly GrafastValuesList<any>[],
-    _extra: ExecutionExtra,
+    _extra: ExecutionExtra
   ): Promise<GrafastResultsList<any>> {
     const result: PromiseOrDirect<any>[] = [];
 
@@ -77,25 +77,25 @@ export class PgNestedMutationUpdateByIdStep<
 
     if (!sql.isSQL(resourceSource)) {
       throw new Error(
-        `Error in nested updateById field: can only update into resources defined as SQL, however ${tableName} has ${inspect(resourceSource)}`,
+        `Error in nested updateById field: can only update into resources defined as SQL, however ${tableName} has ${inspect(resourceSource)}`
       );
     }
     const table = sql`${resourceSource} AS ${tableAlias}`;
     for (let i = 0; i < count; i++) {
       const value = values.map((v) => v[i]);
 
-      const patch = this.attributes.find((attr) => attr.name === "patch");
+      const patch = this.attributes.find((attr) => attr.name === 'patch');
 
-      const ids = this.attributes.filter((attr) => attr.name !== "patch");
+      const ids = this.attributes.filter((attr) => attr.name !== 'patch');
 
       const sqlWhereClauses: SQL[] = [];
       const sqlSets: SQL[] = [];
       const sqlSelects: SQL[] = [];
 
       ids.forEach((attr, index) => {
-        const { name, depId, pgCodec } = attr;
+        const {name, depId, pgCodec} = attr;
         sqlWhereClauses[index] = sql.parens(
-          sql`${sql.identifier(tableSymbol, name.toString())} = ${sql.value(pgCodec.toPg(value[depId]))}`,
+          sql`${sql.identifier(tableSymbol, name.toString())} = ${sql.value(pgCodec.toPg(value[depId]))}`
         );
       });
 
@@ -117,12 +117,12 @@ export class PgNestedMutationUpdateByIdStep<
             sqlSelects[i] = sql`${value} as ${identifier}`;
           });
       }
-      const set = sql` set ${sql.join(sqlSets, ", ")}`;
-      const where = sql` where ${sql.parens(sql.join(sqlWhereClauses, " and "))}`;
+      const set = sql` set ${sql.join(sqlSets, ', ')}`;
+      const where = sql` where ${sql.parens(sql.join(sqlWhereClauses, ' and '))}`;
 
       const returning =
         sqlSelects.length > 0
-          ? sql` returning\n${sql.indent(sql.join(sqlSelects, "\n"))}`
+          ? sql` returning\n${sql.indent(sql.join(sqlSelects, '\n'))}`
           : sql.blank;
 
       const query = sql`update ${table}${set}${where}${returning};`;
@@ -134,27 +134,27 @@ export class PgNestedMutationUpdateByIdStep<
         ...compiled,
       });
 
-      result[i] = promise.then(({ rows }) => rows[0] ?? Object.create(null));
+      result[i] = promise.then(({rows}) => rows[0] ?? Object.create(null));
     }
 
     return result;
   }
 
   set<TKey extends keyof GetPgResourceAttributes<TNestedResource>>(
-    name: TKey | "patch",
-    value: ExecutableStep, // | PgTypedExecutableStep<TAttributes[TKey]["codec"]>
+    name: TKey | 'patch',
+    value: ExecutableStep // | PgTypedExecutableStep<TAttributes[TKey]["codec"]>
   ): void {
     if (this.locked) {
-      throw new Error("Cannot set after plan is locked.");
+      throw new Error('Cannot set after plan is locked.');
     }
     if (isDev) {
       if (this.attributes.some((col) => col.name === name)) {
         throw new Error(
-          `Attribute '${String(name)}' was specified more than once in ${this.relationName} updateById mutation`,
+          `Attribute '${String(name)}' was specified more than once in ${this.relationName} updateById mutation`
         );
       }
     }
-    if (name === "patch") {
+    if (name === 'patch') {
       this.attributes.push({
         name,
         depId: this.addDependency(value),
@@ -162,11 +162,11 @@ export class PgNestedMutationUpdateByIdStep<
       });
     } else {
       const attribute = Object.entries(this.rightTable.codec.attributes).find(
-        ([k, _v]) => k === name,
+        ([k, _v]) => k === name
       );
       if (!attribute) {
         throw new Error(
-          `Attribute ${String(name)} not found in ${this.rightTable.name}`,
+          `Attribute ${String(name)} not found in ${this.rightTable.name}`
         );
       }
       this.attributes.push({
@@ -182,7 +182,7 @@ export function nestedUpdateById<
   TNestedResource extends PgTableResource = PgTableResource,
 >(
   rel: PgNestedMutationRelationship,
-  $args: PgNestedAttributeMap<TNestedResource>,
+  $args: PgNestedAttributeMap<TNestedResource>
 ) {
   return new PgNestedMutationUpdateByIdStep<TNestedResource>(rel, $args);
 }

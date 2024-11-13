@@ -1,5 +1,5 @@
-const { graphql } = require('graphql');
-const { withSchema } = require('../helpers');
+const {graphql} = require('graphql');
+const {withSchema} = require('../helpers');
 
 test(
   '@omit create on child table inhibits nested create',
@@ -19,7 +19,7 @@ test(
       );   
       comment on table p.child is E'@omit create';
     `,
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           createParent(
@@ -52,11 +52,11 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).toHaveProperty('errors');
       expect(result.errors[0].message).toMatch(/"create" is not defined/);
     },
-  }),
+  })
 );
 
 test(
@@ -77,7 +77,7 @@ test(
       );   
       comment on constraint child_parent_fkey on p.child is E'@omit';
     `,
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           createParent(
@@ -110,13 +110,13 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).toHaveProperty('errors');
       expect(result.errors[0].message).toMatch(
-        /"childrenUsingId" is not defined/,
+        /"childrenUsingId" is not defined/
       );
     },
-  }),
+  })
 );
 
 test(
@@ -137,7 +137,7 @@ test(
       );   
       comment on column p.child.parent_id is E'@omit create';
     `,
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           createParent(
@@ -170,11 +170,11 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).toHaveProperty('errors');
       expect(result.errors[0].message).toMatch(/"create" is not defined/);
     },
-  }),
+  })
 );
 
 test(
@@ -195,7 +195,7 @@ test(
           references p.parent (id)
       );   
     `,
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           createParent(
@@ -228,16 +228,16 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).not.toHaveProperty('errors');
 
       const data = result.data.createParent.parent;
       expect(data.childrenByParentId.nodes).toHaveLength(2);
       data.childrenByParentId.nodes.map((n) =>
-        expect(n.parentId).toBe(data.id),
+        expect(n.parentId).toBe(data.id)
       );
     },
-  }),
+  })
 );
 
 test(
@@ -258,7 +258,7 @@ test(
       );
       comment on constraint child_parent_fkey on p.child is E'@name parentChildRelation';
     `,
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           createParent(
@@ -291,16 +291,16 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).not.toHaveProperty('errors');
 
       const data = result.data.createParent.parent;
       expect(data.childrenByParentId.nodes).toHaveLength(2);
       data.childrenByParentId.nodes.map((n) =>
-        expect(n.parentId).toBe(data.id),
+        expect(n.parentId).toBe(data.id)
       );
     },
-  }),
+  })
 );
 
 test(
@@ -321,7 +321,7 @@ test(
       );
       comment on constraint child_parent_fkey on p.child is E'@forwardMutationName susan';
     `,
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           createChild (
@@ -350,13 +350,13 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).not.toHaveProperty('errors');
 
       const data = result.data.createChild.child;
       expect(data.parentByParentId.id).toEqual(data.parentId);
     },
-  }),
+  })
 );
 
 test(
@@ -377,7 +377,7 @@ test(
       );
       comment on constraint child_parent_fkey on p.child is E'@fieldName susan';
     `,
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           createChild (
@@ -406,13 +406,13 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).not.toHaveProperty('errors');
 
       const data = result.data.createChild.child;
       expect(data.susan.id).toEqual(data.parentId);
     },
-  }),
+  })
 );
 
 test(
@@ -433,7 +433,7 @@ test(
       );
       comment on constraint child_parent_fkey on p.child is E'@reverseMutationName jane';
     `,
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           createParent(
@@ -466,16 +466,16 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).not.toHaveProperty('errors');
 
       const data = result.data.createParent.parent;
       expect(data.childrenByParentId.nodes).toHaveLength(2);
       data.childrenByParentId.nodes.map((n) =>
-        expect(n.parentId).toBe(data.id),
+        expect(n.parentId).toBe(data.id)
       );
     },
-  }),
+  })
 );
 
 test(
@@ -496,7 +496,7 @@ test(
       );
       comment on constraint child_parent_fkey on p.child is E'@foreignFieldName jane';
     `,
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           createParent(
@@ -529,14 +529,14 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).not.toHaveProperty('errors');
 
       const data = result.data.createParent.parent;
       expect(data.jane.nodes).toHaveLength(2);
       data.jane.nodes.map((n) => expect(n.parentId).toBe(data.id));
     },
-  }),
+  })
 );
 
 test(
@@ -557,7 +557,7 @@ test(
       );   
       comment on table p.child is E'@omit read,update,create,delete,all,many';
     `,
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           createParent(
@@ -590,11 +590,11 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).toHaveProperty('errors');
       expect(result.errors[0].message).toMatch(
-        /"childrenUsingId" is not defined/,
+        /"childrenUsingId" is not defined/
       );
     },
-  }),
+  })
 );

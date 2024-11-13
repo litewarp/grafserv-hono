@@ -1,5 +1,5 @@
-const { graphql } = require('graphql');
-const { withSchema } = require('../helpers');
+const {graphql} = require('graphql');
+const {withSchema} = require('../helpers');
 
 test(
   'simple names, plural when one-to-many, singular in reverse',
@@ -23,7 +23,7 @@ test(
         nestedMutationsSimpleFieldNames: true,
       },
     },
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           c1: createParent(
@@ -63,10 +63,10 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).not.toHaveProperty('errors');
     },
-  }),
+  })
 );
 
 test(
@@ -90,7 +90,7 @@ test(
         nestedMutationsSimpleFieldNames: true,
       },
     },
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           c1: createParent(
@@ -130,10 +130,10 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).not.toHaveProperty('errors');
     },
-  }),
+  })
 );
 
 test(
@@ -160,7 +160,7 @@ test(
         nestedMutationsDeleteOthers: false,
       },
     },
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           updateParentById(
@@ -192,11 +192,11 @@ test(
           }
         }
       `;
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).toHaveProperty('errors');
       expect(result.errors[0].message).toMatch(/"deleteOthers" is not defined/);
     },
-  }),
+  })
 );
 
 test(
@@ -220,7 +220,7 @@ test(
         nestedMutationsOldUniqueFields: true,
       },
     },
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           createParent(
@@ -243,10 +243,10 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).not.toHaveProperty('errors');
     },
-  }),
+  })
 );
 
 // from https://github.com/mlipscombe/postgraphile-plugin-nested-mutations/issues/40
@@ -267,7 +267,7 @@ test(
     options: {
       classicIds: true,
     },
-    test: async ({ schema, pgClient }) => {
+    test: async ({schema, pgClient}) => {
       const query = `
         mutation {
           createParent(
@@ -297,8 +297,8 @@ test(
       `;
       expect(schema).toMatchSnapshot();
 
-      const result = await graphql(schema, query, null, { pgClient });
+      const result = await graphql(schema, query, null, {pgClient});
       expect(result).not.toHaveProperty('errors');
     },
-  }),
+  })
 );

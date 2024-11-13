@@ -4,9 +4,7 @@ mutation AddParentFromChild {
     input: {
       child: {
         name: "Me first but what about required constraints"
-        parentToDadParentId: {
-          create: { parentName: "my father this of thee" }
-        }
+        parentToDadParentId: {create: {parentName: "my father this of thee"}}
       }
     }
   ) {

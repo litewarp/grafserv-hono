@@ -1,12 +1,12 @@
-import "graphile-config";
-import type { GraphileConfig } from "graphile-config";
-import "postgraphile";
-import { makePgService } from "postgraphile/adaptors/pg";
-import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
-import { makeV4Preset } from "postgraphile/presets/v4";
-import { PostGraphileRelayPreset } from "postgraphile/presets/relay";
+import 'graphile-config';
+import type {GraphileConfig} from 'graphile-config';
+import 'postgraphile';
+import {makePgService} from 'postgraphile/adaptors/pg';
+import {PostGraphileAmberPreset} from 'postgraphile/presets/amber';
+import {PostGraphileRelayPreset} from 'postgraphile/presets/relay';
+import {makeV4Preset} from 'postgraphile/presets/v4';
 
-const isProduction = process.env.NODE_ENV === "production";
+const isProduction = process.env.NODE_ENV === 'production';
 
 const preset: GraphileConfig.Preset = {
   extends: [
@@ -24,7 +24,7 @@ const preset: GraphileConfig.Preset = {
   pgServices: [
     makePgService({
       connectionString: process.env.POSTGRES_DB_URL,
-      schemas: ["public", "app_public", "app_private"],
+      schemas: ['public', 'app_public', 'app_private'],
     }),
   ],
 };

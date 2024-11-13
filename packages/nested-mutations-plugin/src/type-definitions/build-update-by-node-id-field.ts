@@ -1,21 +1,21 @@
+import {} from '@dataplan/pg';
 import {
-  specFromNodeId,
+  type ExecutableStep,
   type __InputListStep,
   type __InputObjectStep,
-  type ExecutableStep,
-} from "grafast";
-import {} from "@dataplan/pg";
-import type { PgNestedMutationRelationship } from "../interfaces";
-import { nestedUpdateById } from "../steps/nested-update-by-id-step";
+  specFromNodeId,
+} from 'grafast';
+import type {PgNestedMutationRelationship} from '../interfaces';
+import {nestedUpdateById} from '../steps/nested-update-by-id-step';
 
 export function buildUpdateByNodeIdField(
   relationship: PgNestedMutationRelationship,
-  build: GraphileBuild.Build,
+  build: GraphileBuild.Build
 ): Parameters<GraphileBuild.InputFieldWithHooksFunction> {
   const {
     inflection,
     EXPORTABLE,
-    graphql: { GraphQLList, GraphQLNonNull },
+    graphql: {GraphQLList, GraphQLNonNull},
   } = build;
 
   const {
@@ -23,12 +23,12 @@ export function buildUpdateByNodeIdField(
     isUnique,
     rightTable,
     relationName,
-    mutationFields: { updateByNodeId },
+    mutationFields: {updateByNodeId},
   } = relationship;
 
   if (!updateByNodeId) {
     throw new Error(
-      `Could not find updateByNodeId field for relation ${relationName}`,
+      `Could not find updateByNodeId field for relation ${relationName}`
     );
   }
 
@@ -52,11 +52,11 @@ export function buildUpdateByNodeIdField(
     specFromNodeId(rightHandler, $step);
 
   return [
-    { fieldName: updateByNodeId.fieldName },
+    {fieldName: updateByNodeId.fieldName},
     {
       description: build.wrapDescription(
         `The primary keys and patch data for ${rightTable.name} for the far side of the relationship`,
-        "field",
+        'field'
       ),
       type:
         !isReverse || isUnique
@@ -66,12 +66,12 @@ export function buildUpdateByNodeIdField(
       applyPlan: EXPORTABLE(
         (getSpec, idField, nestedUpdateById, relationship) =>
           function plan(_$parent, args) {
-            const { isReverse, isUnique } = relationship;
+            const {isReverse, isUnique} = relationship;
 
             if (!isReverse || isUnique) {
               nestedUpdateById(relationship, {
                 ...getSpec(args.get(idField)),
-                patch: args.get("patch"),
+                patch: args.get('patch'),
               });
             } else {
               const $inputObj = args.getRaw() as __InputListStep;
@@ -83,12 +83,12 @@ export function buildUpdateByNodeIdField(
 
                 nestedUpdateById(relationship, {
                   ...getSpec(dep.get(idField)),
-                  patch: dep.get("patch"),
+                  patch: dep.get('patch'),
                 });
               }
             }
           },
-        [getSpec, idField, nestedUpdateById, relationship],
+        [getSpec, idField, nestedUpdateById, relationship]
       ),
     },
   ];

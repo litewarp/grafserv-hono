@@ -4,46 +4,46 @@
  * Should be run first, since it gathers all the relations
  */
 
-import { getNestedRelationships } from "../get-nested-relationships";
-import { isPgTableResource } from "../helpers";
+import {getNestedRelationships} from '../get-nested-relationships';
+import {isPgTableResource} from '../helpers';
 
 export const PostGraphileNestedMutationsConnectPlugin: GraphileConfig.Plugin = {
-  name: "PgNestedMutationConnectPlugin",
-  description: "Adds connectById and connectByKeys input types to schema",
+  name: 'PgNestedMutationConnectPlugin',
+  description: 'Adds connectById and connectByKeys input types to schema',
   /* eslint-disable-next-line @typescript-eslint/no-var-requires */
-  version: require("../../package.json").version,
-  after: ["PgTableNodePlugin"],
-  before: ["PgNestedMutationTypesPlugin"],
+  version: require('../../package.json').version,
+  after: ['PgTableNodePlugin'],
+  before: ['PgNestedMutationTypesPlugin'],
 
   inflection: {
     add: {
       nestedConnectByNodeIdFieldName(_options) {
         return this.camelCase(`connect_by_${this.nodeIdFieldName()}`);
       },
-      nestedConnectByNodeIdInputType(options, { rightTable }) {
+      nestedConnectByNodeIdInputType(_options, {rightTable}) {
         const rightTableFieldName = this.tableFieldName(rightTable);
         return this.upperCamelCase(`${rightTableFieldName}_node_id_connect`);
       },
-      nestedConnectByKeyInputType(options, relationship) {
+      nestedConnectByKeyInputType(_options, relationship) {
         // to do - allow overriding of names through tags
-        const { leftTable, localUnique, tableFieldName } = relationship;
+        const {leftTable, localUnique, tableFieldName} = relationship;
 
         const attributes = localUnique.attributes.map((attributeName) =>
-          this.attribute({ attributeName, codec: leftTable.codec }),
+          this.attribute({attributeName, codec: leftTable.codec})
         );
 
-        const keyName = localUnique.isPrimary ? "pk" : attributes.join("_");
+        const keyName = localUnique.isPrimary ? 'pk' : attributes.join('_');
 
         return this.upperCamelCase(`${tableFieldName}_${keyName}_connect`);
       },
-      nestedConnectByKeyFieldName(options, relationship) {
-        const { leftTable, localUnique } = relationship;
+      nestedConnectByKeyFieldName(_options, relationship) {
+        const {leftTable, localUnique} = relationship;
 
         const attributes = localUnique.attributes.map((attributeName) =>
-          this.attribute({ attributeName, codec: leftTable.codec }),
+          this.attribute({attributeName, codec: leftTable.codec})
         );
 
-        return this.camelCase(`connect_by_${attributes.join("_and_")}`);
+        return this.camelCase(`connect_by_${attributes.join('_and_')}`);
       },
     },
   },
@@ -62,7 +62,7 @@ export const PostGraphileNestedMutationsConnectPlugin: GraphileConfig.Plugin = {
           inflection,
           pgNestedMutationInputTypes,
           pgNestedMutationRelationships,
-          graphql: { GraphQLID, GraphQLNonNull },
+          graphql: {GraphQLID, GraphQLNonNull},
         } = build;
 
         const resources = build.input.pgRegistry.pgResources;
@@ -79,7 +79,7 @@ export const PostGraphileNestedMutationsConnectPlugin: GraphileConfig.Plugin = {
           for (const relationship of relationships) {
             const {
               rightTable,
-              mutationFields: { connectByNodeId, connectByKeys },
+              mutationFields: {connectByNodeId, connectByKeys},
             } = relationship;
 
             // if connectByNodeId type is defined, create the input object
@@ -98,19 +98,19 @@ export const PostGraphileNestedMutationsConnectPlugin: GraphileConfig.Plugin = {
                     () => ({
                       description: build.wrapDescription(
                         `The globally unique \`ID\` to be used in the connection.`,
-                        "type",
+                        'type'
                       ),
-                      fields: ({ fieldWithHooks }) => ({
+                      fields: ({fieldWithHooks}) => ({
                         [nodeIdField]: fieldWithHooks(
-                          { fieldName: nodeIdField },
+                          {fieldName: nodeIdField},
                           () => ({
                             description: `The globally unique \`ID\` which identifies a single \`${rightTable.name}\` to be connected.`,
                             type: new GraphQLNonNull(GraphQLID),
-                          }),
+                          })
                         ),
                       }),
                     }),
-                    `Adding connect by nodeId input type for ${rightTable.name}`,
+                    `Adding connect by nodeId input type for ${rightTable.name}`
                   );
                 });
               }

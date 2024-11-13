@@ -1,12 +1,12 @@
-import * as fs from "node:fs";
-import path from "node:path";
-import * as pg from "pg";
-import type { GraphQLSchema } from "graphql";
-import { parse, buildASTSchema } from "graphql";
-import { lexicographicSortSchema, printSchema } from "graphql/utilities";
+import * as fs from 'node:fs';
+import path from 'node:path';
+import type {GraphQLSchema} from 'graphql';
+import {buildASTSchema, parse} from 'graphql';
+import {lexicographicSortSchema, printSchema} from 'graphql/utilities';
+import * as pg from 'pg';
 
 export async function withPgPool<T>(
-  cb: (pool: pg.Pool) => Promise<T>,
+  cb: (pool: pg.Pool) => Promise<T>
 ): Promise<T> {
   const pool = new pg.Pool({
     connectionString: process.env.TEST_DATABASE_URL,
@@ -19,7 +19,7 @@ export async function withPgPool<T>(
 }
 
 export async function withPgClient<T>(
-  cb: (client: pg.PoolClient) => Promise<T>,
+  cb: (client: pg.PoolClient) => Promise<T>
 ): Promise<T> {
   return withPgPool(async (pool) => {
     const client = await pool.connect();
@@ -33,10 +33,10 @@ export async function withPgClient<T>(
 
 export async function withTransaction<T>(
   cb: (client: pg.PoolClient) => Promise<T>,
-  closeCommand = "rollback",
+  closeCommand = 'rollback'
 ): Promise<T> {
   return withPgClient(async (client) => {
-    await client.query("begin");
+    await client.query('begin');
     try {
       return await cb(client);
     } finally {
@@ -47,11 +47,11 @@ export async function withTransaction<T>(
 
 export function getFixturesForSqlSchema(sqlSchema: string) {
   return fs.existsSync(
-    path.resolve(__dirname, "schemas", sqlSchema, "fixtures", "queries"),
+    path.resolve(__dirname, 'schemas', sqlSchema, 'fixtures', 'queries')
   )
     ? fs
         .readdirSync(
-          path.resolve(__dirname, "schemas", sqlSchema, "fixtures", "queries"),
+          path.resolve(__dirname, 'schemas', sqlSchema, 'fixtures', 'queries')
         )
         .sort()
     : [];
@@ -59,17 +59,17 @@ export function getFixturesForSqlSchema(sqlSchema: string) {
 
 export async function readFixtureForSqlSchema(
   sqlSchema: string,
-  fixture: string,
+  fixture: string
 ) {
   return fs.promises.readFile(
     path.resolve(
       __dirname,
-      "schemas",
+      'schemas',
       sqlSchema,
-      "fixtures",
-      "queries",
-      fixture,
+      'fixtures',
+      'queries',
+      fixture
     ),
-    "utf8",
+    'utf8'
   );
 }

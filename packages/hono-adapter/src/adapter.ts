@@ -1,23 +1,23 @@
-import type { Context as HonoContext, Hono } from "hono";
+import type {Hono, Context as HonoContext} from 'hono';
+import {bodyLimit} from 'hono/body-limit';
+import {stream} from 'hono/streaming';
+import type {StatusCode} from 'hono/utils/http-status';
 import {
-  convertHandlerResultToResult,
   type EventStreamHeandlerResult,
   GrafservBase,
   type GrafservConfig,
-  normalizeRequest,
   type RequestDigest,
   type Result,
-} from "postgraphile/grafserv";
-import type { StatusCode } from "hono/utils/http-status";
-import { stream } from "hono/streaming";
-import { bodyLimit } from "hono/body-limit";
-import { createBunWsMiddleware, makeBunServer } from "./bun-websocket.js";
-import { processHeaders } from "./utils.js";
+  convertHandlerResultToResult,
+  normalizeRequest,
+} from 'postgraphile/grafserv';
+import {createBunWsMiddleware, makeBunServer} from './bun-websocket.js';
+import {processHeaders} from './utils.js';
 
 declare global {
   namespace Grafast {
     interface RequestContext {
-      hono: { context: HonoContext };
+      hono: {context: HonoContext};
     }
   }
 }
@@ -31,7 +31,9 @@ export class HonoGrafserv extends GrafservBase {
     const httpVersionMajor = 1;
     const httpVersionMinor = 1;
 
-    const isSecure = c.req.url.startsWith("https://");
+    c.req.raw;
+
+    const isSecure = c.req.url.startsWith('https://');
 
     return {
       httpVersionMajor,
@@ -42,10 +44,10 @@ export class HonoGrafserv extends GrafservBase {
       headers: processHeaders(c.req.raw.headers.toJSON()),
       getQueryParams: () => c.req.query(),
       getBody: async () => {
-        return { type: "json", json: await c.req.json() };
+        return {type: 'json', json: await c.req.json()};
       },
       requestContext: {
-        hono: { context: c },
+        hono: {context: c},
       },
       preferJSON: true,
     };
@@ -57,36 +59,36 @@ export class HonoGrafserv extends GrafservBase {
     }
 
     switch (response.type) {
-      case "error": {
-        const { statusCode, headers, error } = response;
+      case 'error': {
+        const {statusCode, headers, error} = response;
 
         return c.body(error.message, statusCode as StatusCode, {
           ...processHeaders(headers),
-          "Content-Type": "text/plain",
+          'Content-Type': 'text/plain',
         });
       }
-      case "buffer": {
-        const { statusCode, headers, buffer } = response;
+      case 'buffer': {
+        const {statusCode, headers, buffer} = response;
 
-        return c.body(buffer.toString("utf8"), statusCode as StatusCode, {
+        return c.body(buffer.toString('utf8'), statusCode as StatusCode, {
           ...processHeaders(headers),
         });
       }
-      case "json": {
-        const { statusCode, headers, json } = response;
+      case 'json': {
+        const {statusCode, headers, json} = response;
         return c.body(JSON.stringify(json), statusCode as StatusCode, {
           ...processHeaders(headers),
         });
       }
 
-      case "noContent": {
-        const { statusCode, headers } = response;
-        return c.body(null, statusCode as StatusCode, { ...headers });
+      case 'noContent': {
+        const {statusCode, headers} = response;
+        return c.body(null, statusCode as StatusCode, {...headers});
       }
 
-      case "bufferStream": {
+      case 'bufferStream': {
         return stream(c, async (stream) => {
-          const { statusCode, headers, lowLatency, bufferIterator } = response;
+          const {statusCode, headers, lowLatency, bufferIterator} = response;
           let bufferIteratorHandled = false;
 
           try {
@@ -115,7 +117,7 @@ export class HonoGrafserv extends GrafservBase {
                 } else if (bufferIterator.throw) {
                   bufferIterator.throw(e);
                 }
-              } catch (e2) {
+              } catch (_e2) {
                 // nom nom nom
               }
               throw e;
@@ -125,10 +127,10 @@ export class HonoGrafserv extends GrafservBase {
       }
 
       default: {
-        console.log("Unhandled:");
+        console.log('Unhandled:');
         console.dir(response);
         return c.body("Server hasn't implemented this yet", 501, {
-          "Content-Type": "text/plain",
+          'Content-Type': 'text/plain',
         });
       }
     }
@@ -152,7 +154,7 @@ export class HonoGrafserv extends GrafservBase {
       const digest = this.getDigest(c);
       const handlerResult = await this.graphqlHandler(
         normalizeRequest(digest),
-        this.graphiqlHandler,
+        this.graphiqlHandler
       );
       const result = await convertHandlerResultToResult(handlerResult);
       return this.send(result, c);
@@ -167,7 +169,7 @@ export class HonoGrafserv extends GrafservBase {
       graphqlHandler,
       bodyLimit({
         maxSize: maxRequestLength,
-      }),
+      })
     );
 
     // attach websocket and http handler for GET requests, if desired
@@ -181,26 +183,26 @@ export class HonoGrafserv extends GrafservBase {
     if (graphiql) {
       app.get(
         graphiqlPath,
-        bodyLimit({ maxSize: maxRequestLength }),
+        bodyLimit({maxSize: maxRequestLength}),
         async (c) => {
           const digest = this.getDigest(c);
           const handlerResult = await this.graphiqlHandler(
-            normalizeRequest(digest),
+            normalizeRequest(digest)
           );
           const result = await convertHandlerResultToResult(handlerResult);
           return this.send(result, c);
-        },
+        }
       );
     }
     if (watch) {
       app.get(
         this.dynamicOptions.eventStreamPath,
-        bodyLimit({ maxSize: maxRequestLength }),
+        bodyLimit({maxSize: maxRequestLength}),
         async (c) => {
           const digest = this.getDigest(c);
           // TODO: refactor this to use the eventStreamHandler once we write that...
           const handlerResult: EventStreamHeandlerResult = {
-            type: "event-stream",
+            type: 'event-stream',
             request: normalizeRequest(digest),
             dynamicOptions: this.dynamicOptions,
             payload: this.makeStream(),
@@ -208,7 +210,7 @@ export class HonoGrafserv extends GrafservBase {
           };
           const result = await convertHandlerResultToResult(handlerResult);
           return this.send(result, c);
-        },
+        }
       );
     }
   }

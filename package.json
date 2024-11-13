@@ -5,18 +5,24 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "format-and-lint": "biome check",
+    "format-and-lint:fix": "biome check --fix",
+    "format-and-lint:staged": "biome check --error-on-warnings --no-errors-on-unmatched --staged",
     "sync:list": "syncpack list",
     "sync:fix": "syncpack fix-mismatches"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
     "prettier": "^3.2.5",
     "syncpack": "^12.4.0",
     "turbo": "^2.0.9",
-    "typescript": "^5.5.4"
+    "typescript": "^5.6.3"
   },
-  "packageManager": "pnpm@9.6.0",
+  "overrides": {
+    "graphql": "16.1.0-experimental-stream-defer.6"
+  },
+  "packageManager": "pnpm@9.13.0",
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   }
 }

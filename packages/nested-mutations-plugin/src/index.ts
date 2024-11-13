@@ -1,10 +1,10 @@
-import type { GraphileConfig } from "graphile-build";
+import type {GraphileConfig} from 'graphile-build';
 import {
-  PostGraphileNestedTypesPlugin,
   PostGraphileNestedMutationsConnectPlugin,
   PostGraphileNestedMutationsCreatePlugin,
   PostGraphileNestedMutationsUpdatePlugin,
-} from "./plugins";
+  PostGraphileNestedTypesPlugin,
+} from './plugins';
 
 export const NestedMutationPreset: GraphileConfig.Preset = {
   plugins: [
