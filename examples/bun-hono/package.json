@@ -27,6 +27,7 @@
     "graphile-config": "0.0.1-beta.11",
     "graphql-ws": "^5.16.0",
     "hono": "^4.6.5",
+    "graphql": "16.1.0-experimental-stream-defer.6",
     "jsonwebtoken": "^9.0.2",
     "postgraphile": "5.0.0-beta.33"
   }
