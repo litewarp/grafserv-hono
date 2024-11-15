@@ -75,7 +75,10 @@ export const PgNestedMutationsInputTypesPlugin: GraphileConfig.Plugin = {
               build.registerInputObjectType(
                 input.typeName,
                 {
-                  // input object scope
+                  isNestedMutationConnectorType: true,
+                  isNestedInverseMutation: isReverse,
+                  pgResource: leftTable,
+                  pgNestedResource: rightTable,
                 },
                 () => ({
                   description: `Input for the nested mutation of ${leftTable.name} type`,
@@ -144,10 +147,11 @@ export const PgNestedMutationsInputTypesPlugin: GraphileConfig.Plugin = {
         }
         return _init;
       },
-      GraphQLInputObjectType_fields(fields, build, context) {
+      GraphQLInputObjectType_fields(field, build, context) {
         const {
           pgNestedMutationRelationships,
           pgNestedMutationInputTypes,
+          wrapDescription,
           getInputTypeByName,
           extend,
         } = build;
@@ -159,16 +163,16 @@ export const PgNestedMutationsInputTypesPlugin: GraphileConfig.Plugin = {
         } = context;
 
         if (!isPgRowType || !pgCodec) {
-          return fields;
+          return field;
         }
 
         const relationships = pgNestedMutationRelationships.get(pgCodec);
         if (!relationships) {
-          return fields;
+          return field;
         }
 
         return extend(
-          fields,
+          field,
           {
             ...Object.values(relationships).reduce((acc, relationship) => {
               const {fieldName, mutationFields, rightTable} = relationship;
@@ -180,14 +184,40 @@ export const PgNestedMutationsInputTypesPlugin: GraphileConfig.Plugin = {
                     fieldName: mutationFields.input.fieldName,
                   },
                   {
-                    description: `Nested mutation for ${rightTable.name}`,
+                    description: wrapDescription(
+                      `Nested mutation for ${rightTable.name}`,
+                      'type'
+                    ),
                     type,
                   }
                 ),
               };
             }, {}),
           },
-          `Adding field for idk fields for ${Self.name}`
+          `Adding nested mutation fields for ${Self.name}`
+        );
+      },
+
+      GraphQLObjectType_fields_field(field, build, context) {
+        const {extend, behavior} = build;
+        const {
+          fieldWithHooks,
+          scope: {fieldName, fieldBehaviorScope, isRootMutation},
+          Self,
+        } = context;
+
+        if (!isRootMutation) {
+          return field;
+        }
+        // console.log(Self.name, field.type);
+
+        // console.log(fieldName, fieldBehaviorScope, context.scope);
+        return extend(
+          field,
+          {
+            // plan($parent, args, info) {},
+          },
+          `Adding nested mutation plan for ${fieldName}`
         );
       },
     },

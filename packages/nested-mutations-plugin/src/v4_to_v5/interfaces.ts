@@ -180,6 +180,8 @@ declare global {
        * field which resolves to the the connector type
        */
       isNestedMutationInputField?: boolean;
+
+      pgNestedResource?: PgTableResource;
     }
 
     interface ScopeObjectFieldsField {

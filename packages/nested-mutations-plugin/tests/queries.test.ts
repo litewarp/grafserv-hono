@@ -32,7 +32,7 @@ const createPostGraphileSchema = async (pgPool: Pool, sqlSchema: string) => {
     ],
     pgServices: [
       makePgService({
-        connectionString: process.env.TEST_DATABASE_URL,
+        pool: pgPool,
         schemas: [sqlSchema],
       }),
     ],

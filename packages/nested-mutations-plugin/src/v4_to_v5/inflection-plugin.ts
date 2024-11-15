@@ -149,7 +149,26 @@ export const PgNestedMutationsInflectionPlugin: GraphileConfig.Plugin = {
         return '';
       },
       nestedUpdatePatchType(_options, _relationship) {
-        return '';
+        const {rightTable, tableFieldName, localAttributes, remoteAttributes, isReverse} =
+          _relationship;
+
+        const rightTableFieldName = this.tableFieldName(rightTable);
+
+        const constraintName = isReverse
+          ? [rightTableFieldName, ...remoteAttributes]
+          : [tableFieldName, ...localAttributes];
+
+        return this.upperCamelCase(
+          [
+            'update',
+            rightTableFieldName,
+            'on',
+            tableFieldName,
+            'for',
+            ...constraintName,
+            'patch',
+          ].join('_')
+        );
       },
       nestedDeleteByNodeIdFieldName(_options) {
         return this.camelCase(`delete_by_${this.nodeIdFieldName()}`);

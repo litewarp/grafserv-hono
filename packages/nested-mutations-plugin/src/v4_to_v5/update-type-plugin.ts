@@ -1,3 +1,4 @@
+import {memo} from 'postgraphile/grafserv';
 import {isPgTableResource} from '../helpers.ts';
 
 export const PgNestedMutationsUpdateTypesPlugin: GraphileConfig.Plugin = {
@@ -11,7 +12,7 @@ export const PgNestedMutationsUpdateTypesPlugin: GraphileConfig.Plugin = {
           inflection,
           pgNestedMutationRelationships,
           pgNestedMutationInputTypes,
-          graphql: {GraphQLID, GraphQLNonNull},
+          graphql: {GraphQLID, GraphQLNonNull, GraphQLInputObjectType},
         } = build;
 
         for (const resource of Object.values(build.input.pgRegistry.pgResources)) {
@@ -38,7 +39,6 @@ export const PgNestedMutationsUpdateTypesPlugin: GraphileConfig.Plugin = {
             ) {
               pgNestedMutationInputTypes.add(updateByNodeId.typeName);
               const nodeIdField = inflection.nodeIdFieldName();
-              console.log(updateByNodeId.typeName);
 
               // process connectByNodeId
               build.recoverable(null, () => {
@@ -58,6 +58,21 @@ export const PgNestedMutationsUpdateTypesPlugin: GraphileConfig.Plugin = {
                         description: `The globally unique \`ID\` which identifies a single \`${rightTable.name}\` to be updated.`,
                         type: new GraphQLNonNull(GraphQLID),
                       })),
+                      patch: fieldWithHooks({fieldName: 'patch'}, () => {
+                        const tablePatchType = build.getGraphQLTypeByPgCodec(
+                          rightTable.codec,
+                          'patch'
+                        );
+                        const fields = (
+                          tablePatchType as GraphQLInputObjectType
+                        ).getFields();
+                        return {
+                          type: new GraphQLInputObjectType({
+                            name: inflection.nestedUpdatePatchType(relationship),
+                            fields: {...fields},
+                          }),
+                        };
+                      }),
                     }),
                   }),
                   `Adding update by nodeId input type for ${rightTable.name}`

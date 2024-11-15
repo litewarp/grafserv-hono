@@ -40,7 +40,6 @@ export const PgNestedMutationsConnectTypesPlugin: GraphileConfig.Plugin = {
               pgNestedMutationInputTypes.add(connectByNodeId.typeName);
               const nodeIdField = inflection.nodeIdFieldName();
 
-              console.log(connectByNodeId.typeName);
               // process connectByNodeId
               build.recoverable(null, () => {
                 build.registerInputObjectType(

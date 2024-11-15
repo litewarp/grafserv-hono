@@ -479,6 +479,7 @@ input JobOnJobRelationshipForJobRelationshipFromJobIdNodeIdUpdate {
   The globally unique `ID` which identifies a single `job` to be updated.
   """
   id: ID!
+  patch: UpdateJobOnJobRelationshipForJobRelationshipFromJobIdPatch
 }
 
 """The globally unique `ID` to be used in the connection."""
@@ -487,6 +488,7 @@ input JobOnJobRelationshipForJobRelationshipToJobIdNodeIdUpdate {
   The globally unique `ID` which identifies a single `job` to be updated.
   """
   id: ID!
+  patch: UpdateJobOnJobRelationshipForJobRelationshipToJobIdPatch
 }
 
 """Methods to use when ordering `Job`."""
@@ -592,6 +594,11 @@ input JobRelationshipFromJobIdFKeyInverseInput {
 
 """The `job` to be created by this mutation."""
 input JobRelationshipFromJobIdFkeyJobCreateInput {
+  """Nested mutation for job_relationship"""
+  jobRelationshipsToIdUsingFromJobId: JobRelationshipFromJobIdFKeyInverseInput
+
+  """Nested mutation for job_relationship"""
+  jobRelationshipsToIdUsingToJobId: JobRelationshipToJobIdFKeyInverseInput
   name: String
   rowId: Int
 }
@@ -599,6 +606,12 @@ input JobRelationshipFromJobIdFkeyJobCreateInput {
 """The `job_relationship` to be created by this mutation."""
 input JobRelationshipFromJobIdFkeyJobRelationshipCreateInput {
   fromJobId: Int
+
+  """Nested mutation for job"""
+  jobToFromJobId: JobRelationshipFromJobIdFKeyInput
+
+  """Nested mutation for job"""
+  jobToToJobId: JobRelationshipToJobIdFKeyInput
   toJobId: Int
   type: String
 }
@@ -630,6 +643,7 @@ input JobRelationshipOnJobForJobRelationshipFromJobIdNodeIdUpdate {
   The globally unique `ID` which identifies a single `job_relationship` to be updated.
   """
   id: ID!
+  patch: UpdateJobRelationshipOnJobForJobRelationshipFromJobIdPatch
 }
 
 """The globally unique `ID` to be used in the connection."""
@@ -638,6 +652,7 @@ input JobRelationshipOnJobForJobRelationshipToJobIdNodeIdUpdate {
   The globally unique `ID` which identifies a single `job_relationship` to be updated.
   """
   id: ID!
+  patch: UpdateJobRelationshipOnJobForJobRelationshipToJobIdPatch
 }
 
 """Methods to use when ordering `JobRelationship`."""
@@ -681,6 +696,11 @@ input JobRelationshipToJobIdFKeyInverseInput {
 
 """The `job` to be created by this mutation."""
 input JobRelationshipToJobIdFkeyJobCreateInput {
+  """Nested mutation for job_relationship"""
+  jobRelationshipsToIdUsingFromJobId: JobRelationshipFromJobIdFKeyInverseInput
+
+  """Nested mutation for job_relationship"""
+  jobRelationshipsToIdUsingToJobId: JobRelationshipToJobIdFKeyInverseInput
   name: String
   rowId: Int
 }
@@ -688,6 +708,12 @@ input JobRelationshipToJobIdFkeyJobCreateInput {
 """The `job_relationship` to be created by this mutation."""
 input JobRelationshipToJobIdFkeyJobRelationshipCreateInput {
   fromJobId: Int
+
+  """Nested mutation for job"""
+  jobToFromJobId: JobRelationshipFromJobIdFKeyInput
+
+  """Nested mutation for job"""
+  jobToToJobId: JobRelationshipToJobIdFKeyInput
   toJobId: Int
   type: String
 }
@@ -889,6 +915,26 @@ input UpdateJobInput {
   rowId: Int!
 }
 
+input UpdateJobOnJobRelationshipForJobRelationshipFromJobIdPatch {
+  """Nested mutation for job_relationship"""
+  jobRelationshipsToIdUsingFromJobId: JobRelationshipFromJobIdFKeyInverseInput
+
+  """Nested mutation for job_relationship"""
+  jobRelationshipsToIdUsingToJobId: JobRelationshipToJobIdFKeyInverseInput
+  name: String
+  rowId: Int
+}
+
+input UpdateJobOnJobRelationshipForJobRelationshipToJobIdPatch {
+  """Nested mutation for job_relationship"""
+  jobRelationshipsToIdUsingFromJobId: JobRelationshipFromJobIdFKeyInverseInput
+
+  """Nested mutation for job_relationship"""
+  jobRelationshipsToIdUsingToJobId: JobRelationshipToJobIdFKeyInverseInput
+  name: String
+  rowId: Int
+}
+
 """The output of our update `Job` mutation."""
 type UpdateJobPayload {
   """
@@ -910,4 +956,28 @@ type UpdateJobPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
+}
+
+input UpdateJobRelationshipOnJobForJobRelationshipFromJobIdPatch {
+  fromJobId: Int
+
+  """Nested mutation for job"""
+  jobToFromJobId: JobRelationshipFromJobIdFKeyInput
+
+  """Nested mutation for job"""
+  jobToToJobId: JobRelationshipToJobIdFKeyInput
+  toJobId: Int
+  type: String
+}
+
+input UpdateJobRelationshipOnJobForJobRelationshipToJobIdPatch {
+  fromJobId: Int
+
+  """Nested mutation for job"""
+  jobToFromJobId: JobRelationshipFromJobIdFKeyInput
+
+  """Nested mutation for job"""
+  jobToToJobId: JobRelationshipToJobIdFKeyInput
+  toJobId: Int
+  type: String
 }

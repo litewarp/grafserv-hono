@@ -79,11 +79,22 @@ input ChildDadParentIdFkeyChildCreateInput {
   dadParentId: Int
   momParentId: Int
   name: String!
+
+  """Nested mutation for parent"""
+  parentToDadParentId: ChildDadParentIdFKeyInput
+
+  """Nested mutation for parent"""
+  parentToMomParentId: ChildMomParentIdFKeyInput
   rowId: Int
 }
 
 """The `parent` to be created by this mutation."""
 input ChildDadParentIdFkeyParentCreateInput {
+  """Nested mutation for child"""
+  childrenToIdUsingDadParentId: ChildDadParentIdFKeyInverseInput
+
+  """Nested mutation for child"""
+  childrenToIdUsingMomParentId: ChildMomParentIdFKeyInverseInput
   parentName: String!
   rowId: Int
 }
@@ -144,11 +155,22 @@ input ChildMomParentIdFkeyChildCreateInput {
   dadParentId: Int
   momParentId: Int
   name: String!
+
+  """Nested mutation for parent"""
+  parentToDadParentId: ChildDadParentIdFKeyInput
+
+  """Nested mutation for parent"""
+  parentToMomParentId: ChildMomParentIdFKeyInput
   rowId: Int
 }
 
 """The `parent` to be created by this mutation."""
 input ChildMomParentIdFkeyParentCreateInput {
+  """Nested mutation for child"""
+  childrenToIdUsingDadParentId: ChildDadParentIdFKeyInverseInput
+
+  """Nested mutation for child"""
+  childrenToIdUsingMomParentId: ChildMomParentIdFKeyInverseInput
   parentName: String!
   rowId: Int
 }
@@ -167,6 +189,7 @@ input ChildOnParentForChildDadParentIdNodeIdUpdate {
   The globally unique `ID` which identifies a single `child` to be updated.
   """
   id: ID!
+  patch: UpdateChildOnParentForChildDadParentIdPatch
 }
 
 """The globally unique `ID` to be used in the connection."""
@@ -175,6 +198,7 @@ input ChildOnParentForChildMomParentIdNodeIdUpdate {
   The globally unique `ID` which identifies a single `child` to be updated.
   """
   id: ID!
+  patch: UpdateChildOnParentForChildMomParentIdPatch
 }
 
 """Methods to use when ordering `Child`."""
@@ -701,6 +725,7 @@ input ParentOnChildForChildDadParentIdNodeIdUpdate {
   The globally unique `ID` which identifies a single `parent` to be updated.
   """
   id: ID!
+  patch: UpdateParentOnChildForChildDadParentIdPatch
 }
 
 """The globally unique `ID` to be used in the connection."""
@@ -709,6 +734,7 @@ input ParentOnChildForChildMomParentIdNodeIdUpdate {
   The globally unique `ID` which identifies a single `parent` to be updated.
   """
   id: ID!
+  patch: UpdateParentOnChildForChildMomParentIdPatch
 }
 
 """Methods to use when ordering `Parent`."""
@@ -1007,6 +1033,32 @@ input UpdateChildInput {
   rowId: Int!
 }
 
+input UpdateChildOnParentForChildDadParentIdPatch {
+  dadParentId: Int
+  momParentId: Int
+  name: String
+
+  """Nested mutation for parent"""
+  parentToDadParentId: ChildDadParentIdFKeyInput
+
+  """Nested mutation for parent"""
+  parentToMomParentId: ChildMomParentIdFKeyInput
+  rowId: Int
+}
+
+input UpdateChildOnParentForChildMomParentIdPatch {
+  dadParentId: Int
+  momParentId: Int
+  name: String
+
+  """Nested mutation for parent"""
+  parentToDadParentId: ChildDadParentIdFKeyInput
+
+  """Nested mutation for parent"""
+  parentToMomParentId: ChildMomParentIdFKeyInput
+  rowId: Int
+}
+
 """The output of our update `Child` mutation."""
 type UpdateChildPayload {
   """The `Child` that was updated by this mutation."""
@@ -1062,6 +1114,26 @@ input UpdateParentInput {
   """
   patch: ParentPatch!
   rowId: Int!
+}
+
+input UpdateParentOnChildForChildDadParentIdPatch {
+  """Nested mutation for child"""
+  childrenToIdUsingDadParentId: ChildDadParentIdFKeyInverseInput
+
+  """Nested mutation for child"""
+  childrenToIdUsingMomParentId: ChildMomParentIdFKeyInverseInput
+  parentName: String
+  rowId: Int
+}
+
+input UpdateParentOnChildForChildMomParentIdPatch {
+  """Nested mutation for child"""
+  childrenToIdUsingDadParentId: ChildDadParentIdFKeyInverseInput
+
+  """Nested mutation for child"""
+  childrenToIdUsingMomParentId: ChildMomParentIdFKeyInverseInput
+  parentName: String
+  rowId: Int
 }
 
 """The output of our update `Parent` mutation."""
