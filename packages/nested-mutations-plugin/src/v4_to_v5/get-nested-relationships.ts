@@ -121,8 +121,8 @@ export function getNestedRelationships(
 
         deleteByKeys: [],
         deleteByNodeId: {
-          typeName: '',
-          fieldName: '',
+          typeName: inflection.nestedDeleteByNodeIdInputType(relationship),
+          fieldName: inflection.nestedDeleteByNodeIdFieldName(relationship),
         },
       };
 

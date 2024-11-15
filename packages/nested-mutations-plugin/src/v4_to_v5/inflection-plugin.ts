@@ -8,13 +8,8 @@ export const PgNestedMutationsInflectionPlugin: GraphileConfig.Plugin = {
     add: {
       // graphql typename for input object type
       nestedConnectorFieldType(_options, details) {
-        const {
-          isReverse,
-          leftTable,
-          localAttributes,
-          remoteAttributes,
-          rightTable,
-        } = details;
+        const {isReverse, leftTable, localAttributes, remoteAttributes, rightTable} =
+          details;
         // name for the Input Object
         // e.g., SessionUserIdFkeyInput for user object in SessionInput
         // e.g., SessionUserIdFkeyInverseInput for session object in UserInput
@@ -57,16 +52,12 @@ export const PgNestedMutationsInflectionPlugin: GraphileConfig.Plugin = {
         );
 
         if (!isReverse) {
-          return this.camelCase(
-            `${tableFieldName}_to_${localAttributes.join('_and_')}`
-          );
+          return this.camelCase(`${tableFieldName}_to_${localAttributes.join('_and_')}`);
         }
 
         if (!multipleFks) {
           return this.camelCase(
-            `${computedReverseMutationName}_using_${localAttributes.join(
-              '_and_ '
-            )}`
+            `${computedReverseMutationName}_using_${localAttributes.join('_and_ ')}`
           );
         }
 
@@ -109,13 +100,8 @@ export const PgNestedMutationsInflectionPlugin: GraphileConfig.Plugin = {
       },
       nestedCreateInputType(_options, details) {
         // Same as fieldType except no 'inverse' and then add rightTableName + 'create'
-        const {
-          leftTable,
-          rightTable,
-          localAttributes,
-          remoteAttributes,
-          isReverse,
-        } = details;
+        const {leftTable, rightTable, localAttributes, remoteAttributes, isReverse} =
+          details;
 
         return this.upperCamelCase(
           [
@@ -135,13 +121,7 @@ export const PgNestedMutationsInflectionPlugin: GraphileConfig.Plugin = {
       },
       nestedUpdateByNodeIdInputType(
         _options,
-        {
-          rightTable,
-          tableFieldName,
-          isReverse,
-          localAttributes,
-          remoteAttributes,
-        }
+        {rightTable, tableFieldName, isReverse, localAttributes, remoteAttributes}
       ) {
         const rightTableFieldName = this.tableFieldName(rightTable);
 
@@ -172,13 +152,13 @@ export const PgNestedMutationsInflectionPlugin: GraphileConfig.Plugin = {
         return '';
       },
       nestedDeleteByNodeIdFieldName(_options) {
-        return '';
+        return this.camelCase(`delete_by_${this.nodeIdFieldName()}`);
       },
       nestedDeleteByKeyFieldName(_options) {
         return '';
       },
-      nestedDeleteByNodeIdInputType(_options) {
-        return '';
+      nestedDeleteByNodeIdInputType(_options, {leftTable}) {
+        return this.upperCamelCase(`${this.tableFieldName(leftTable)}_node_id_delete`);
       },
       nestedDeleteByKeyInputType(_options) {
         return '';

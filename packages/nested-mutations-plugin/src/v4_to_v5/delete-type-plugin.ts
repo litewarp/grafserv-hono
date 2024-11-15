@@ -36,6 +36,7 @@ export const PgNestedMutationsDeleteTypesPlugin: GraphileConfig.Plugin = {
               deleteByNodeId &&
               !pgNestedMutationInputTypes.has(deleteByNodeId.typeName)
             ) {
+              pgNestedMutationInputTypes.add(deleteByNodeId.typeName);
               const nodeIdField = inflection.nodeIdFieldName();
 
               // process deleteByNodeId
