@@ -1,30 +1,24 @@
 import {existsSync, readdirSync} from 'node:fs';
 import {readFile, writeFile} from 'node:fs/promises';
 import path from 'node:path';
+import adaptor, {makePgService} from '@dataplan/pg/adaptors/pg';
 import {PgManyToManyPreset} from '@graphile-contrib/pg-many-to-many';
 import {PgSimplifyInflectionPreset} from '@graphile/simplify-inflection';
-import {execute, hookArgs} from 'grafast';
 import type {SchemaResult} from 'graphile-build';
 import {makeSchema} from 'graphile-build';
 import type {ExecutionArgs} from 'graphql';
 import {parse, validate} from 'graphql';
 import type {Pool} from 'pg';
 import {makeWithPgClientViaPgClientAlreadyInTransaction} from 'postgraphile/adaptors/pg';
+import {execute, hookArgs} from 'postgraphile/grafast';
 import {PostGraphileAmberPreset} from 'postgraphile/presets/amber';
-import {NestedMutationPreset} from '../src';
-import {withPgClient, withPgPool} from './helpers';
-import {printOrderedSchema} from './print-ordered-schema';
+import {NestedMutationPreset} from '../src/index.ts';
+import {withPgClient, withPgPool} from './helpers.ts';
+import {printOrderedSchema} from './print-ordered-schema.ts';
 
 const readFixtureForSqlSchema = async (sqlSchema: string, fixture: string) =>
   readFile(
-    path.resolve(
-      __dirname,
-      'schemas',
-      sqlSchema,
-      'fixtures',
-      'queries',
-      fixture
-    ),
+    path.resolve(__dirname, 'schemas', sqlSchema, 'fixtures', 'queries', fixture),
     'utf8'
   );
 
@@ -37,38 +31,24 @@ const createPostGraphileSchema = async (pgPool: Pool, sqlSchema: string) => {
       NestedMutationPreset,
     ],
     pgServices: [
-      {
-        name: 'main',
-        adaptor: '@dataplan/pg/adaptors/pg',
-        withPgClientKey: 'withPgClient',
-        pgSettingsKey: 'pgSettings',
-        pgSettingsForIntrospection: {},
+      makePgService({
+        connectionString: process.env.TEST_DATABASE_URL,
         schemas: [sqlSchema],
-        adaptorSettings: {
-          pool: pgPool,
-        },
-      },
+      }),
     ],
   });
-  await writeFile(
-    `./tmp/${sqlSchema}.graphql`,
-    printOrderedSchema(gs.schema),
-    'utf8'
-  );
+  await writeFile(`./tmp/${sqlSchema}.graphql`, printOrderedSchema(gs.schema), 'utf8');
   return gs;
 };
 
 const getFixturesForSqlSchema = (sqlSchema: string) =>
-  existsSync(
-    path.resolve(__dirname, 'schemas', sqlSchema, 'fixtures', 'queries')
-  )
+  existsSync(path.resolve(__dirname, 'schemas', sqlSchema, 'fixtures', 'queries'))
     ? readdirSync(
         path.resolve(__dirname, 'schemas', sqlSchema, 'fixtures', 'queries')
       ).sort()
     : [];
 
-const getSqlSchemas = () =>
-  readdirSync(path.resolve(__dirname, 'schemas')).sort();
+const getSqlSchemas = () => readdirSync(path.resolve(__dirname, 'schemas')).sort();
 
 const sqlSchemas = getSqlSchemas();
 
@@ -113,9 +93,7 @@ describe.each(sqlSchemas)('%s', (sqlSchema) => {
       const errors = validate(schema, document);
       if (errors.length > 0) {
         throw new Error(
-          `GraphQL validation errors:\n${errors
-            .map((e) => e.message)
-            .join('\n')}`
+          `GraphQL validation errors:\n${errors.map((e) => e.message).join('\n')}`
         );
       }
       const args: ExecutionArgs = {
@@ -129,8 +107,10 @@ describe.each(sqlSchemas)('%s', (sqlSchema) => {
         // NOTE: the withPgClient needed on context is **VERY DIFFERENT** to our
         // withPgClient test helper. We should rename our test helper ;)
 
-        const contextWithPgClient =
-          makeWithPgClientViaPgClientAlreadyInTransaction(pgClient, false);
+        const contextWithPgClient = makeWithPgClientViaPgClientAlreadyInTransaction(
+          pgClient,
+          false
+        );
 
         try {
           args.contextValue = {

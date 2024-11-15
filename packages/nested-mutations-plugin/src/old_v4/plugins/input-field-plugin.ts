@@ -5,10 +5,10 @@ import type {
 } from 'grafast';
 import {__InputListStep} from 'grafast';
 import type {GraphileConfig} from 'graphile-build';
-import {isPgTableResource} from '../helpers';
-import {buildConnectByNodeIdField} from '../type-definitions/build-connect-by-node-id-field';
-import {buildCreateField} from '../type-definitions/build-create-field';
-import {buildUpdateByNodeIdField} from '../type-definitions/build-update-by-node-id-field';
+import {isPgTableResource} from '../../helpers.ts';
+import {buildConnectByNodeIdField} from '../../type-definitions/build-connect-by-node-id-field.ts';
+import {buildCreateField} from '../../type-definitions/build-create-field.ts';
+import {buildUpdateByNodeIdField} from '../../type-definitions/build-update-by-node-id-field.ts';
 
 /**
  * adds the relationship input field to the parent object
@@ -281,6 +281,7 @@ export const PostGraphileNestedTypesPlugin: GraphileConfig.Plugin = {
         }
         return field;
       },
+
 
       GraphQLInputObjectType_fields(fields, build, context) {
         const {EXPORTABLE} = build;

@@ -2,7 +2,7 @@ import {pgUpdateSingle} from '@dataplan/pg';
 import type {__InputObjectStep} from 'postgraphile/grafast';
 import {__InputListStep, specFromNodeId} from 'postgraphile/grafast';
 import {isInsertOrUpdate} from '../helpers.ts';
-import type {PgNestedMutationRelationship} from '../interfaces.ts';
+import type {PgNestedMutationRelationship} from '../../v4_to_v5/interfaces.ts';
 
 export function buildConnectByNodeIdField(
   relationship: PgNestedMutationRelationship,

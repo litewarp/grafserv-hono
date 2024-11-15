@@ -1,6 +1,4 @@
-"""
-All input for the create `Job` mutation.
-"""
+"""All input for the create `Job` mutation."""
 input CreateJobInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -8,15 +6,11 @@ input CreateJobInput {
   """
   clientMutationId: String
 
-  """
-  The `Job` to be created by this mutation.
-  """
+  """The `Job` to be created by this mutation."""
   job: JobInput!
 }
 
-"""
-The output of our create `Job` mutation.
-"""
+"""The output of our create `Job` mutation."""
 type CreateJobPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
@@ -24,18 +18,12 @@ type CreateJobPayload {
   """
   clientMutationId: String
 
-  """
-  The `Job` that was created by this mutation.
-  """
+  """The `Job` that was created by this mutation."""
   job: Job
 
-  """
-  An edge for our `Job`. May be used by Relay 1.
-  """
+  """An edge for our `Job`. May be used by Relay 1."""
   jobEdge(
-    """
-    The method to use when ordering `Job`.
-    """
+    """The method to use when ordering `Job`."""
     orderBy: [JobOrderBy!]! = [PRIMARY_KEY_ASC]
   ): JobEdge
 
@@ -45,9 +33,7 @@ type CreateJobPayload {
   query: Query
 }
 
-"""
-All input for the create `JobRelationship` mutation.
-"""
+"""All input for the create `JobRelationship` mutation."""
 input CreateJobRelationshipInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -55,15 +41,11 @@ input CreateJobRelationshipInput {
   """
   clientMutationId: String
 
-  """
-  The `JobRelationship` to be created by this mutation.
-  """
+  """The `JobRelationship` to be created by this mutation."""
   jobRelationship: JobRelationshipInput!
 }
 
-"""
-The output of our create `JobRelationship` mutation.
-"""
+"""The output of our create `JobRelationship` mutation."""
 type CreateJobRelationshipPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
@@ -71,9 +53,7 @@ type CreateJobRelationshipPayload {
   """
   clientMutationId: String
 
-  """
-  The `JobRelationship` that was created by this mutation.
-  """
+  """The `JobRelationship` that was created by this mutation."""
   jobRelationship: JobRelationship
 
   """
@@ -82,14 +62,10 @@ type CreateJobRelationshipPayload {
   query: Query
 }
 
-"""
-A location in a connection that can be used for resuming pagination.
-"""
+"""A location in a connection that can be used for resuming pagination."""
 scalar Cursor
 
-"""
-All input for the `deleteJobById` mutation.
-"""
+"""All input for the `deleteJobById` mutation."""
 input DeleteJobByIdInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -103,9 +79,7 @@ input DeleteJobByIdInput {
   id: ID!
 }
 
-"""
-All input for the `deleteJob` mutation.
-"""
+"""All input for the `deleteJob` mutation."""
 input DeleteJobInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -115,9 +89,7 @@ input DeleteJobInput {
   rowId: Int!
 }
 
-"""
-The output of our delete `Job` mutation.
-"""
+"""The output of our delete `Job` mutation."""
 type DeleteJobPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
@@ -126,18 +98,12 @@ type DeleteJobPayload {
   clientMutationId: String
   deletedJobId: ID
 
-  """
-  The `Job` that was deleted by this mutation.
-  """
+  """The `Job` that was deleted by this mutation."""
   job: Job
 
-  """
-  An edge for our `Job`. May be used by Relay 1.
-  """
+  """An edge for our `Job`. May be used by Relay 1."""
   jobEdge(
-    """
-    The method to use when ordering `Job`.
-    """
+    """The method to use when ordering `Job`."""
     orderBy: [JobOrderBy!]! = [PRIMARY_KEY_ASC]
   ): JobEdge
 
@@ -153,18 +119,12 @@ type Job implements Node {
   """
   id: ID!
 
-  """
-  Reads and enables pagination through a set of `JobRelationship`.
-  """
+  """Reads and enables pagination through a set of `JobRelationship`."""
   jobRelationshipsByFromJobId(
-    """
-    Read all values in the set after (below) this cursor.
-    """
+    """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """
-    Read all values in the set before (above) this cursor.
-    """
+    """Read all values in the set before (above) this cursor."""
     before: Cursor
 
     """
@@ -172,14 +132,10 @@ type Job implements Node {
     """
     condition: JobRelationshipCondition
 
-    """
-    Only read the first `n` values of the set.
-    """
+    """Only read the first `n` values of the set."""
     first: Int
 
-    """
-    Only read the last `n` values of the set.
-    """
+    """Only read the last `n` values of the set."""
     last: Int
 
     """
@@ -188,24 +144,16 @@ type Job implements Node {
     """
     offset: Int
 
-    """
-    The method to use when ordering `JobRelationship`.
-    """
+    """The method to use when ordering `JobRelationship`."""
     orderBy: [JobRelationshipOrderBy!] = [NATURAL]
   ): JobRelationshipConnection!
 
-  """
-  Reads and enables pagination through a set of `JobRelationship`.
-  """
+  """Reads and enables pagination through a set of `JobRelationship`."""
   jobRelationshipsByToJobId(
-    """
-    Read all values in the set after (below) this cursor.
-    """
+    """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """
-    Read all values in the set before (above) this cursor.
-    """
+    """Read all values in the set before (above) this cursor."""
     before: Cursor
 
     """
@@ -213,14 +161,10 @@ type Job implements Node {
     """
     condition: JobRelationshipCondition
 
-    """
-    Only read the first `n` values of the set.
-    """
+    """Only read the first `n` values of the set."""
     first: Int
 
-    """
-    Only read the last `n` values of the set.
-    """
+    """Only read the last `n` values of the set."""
     last: Int
 
     """
@@ -229,24 +173,16 @@ type Job implements Node {
     """
     offset: Int
 
-    """
-    The method to use when ordering `JobRelationship`.
-    """
+    """The method to use when ordering `JobRelationship`."""
     orderBy: [JobRelationshipOrderBy!] = [NATURAL]
   ): JobRelationshipConnection!
 
-  """
-  Reads and enables pagination through a set of `Job`.
-  """
+  """Reads and enables pagination through a set of `Job`."""
   jobsByJobRelationshipFromJobIdAndToJobId(
-    """
-    Read all values in the set after (below) this cursor.
-    """
+    """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """
-    Read all values in the set before (above) this cursor.
-    """
+    """Read all values in the set before (above) this cursor."""
     before: Cursor
 
     """
@@ -254,14 +190,10 @@ type Job implements Node {
     """
     condition: JobCondition
 
-    """
-    Only read the first `n` values of the set.
-    """
+    """Only read the first `n` values of the set."""
     first: Int
 
-    """
-    Only read the last `n` values of the set.
-    """
+    """Only read the last `n` values of the set."""
     last: Int
 
     """
@@ -270,24 +202,33 @@ type Job implements Node {
     """
     offset: Int
 
-    """
-    The method to use when ordering `Job`.
-    """
+    """The method to use when ordering `Job`."""
     orderBy: [JobOrderBy!] = [PRIMARY_KEY_ASC]
   ): JobJobsByJobRelationshipFromJobIdAndToJobIdManyToManyConnection!
 
-  """
-  Reads and enables pagination through a set of `Job`.
-  """
+  """Reads and enables pagination through a set of `Job`."""
+  jobsByJobRelationshipFromJobIdAndToJobIdList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: JobCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `Job`."""
+    orderBy: [JobOrderBy!]
+  ): [Job!]!
+
+  """Reads and enables pagination through a set of `Job`."""
   jobsByJobRelationshipToJobIdAndFromJobId(
-    """
-    Read all values in the set after (below) this cursor.
-    """
+    """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """
-    Read all values in the set before (above) this cursor.
-    """
+    """Read all values in the set before (above) this cursor."""
     before: Cursor
 
     """
@@ -295,14 +236,10 @@ type Job implements Node {
     """
     condition: JobCondition
 
-    """
-    Only read the first `n` values of the set.
-    """
+    """Only read the first `n` values of the set."""
     first: Int
 
-    """
-    Only read the last `n` values of the set.
-    """
+    """Only read the last `n` values of the set."""
     last: Int
 
     """
@@ -311,11 +248,26 @@ type Job implements Node {
     """
     offset: Int
 
-    """
-    The method to use when ordering `Job`.
-    """
+    """The method to use when ordering `Job`."""
     orderBy: [JobOrderBy!] = [PRIMARY_KEY_ASC]
   ): JobJobsByJobRelationshipToJobIdAndFromJobIdManyToManyConnection!
+
+  """Reads and enables pagination through a set of `Job`."""
+  jobsByJobRelationshipToJobIdAndFromJobIdList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: JobCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `Job`."""
+    orderBy: [JobOrderBy!]
+  ): [Job!]!
   name: String
   rowId: Int!
 }
@@ -324,64 +276,42 @@ type Job implements Node {
 A condition to be used against `Job` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
 input JobCondition {
-  """
-  Checks for equality with the object’s `rowId` field.
-  """
+  """Checks for equality with the object’s `rowId` field."""
   rowId: Int
 }
 
-"""
-A connection to a list of `Job` values.
-"""
+"""A connection to a list of `Job` values."""
 type JobConnection {
   """
   A list of edges which contains the `Job` and cursor to aid in pagination.
   """
   edges: [JobEdge]!
 
-  """
-  A list of `Job` objects.
-  """
+  """A list of `Job` objects."""
   nodes: [Job]!
 
-  """
-  Information to aid in pagination.
-  """
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """
-  The count of *all* `Job` you could get from the connection.
-  """
+  """The count of *all* `Job` you could get from the connection."""
   totalCount: Int!
 }
 
-"""
-A `Job` edge in the connection.
-"""
+"""A `Job` edge in the connection."""
 type JobEdge {
-  """
-  A cursor for use in pagination.
-  """
+  """A cursor for use in pagination."""
   cursor: Cursor
 
-  """
-  The `Job` at the end of the edge.
-  """
+  """The `Job` at the end of the edge."""
   node: Job
 }
 
-"""
-An input for mutations affecting `Job`
-"""
+"""An input for mutations affecting `Job`"""
 input JobInput {
-  """
-  Input for the nested mutation of `job_relationship in the `JobInput` mutation
-  """
+  """Nested mutation for job_relationship"""
   jobRelationshipsToIdUsingFromJobId: JobRelationshipFromJobIdFKeyInverseInput
 
-  """
-  Input for the nested mutation of `job_relationship in the `JobInput` mutation
-  """
+  """Nested mutation for job_relationship"""
   jobRelationshipsToIdUsingToJobId: JobRelationshipToJobIdFKeyInverseInput
   name: String
   rowId: Int
@@ -396,43 +326,27 @@ type JobJobsByJobRelationshipFromJobIdAndToJobIdManyToManyConnection {
   """
   edges: [JobJobsByJobRelationshipFromJobIdAndToJobIdManyToManyEdge!]!
 
-  """
-  A list of `Job` objects.
-  """
+  """A list of `Job` objects."""
   nodes: [Job]!
 
-  """
-  Information to aid in pagination.
-  """
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """
-  The count of *all* `Job` you could get from the connection.
-  """
+  """The count of *all* `Job` you could get from the connection."""
   totalCount: Int!
 }
 
-"""
-A `Job` edge in the connection, with data from `JobRelationship`.
-"""
+"""A `Job` edge in the connection, with data from `JobRelationship`."""
 type JobJobsByJobRelationshipFromJobIdAndToJobIdManyToManyEdge {
-  """
-  A cursor for use in pagination.
-  """
+  """A cursor for use in pagination."""
   cursor: Cursor
 
-  """
-  Reads and enables pagination through a set of `JobRelationship`.
-  """
+  """Reads and enables pagination through a set of `JobRelationship`."""
   jobRelationshipsByToJobId(
-    """
-    Read all values in the set after (below) this cursor.
-    """
+    """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """
-    Read all values in the set before (above) this cursor.
-    """
+    """Read all values in the set before (above) this cursor."""
     before: Cursor
 
     """
@@ -440,14 +354,10 @@ type JobJobsByJobRelationshipFromJobIdAndToJobIdManyToManyEdge {
     """
     condition: JobRelationshipCondition
 
-    """
-    Only read the first `n` values of the set.
-    """
+    """Only read the first `n` values of the set."""
     first: Int
 
-    """
-    Only read the last `n` values of the set.
-    """
+    """Only read the last `n` values of the set."""
     last: Int
 
     """
@@ -456,15 +366,28 @@ type JobJobsByJobRelationshipFromJobIdAndToJobIdManyToManyEdge {
     """
     offset: Int
 
-    """
-    The method to use when ordering `JobRelationship`.
-    """
+    """The method to use when ordering `JobRelationship`."""
     orderBy: [JobRelationshipOrderBy!] = [NATURAL]
   ): JobRelationshipConnection!
 
-  """
-  The `Job` at the end of the edge.
-  """
+  """Reads and enables pagination through a set of `JobRelationship`."""
+  jobRelationshipsByToJobIdList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: JobRelationshipCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `JobRelationship`."""
+    orderBy: [JobRelationshipOrderBy!]
+  ): [JobRelationship!]!
+
+  """The `Job` at the end of the edge."""
   node: Job
 }
 
@@ -477,43 +400,27 @@ type JobJobsByJobRelationshipToJobIdAndFromJobIdManyToManyConnection {
   """
   edges: [JobJobsByJobRelationshipToJobIdAndFromJobIdManyToManyEdge!]!
 
-  """
-  A list of `Job` objects.
-  """
+  """A list of `Job` objects."""
   nodes: [Job]!
 
-  """
-  Information to aid in pagination.
-  """
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """
-  The count of *all* `Job` you could get from the connection.
-  """
+  """The count of *all* `Job` you could get from the connection."""
   totalCount: Int!
 }
 
-"""
-A `Job` edge in the connection, with data from `JobRelationship`.
-"""
+"""A `Job` edge in the connection, with data from `JobRelationship`."""
 type JobJobsByJobRelationshipToJobIdAndFromJobIdManyToManyEdge {
-  """
-  A cursor for use in pagination.
-  """
+  """A cursor for use in pagination."""
   cursor: Cursor
 
-  """
-  Reads and enables pagination through a set of `JobRelationship`.
-  """
+  """Reads and enables pagination through a set of `JobRelationship`."""
   jobRelationshipsByFromJobId(
-    """
-    Read all values in the set after (below) this cursor.
-    """
+    """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """
-    Read all values in the set before (above) this cursor.
-    """
+    """Read all values in the set before (above) this cursor."""
     before: Cursor
 
     """
@@ -521,14 +428,10 @@ type JobJobsByJobRelationshipToJobIdAndFromJobIdManyToManyEdge {
     """
     condition: JobRelationshipCondition
 
-    """
-    Only read the first `n` values of the set.
-    """
+    """Only read the first `n` values of the set."""
     first: Int
 
-    """
-    Only read the last `n` values of the set.
-    """
+    """Only read the last `n` values of the set."""
     last: Int
 
     """
@@ -537,21 +440,32 @@ type JobJobsByJobRelationshipToJobIdAndFromJobIdManyToManyEdge {
     """
     offset: Int
 
-    """
-    The method to use when ordering `JobRelationship`.
-    """
+    """The method to use when ordering `JobRelationship`."""
     orderBy: [JobRelationshipOrderBy!] = [NATURAL]
   ): JobRelationshipConnection!
 
-  """
-  The `Job` at the end of the edge.
-  """
+  """Reads and enables pagination through a set of `JobRelationship`."""
+  jobRelationshipsByFromJobIdList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: JobRelationshipCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `JobRelationship`."""
+    orderBy: [JobRelationshipOrderBy!]
+  ): [JobRelationship!]!
+
+  """The `Job` at the end of the edge."""
   node: Job
 }
 
-"""
-The globally unique `ID` to be used in the connection.
-"""
+"""The globally unique `ID` to be used in the connection."""
 input JobNodeIdConnect {
   """
   The globally unique `ID` which identifies a single `job` to be connected.
@@ -559,39 +473,23 @@ input JobNodeIdConnect {
   id: ID!
 }
 
-"""
-The globally unique `ID` look up for the row to update
-"""
+"""The globally unique `ID` to be used in the connection."""
 input JobOnJobRelationshipForJobRelationshipFromJobIdNodeIdUpdate {
   """
-  The globally unique `ID` which identifies a signle `job` to be connected
+  The globally unique `ID` which identifies a single `job` to be updated.
   """
   id: ID!
-
-  """
-  The nested patch object for JobInput
-  """
-  patch: JobPatch!
 }
 
-"""
-The globally unique `ID` look up for the row to update
-"""
+"""The globally unique `ID` to be used in the connection."""
 input JobOnJobRelationshipForJobRelationshipToJobIdNodeIdUpdate {
   """
-  The globally unique `ID` which identifies a signle `job` to be connected
+  The globally unique `ID` which identifies a single `job` to be updated.
   """
   id: ID!
-
-  """
-  The nested patch object for JobInput
-  """
-  patch: JobPatch!
 }
 
-"""
-Methods to use when ordering `Job`.
-"""
+"""Methods to use when ordering `Job`."""
 enum JobOrderBy {
   ID_ASC
   ID_DESC
@@ -600,33 +498,23 @@ enum JobOrderBy {
   PRIMARY_KEY_DESC
 }
 
-"""
-Represents an update to a `Job`. Fields that are set will be updated.
-"""
+"""Represents an update to a `Job`. Fields that are set will be updated."""
 input JobPatch {
-  """
-  Input for the nested mutation of `job_relationship in the `JobPatch` mutation
-  """
+  """Nested mutation for job_relationship"""
   jobRelationshipsToIdUsingFromJobId: JobRelationshipFromJobIdFKeyInverseInput
 
-  """
-  Input for the nested mutation of `job_relationship in the `JobPatch` mutation
-  """
+  """Nested mutation for job_relationship"""
   jobRelationshipsToIdUsingToJobId: JobRelationshipToJobIdFKeyInverseInput
   name: String
   rowId: Int
 }
 
 type JobRelationship {
-  """
-  Reads a single `Job` that is related to this `JobRelationship`.
-  """
+  """Reads a single `Job` that is related to this `JobRelationship`."""
   fromJob: Job
   fromJobId: Int
 
-  """
-  Reads a single `Job` that is related to this `JobRelationship`.
-  """
+  """Reads a single `Job` that is related to this `JobRelationship`."""
   toJob: Job
   toJobId: Int
   type: String
@@ -637,34 +525,24 @@ A condition to be used against `JobRelationship` object types. All fields are
 tested for equality and combined with a logical ‘and.’
 """
 input JobRelationshipCondition {
-  """
-  Checks for equality with the object’s `fromJobId` field.
-  """
+  """Checks for equality with the object’s `fromJobId` field."""
   fromJobId: Int
 
-  """
-  Checks for equality with the object’s `toJobId` field.
-  """
+  """Checks for equality with the object’s `toJobId` field."""
   toJobId: Int
 }
 
-"""
-A connection to a list of `JobRelationship` values.
-"""
+"""A connection to a list of `JobRelationship` values."""
 type JobRelationshipConnection {
   """
   A list of edges which contains the `JobRelationship` and cursor to aid in pagination.
   """
   edges: [JobRelationshipEdge]!
 
-  """
-  A list of `JobRelationship` objects.
-  """
+  """A list of `JobRelationship` objects."""
   nodes: [JobRelationship]!
 
-  """
-  Information to aid in pagination.
-  """
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 
   """
@@ -673,90 +551,96 @@ type JobRelationshipConnection {
   totalCount: Int!
 }
 
-"""
-A `JobRelationship` edge in the connection.
-"""
+"""A `JobRelationship` edge in the connection."""
 type JobRelationshipEdge {
-  """
-  A cursor for use in pagination.
-  """
+  """A cursor for use in pagination."""
   cursor: Cursor
 
-  """
-  The `JobRelationship` at the end of the edge.
-  """
+  """The `JobRelationship` at the end of the edge."""
   node: JobRelationship
 }
 
-"""
-Input for the nested mutation of `job_relationship`
-"""
+"""Input for the nested mutation of job_relationship type"""
 input JobRelationshipFromJobIdFKeyInput {
-  """
-  A `job` object that will be connected by its ID.
-  """
+  """A job object that will be connected by its ID"""
   connectById: JobNodeIdConnect
 
-  """
-  A `JobInput` object that will be created and connected to this object.
-  """
+  """A JobInput object that will be created and connected to this object"""
   create: JobRelationshipFromJobIdFkeyJobCreateInput
 
   """
-  The primary keys and patch data for job for the far side of the relationship
+  The primary keys and patch data for job for the far side of the relationship field
   """
   updateById: JobOnJobRelationshipForJobRelationshipFromJobIdNodeIdUpdate
 }
 
-"""
-Input for the nested mutation of `job`
-"""
+"""Input for the nested mutation of job type"""
 input JobRelationshipFromJobIdFKeyInverseInput {
+  """A job_relationship object that will be connected by its ID"""
+  connectById: [JobRelationshipNodeIdConnect!]
+
   """
-  A `JobRelationshipInput` object that will be created and connected to this object.
+  A JobRelationshipInput object that will be created and connected to this object
   """
   create: [JobRelationshipFromJobIdFkeyJobRelationshipCreateInput!]
+
+  """
+  The primary keys and patch data for job_relationship for the far side of the relationship field
+  """
+  updateById: [JobRelationshipOnJobForJobRelationshipFromJobIdNodeIdUpdate!]
 }
 
-"""
-The `job` to be created by this mutation.
-"""
+"""The `job` to be created by this mutation."""
 input JobRelationshipFromJobIdFkeyJobCreateInput {
   name: String
   rowId: Int
 }
 
-"""
-The `job_relationship` to be created by this mutation.
-"""
+"""The `job_relationship` to be created by this mutation."""
 input JobRelationshipFromJobIdFkeyJobRelationshipCreateInput {
   fromJobId: Int
   toJobId: Int
   type: String
 }
 
-"""
-An input for mutations affecting `JobRelationship`
-"""
+"""An input for mutations affecting `JobRelationship`"""
 input JobRelationshipInput {
   fromJobId: Int
 
-  """
-  Input for the nested mutation of `job in the `JobRelationshipInput` mutation
-  """
+  """Nested mutation for job"""
   jobToFromJobId: JobRelationshipFromJobIdFKeyInput
 
-  """
-  Input for the nested mutation of `job in the `JobRelationshipInput` mutation
-  """
+  """Nested mutation for job"""
   jobToToJobId: JobRelationshipToJobIdFKeyInput
   toJobId: Int
   type: String
 }
 
-"""
-Methods to use when ordering `JobRelationship`.
-"""
+"""The globally unique `ID` to be used in the connection."""
+input JobRelationshipNodeIdConnect {
+  """
+  The globally unique `ID` which identifies a single `job_relationship` to be connected.
+  """
+  id: ID!
+}
+
+"""The globally unique `ID` to be used in the connection."""
+input JobRelationshipOnJobForJobRelationshipFromJobIdNodeIdUpdate {
+  """
+  The globally unique `ID` which identifies a single `job_relationship` to be updated.
+  """
+  id: ID!
+}
+
+"""The globally unique `ID` to be used in the connection."""
+input JobRelationshipOnJobForJobRelationshipToJobIdNodeIdUpdate {
+  """
+  The globally unique `ID` which identifies a single `job_relationship` to be updated.
+  """
+  id: ID!
+}
+
+"""Methods to use when ordering `JobRelationship`."""
 enum JobRelationshipOrderBy {
   FROM_JOB_ID_ASC
   FROM_JOB_ID_DESC
@@ -765,47 +649,43 @@ enum JobRelationshipOrderBy {
   TO_JOB_ID_DESC
 }
 
-"""
-Input for the nested mutation of `job_relationship`
-"""
+"""Input for the nested mutation of job_relationship type"""
 input JobRelationshipToJobIdFKeyInput {
-  """
-  A `job` object that will be connected by its ID.
-  """
+  """A job object that will be connected by its ID"""
   connectById: JobNodeIdConnect
 
-  """
-  A `JobInput` object that will be created and connected to this object.
-  """
+  """A JobInput object that will be created and connected to this object"""
   create: JobRelationshipToJobIdFkeyJobCreateInput
 
   """
-  The primary keys and patch data for job for the far side of the relationship
+  The primary keys and patch data for job for the far side of the relationship field
   """
   updateById: JobOnJobRelationshipForJobRelationshipToJobIdNodeIdUpdate
 }
 
-"""
-Input for the nested mutation of `job`
-"""
+"""Input for the nested mutation of job type"""
 input JobRelationshipToJobIdFKeyInverseInput {
+  """A job_relationship object that will be connected by its ID"""
+  connectById: [JobRelationshipNodeIdConnect!]
+
   """
-  A `JobRelationshipInput` object that will be created and connected to this object.
+  A JobRelationshipInput object that will be created and connected to this object
   """
   create: [JobRelationshipToJobIdFkeyJobRelationshipCreateInput!]
+
+  """
+  The primary keys and patch data for job_relationship for the far side of the relationship field
+  """
+  updateById: [JobRelationshipOnJobForJobRelationshipToJobIdNodeIdUpdate!]
 }
 
-"""
-The `job` to be created by this mutation.
-"""
+"""The `job` to be created by this mutation."""
 input JobRelationshipToJobIdFkeyJobCreateInput {
   name: String
   rowId: Int
 }
 
-"""
-The `job_relationship` to be created by this mutation.
-"""
+"""The `job_relationship` to be created by this mutation."""
 input JobRelationshipToJobIdFkeyJobRelationshipCreateInput {
   fromJobId: Int
   toJobId: Int
@@ -816,9 +696,7 @@ input JobRelationshipToJobIdFkeyJobRelationshipCreateInput {
 The root mutation type which contains root level fields which mutate data.
 """
 type Mutation {
-  """
-  Creates a single `Job`.
-  """
+  """Creates a single `Job`."""
   createJob(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -826,9 +704,7 @@ type Mutation {
     input: CreateJobInput!
   ): CreateJobPayload
 
-  """
-  Creates a single `JobRelationship`.
-  """
+  """Creates a single `JobRelationship`."""
   createJobRelationship(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -836,9 +712,7 @@ type Mutation {
     input: CreateJobRelationshipInput!
   ): CreateJobRelationshipPayload
 
-  """
-  Deletes a single `Job` using a unique key.
-  """
+  """Deletes a single `Job` using a unique key."""
   deleteJob(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -846,9 +720,7 @@ type Mutation {
     input: DeleteJobInput!
   ): DeleteJobPayload
 
-  """
-  Deletes a single `Job` using its globally unique id.
-  """
+  """Deletes a single `Job` using its globally unique id."""
   deleteJobById(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -856,9 +728,7 @@ type Mutation {
     input: DeleteJobByIdInput!
   ): DeleteJobPayload
 
-  """
-  Updates a single `Job` using a unique key and a patch.
-  """
+  """Updates a single `Job` using a unique key and a patch."""
   updateJob(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -866,9 +736,7 @@ type Mutation {
     input: UpdateJobInput!
   ): UpdateJobPayload
 
-  """
-  Updates a single `Job` using its globally unique id and a patch.
-  """
+  """Updates a single `Job` using its globally unique id and a patch."""
   updateJobById(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -877,9 +745,7 @@ type Mutation {
   ): UpdateJobPayload
 }
 
-"""
-An object with a globally unique `ID`.
-"""
+"""An object with a globally unique `ID`."""
 interface Node {
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
@@ -887,67 +753,43 @@ interface Node {
   id: ID!
 }
 
-"""
-Information about pagination in a connection.
-"""
+"""Information about pagination in a connection."""
 type PageInfo {
-  """
-  When paginating forwards, the cursor to continue.
-  """
+  """When paginating forwards, the cursor to continue."""
   endCursor: Cursor
 
-  """
-  When paginating forwards, are there more items?
-  """
+  """When paginating forwards, are there more items?"""
   hasNextPage: Boolean!
 
-  """
-  When paginating backwards, are there more items?
-  """
+  """When paginating backwards, are there more items?"""
   hasPreviousPage: Boolean!
 
-  """
-  When paginating backwards, the cursor to continue.
-  """
+  """When paginating backwards, the cursor to continue."""
   startCursor: Cursor
 }
 
-"""
-The root query type which gives access points into the data universe.
-"""
+"""The root query type which gives access points into the data universe."""
 type Query implements Node {
   """
   The root query type must be a `Node` to work well with Relay 1 mutations. This just resolves to `query`.
   """
   id: ID!
 
-  """
-  Get a single `Job`.
-  """
+  """Get a single `Job`."""
   job(rowId: Int!): Job
 
-  """
-  Reads a single `Job` using its globally unique `ID`.
-  """
+  """Reads a single `Job` using its globally unique `ID`."""
   jobById(
-    """
-    The globally unique `ID` to be used in selecting a single `Job`.
-    """
+    """The globally unique `ID` to be used in selecting a single `Job`."""
     id: ID!
   ): Job
 
-  """
-  Reads and enables pagination through a set of `JobRelationship`.
-  """
+  """Reads and enables pagination through a set of `JobRelationship`."""
   jobRelationships(
-    """
-    Read all values in the set after (below) this cursor.
-    """
+    """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """
-    Read all values in the set before (above) this cursor.
-    """
+    """Read all values in the set before (above) this cursor."""
     before: Cursor
 
     """
@@ -955,14 +797,10 @@ type Query implements Node {
     """
     condition: JobRelationshipCondition
 
-    """
-    Only read the first `n` values of the set.
-    """
+    """Only read the first `n` values of the set."""
     first: Int
 
-    """
-    Only read the last `n` values of the set.
-    """
+    """Only read the last `n` values of the set."""
     last: Int
 
     """
@@ -971,24 +809,16 @@ type Query implements Node {
     """
     offset: Int
 
-    """
-    The method to use when ordering `JobRelationship`.
-    """
+    """The method to use when ordering `JobRelationship`."""
     orderBy: [JobRelationshipOrderBy!] = [NATURAL]
   ): JobRelationshipConnection
 
-  """
-  Reads and enables pagination through a set of `Job`.
-  """
+  """Reads and enables pagination through a set of `Job`."""
   jobs(
-    """
-    Read all values in the set after (below) this cursor.
-    """
+    """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """
-    Read all values in the set before (above) this cursor.
-    """
+    """Read all values in the set before (above) this cursor."""
     before: Cursor
 
     """
@@ -996,14 +826,10 @@ type Query implements Node {
     """
     condition: JobCondition
 
-    """
-    Only read the first `n` values of the set.
-    """
+    """Only read the first `n` values of the set."""
     first: Int
 
-    """
-    Only read the last `n` values of the set.
-    """
+    """Only read the last `n` values of the set."""
     last: Int
 
     """
@@ -1012,19 +838,13 @@ type Query implements Node {
     """
     offset: Int
 
-    """
-    The method to use when ordering `Job`.
-    """
+    """The method to use when ordering `Job`."""
     orderBy: [JobOrderBy!] = [PRIMARY_KEY_ASC]
   ): JobConnection
 
-  """
-  Fetches an object given its globally unique `ID`.
-  """
+  """Fetches an object given its globally unique `ID`."""
   node(
-    """
-    The globally unique `ID`.
-    """
+    """The globally unique `ID`."""
     id: ID!
   ): Node
 
@@ -1035,9 +855,7 @@ type Query implements Node {
   query: Query!
 }
 
-"""
-All input for the `updateJobById` mutation.
-"""
+"""All input for the `updateJobById` mutation."""
 input UpdateJobByIdInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -1056,9 +874,7 @@ input UpdateJobByIdInput {
   patch: JobPatch!
 }
 
-"""
-All input for the `updateJob` mutation.
-"""
+"""All input for the `updateJob` mutation."""
 input UpdateJobInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -1073,9 +889,7 @@ input UpdateJobInput {
   rowId: Int!
 }
 
-"""
-The output of our update `Job` mutation.
-"""
+"""The output of our update `Job` mutation."""
 type UpdateJobPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
@@ -1083,18 +897,12 @@ type UpdateJobPayload {
   """
   clientMutationId: String
 
-  """
-  The `Job` that was updated by this mutation.
-  """
+  """The `Job` that was updated by this mutation."""
   job: Job
 
-  """
-  An edge for our `Job`. May be used by Relay 1.
-  """
+  """An edge for our `Job`. May be used by Relay 1."""
   jobEdge(
-    """
-    The method to use when ordering `Job`.
-    """
+    """The method to use when ordering `Job`."""
     orderBy: [JobOrderBy!]! = [PRIMARY_KEY_ASC]
   ): JobEdge
 

@@ -1,7 +1,5 @@
 type Child implements Node {
-  """
-  Reads a single `Parent` that is related to this `Child`.
-  """
+  """Reads a single `Parent` that is related to this `Child`."""
   dadParent: Parent
   dadParentId: Int
 
@@ -10,9 +8,7 @@ type Child implements Node {
   """
   id: ID!
 
-  """
-  Reads a single `Parent` that is related to this `Child`.
-  """
+  """Reads a single `Parent` that is related to this `Child`."""
   momParent: Parent
   momParentId: Int
   name: String!
@@ -23,90 +19,62 @@ type Child implements Node {
 A condition to be used against `Child` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
 input ChildCondition {
-  """
-  Checks for equality with the object’s `dadParentId` field.
-  """
+  """Checks for equality with the object’s `dadParentId` field."""
   dadParentId: Int
 
-  """
-  Checks for equality with the object’s `momParentId` field.
-  """
+  """Checks for equality with the object’s `momParentId` field."""
   momParentId: Int
 
-  """
-  Checks for equality with the object’s `rowId` field.
-  """
+  """Checks for equality with the object’s `rowId` field."""
   rowId: Int
 }
 
-"""
-A connection to a list of `Child` values.
-"""
+"""A connection to a list of `Child` values."""
 type ChildConnection {
   """
   A list of edges which contains the `Child` and cursor to aid in pagination.
   """
   edges: [ChildEdge]!
 
-  """
-  A list of `Child` objects.
-  """
+  """A list of `Child` objects."""
   nodes: [Child]!
 
-  """
-  Information to aid in pagination.
-  """
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """
-  The count of *all* `Child` you could get from the connection.
-  """
+  """The count of *all* `Child` you could get from the connection."""
   totalCount: Int!
 }
 
-"""
-Input for the nested mutation of `child`
-"""
+"""Input for the nested mutation of child type"""
 input ChildDadParentIdFKeyInput {
-  """
-  A `parent` object that will be connected by its ID.
-  """
+  """A parent object that will be connected by its ID"""
   connectById: ParentNodeIdConnect
 
-  """
-  A `ParentInput` object that will be created and connected to this object.
-  """
+  """A ParentInput object that will be created and connected to this object"""
   create: ChildDadParentIdFkeyParentCreateInput
 
   """
-  The primary keys and patch data for parent for the far side of the relationship
+  The primary keys and patch data for parent for the far side of the relationship field
   """
   updateById: ParentOnChildForChildDadParentIdNodeIdUpdate
 }
 
-"""
-Input for the nested mutation of `parent`
-"""
+"""Input for the nested mutation of parent type"""
 input ChildDadParentIdFKeyInverseInput {
-  """
-  A `child` object that will be connected by its ID.
-  """
+  """A child object that will be connected by its ID"""
   connectById: [ChildNodeIdConnect!]
 
-  """
-  A `ChildInput` object that will be created and connected to this object.
-  """
+  """A ChildInput object that will be created and connected to this object"""
   create: [ChildDadParentIdFkeyChildCreateInput!]
 
   """
-  The primary keys and patch data for child for the far side of the relationship
+  The primary keys and patch data for child for the far side of the relationship field
   """
   updateById: [ChildOnParentForChildDadParentIdNodeIdUpdate!]
 }
 
-"""
-The `child` to be created by this mutation.
-"""
+"""The `child` to be created by this mutation."""
 input ChildDadParentIdFkeyChildCreateInput {
   dadParentId: Int
   momParentId: Int
@@ -114,92 +82,64 @@ input ChildDadParentIdFkeyChildCreateInput {
   rowId: Int
 }
 
-"""
-The `parent` to be created by this mutation.
-"""
+"""The `parent` to be created by this mutation."""
 input ChildDadParentIdFkeyParentCreateInput {
   parentName: String!
   rowId: Int
 }
 
-"""
-A `Child` edge in the connection.
-"""
+"""A `Child` edge in the connection."""
 type ChildEdge {
-  """
-  A cursor for use in pagination.
-  """
+  """A cursor for use in pagination."""
   cursor: Cursor
 
-  """
-  The `Child` at the end of the edge.
-  """
+  """The `Child` at the end of the edge."""
   node: Child
 }
 
-"""
-An input for mutations affecting `Child`
-"""
+"""An input for mutations affecting `Child`"""
 input ChildInput {
   dadParentId: Int
   momParentId: Int
   name: String!
 
-  """
-  Input for the nested mutation of `parent in the `ChildInput` mutation
-  """
+  """Nested mutation for parent"""
   parentToDadParentId: ChildDadParentIdFKeyInput
 
-  """
-  Input for the nested mutation of `parent in the `ChildInput` mutation
-  """
+  """Nested mutation for parent"""
   parentToMomParentId: ChildMomParentIdFKeyInput
   rowId: Int
 }
 
-"""
-Input for the nested mutation of `child`
-"""
+"""Input for the nested mutation of child type"""
 input ChildMomParentIdFKeyInput {
-  """
-  A `parent` object that will be connected by its ID.
-  """
+  """A parent object that will be connected by its ID"""
   connectById: ParentNodeIdConnect
 
-  """
-  A `ParentInput` object that will be created and connected to this object.
-  """
+  """A ParentInput object that will be created and connected to this object"""
   create: ChildMomParentIdFkeyParentCreateInput
 
   """
-  The primary keys and patch data for parent for the far side of the relationship
+  The primary keys and patch data for parent for the far side of the relationship field
   """
   updateById: ParentOnChildForChildMomParentIdNodeIdUpdate
 }
 
-"""
-Input for the nested mutation of `parent`
-"""
+"""Input for the nested mutation of parent type"""
 input ChildMomParentIdFKeyInverseInput {
-  """
-  A `child` object that will be connected by its ID.
-  """
+  """A child object that will be connected by its ID"""
   connectById: [ChildNodeIdConnect!]
 
-  """
-  A `ChildInput` object that will be created and connected to this object.
-  """
+  """A ChildInput object that will be created and connected to this object"""
   create: [ChildMomParentIdFkeyChildCreateInput!]
 
   """
-  The primary keys and patch data for child for the far side of the relationship
+  The primary keys and patch data for child for the far side of the relationship field
   """
   updateById: [ChildOnParentForChildMomParentIdNodeIdUpdate!]
 }
 
-"""
-The `child` to be created by this mutation.
-"""
+"""The `child` to be created by this mutation."""
 input ChildMomParentIdFkeyChildCreateInput {
   dadParentId: Int
   momParentId: Int
@@ -207,17 +147,13 @@ input ChildMomParentIdFkeyChildCreateInput {
   rowId: Int
 }
 
-"""
-The `parent` to be created by this mutation.
-"""
+"""The `parent` to be created by this mutation."""
 input ChildMomParentIdFkeyParentCreateInput {
   parentName: String!
   rowId: Int
 }
 
-"""
-The globally unique `ID` to be used in the connection.
-"""
+"""The globally unique `ID` to be used in the connection."""
 input ChildNodeIdConnect {
   """
   The globally unique `ID` which identifies a single `child` to be connected.
@@ -225,39 +161,23 @@ input ChildNodeIdConnect {
   id: ID!
 }
 
-"""
-The globally unique `ID` look up for the row to update
-"""
+"""The globally unique `ID` to be used in the connection."""
 input ChildOnParentForChildDadParentIdNodeIdUpdate {
   """
-  The globally unique `ID` which identifies a signle `child` to be connected
+  The globally unique `ID` which identifies a single `child` to be updated.
   """
   id: ID!
-
-  """
-  The nested patch object for ChildInput
-  """
-  patch: ChildPatch!
 }
 
-"""
-The globally unique `ID` look up for the row to update
-"""
+"""The globally unique `ID` to be used in the connection."""
 input ChildOnParentForChildMomParentIdNodeIdUpdate {
   """
-  The globally unique `ID` which identifies a signle `child` to be connected
+  The globally unique `ID` which identifies a single `child` to be updated.
   """
   id: ID!
-
-  """
-  The nested patch object for ChildInput
-  """
-  patch: ChildPatch!
 }
 
-"""
-Methods to use when ordering `Child`.
-"""
+"""Methods to use when ordering `Child`."""
 enum ChildOrderBy {
   DAD_PARENT_ID_ASC
   DAD_PARENT_ID_DESC
@@ -278,25 +198,17 @@ input ChildPatch {
   momParentId: Int
   name: String
 
-  """
-  Input for the nested mutation of `parent in the `ChildPatch` mutation
-  """
+  """Nested mutation for parent"""
   parentToDadParentId: ChildDadParentIdFKeyInput
 
-  """
-  Input for the nested mutation of `parent in the `ChildPatch` mutation
-  """
+  """Nested mutation for parent"""
   parentToMomParentId: ChildMomParentIdFKeyInput
   rowId: Int
 }
 
-"""
-All input for the create `Child` mutation.
-"""
+"""All input for the create `Child` mutation."""
 input CreateChildInput {
-  """
-  The `Child` to be created by this mutation.
-  """
+  """The `Child` to be created by this mutation."""
   child: ChildInput!
 
   """
@@ -306,22 +218,14 @@ input CreateChildInput {
   clientMutationId: String
 }
 
-"""
-The output of our create `Child` mutation.
-"""
+"""The output of our create `Child` mutation."""
 type CreateChildPayload {
-  """
-  The `Child` that was created by this mutation.
-  """
+  """The `Child` that was created by this mutation."""
   child: Child
 
-  """
-  An edge for our `Child`. May be used by Relay 1.
-  """
+  """An edge for our `Child`. May be used by Relay 1."""
   childEdge(
-    """
-    The method to use when ordering `Child`.
-    """
+    """The method to use when ordering `Child`."""
     orderBy: [ChildOrderBy!]! = [PRIMARY_KEY_ASC]
   ): ChildEdge
 
@@ -337,9 +241,7 @@ type CreateChildPayload {
   query: Query
 }
 
-"""
-All input for the create `Parent` mutation.
-"""
+"""All input for the create `Parent` mutation."""
 input CreateParentInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -347,15 +249,11 @@ input CreateParentInput {
   """
   clientMutationId: String
 
-  """
-  The `Parent` to be created by this mutation.
-  """
+  """The `Parent` to be created by this mutation."""
   parent: ParentInput!
 }
 
-"""
-The output of our create `Parent` mutation.
-"""
+"""The output of our create `Parent` mutation."""
 type CreateParentPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
@@ -363,18 +261,12 @@ type CreateParentPayload {
   """
   clientMutationId: String
 
-  """
-  The `Parent` that was created by this mutation.
-  """
+  """The `Parent` that was created by this mutation."""
   parent: Parent
 
-  """
-  An edge for our `Parent`. May be used by Relay 1.
-  """
+  """An edge for our `Parent`. May be used by Relay 1."""
   parentEdge(
-    """
-    The method to use when ordering `Parent`.
-    """
+    """The method to use when ordering `Parent`."""
     orderBy: [ParentOrderBy!]! = [PRIMARY_KEY_ASC]
   ): ParentEdge
 
@@ -384,14 +276,10 @@ type CreateParentPayload {
   query: Query
 }
 
-"""
-A location in a connection that can be used for resuming pagination.
-"""
+"""A location in a connection that can be used for resuming pagination."""
 scalar Cursor
 
-"""
-All input for the `deleteChildById` mutation.
-"""
+"""All input for the `deleteChildById` mutation."""
 input DeleteChildByIdInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -405,9 +293,7 @@ input DeleteChildByIdInput {
   id: ID!
 }
 
-"""
-All input for the `deleteChild` mutation.
-"""
+"""All input for the `deleteChild` mutation."""
 input DeleteChildInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -417,22 +303,14 @@ input DeleteChildInput {
   rowId: Int!
 }
 
-"""
-The output of our delete `Child` mutation.
-"""
+"""The output of our delete `Child` mutation."""
 type DeleteChildPayload {
-  """
-  The `Child` that was deleted by this mutation.
-  """
+  """The `Child` that was deleted by this mutation."""
   child: Child
 
-  """
-  An edge for our `Child`. May be used by Relay 1.
-  """
+  """An edge for our `Child`. May be used by Relay 1."""
   childEdge(
-    """
-    The method to use when ordering `Child`.
-    """
+    """The method to use when ordering `Child`."""
     orderBy: [ChildOrderBy!]! = [PRIMARY_KEY_ASC]
   ): ChildEdge
 
@@ -449,9 +327,7 @@ type DeleteChildPayload {
   query: Query
 }
 
-"""
-All input for the `deleteParentById` mutation.
-"""
+"""All input for the `deleteParentById` mutation."""
 input DeleteParentByIdInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -465,9 +341,7 @@ input DeleteParentByIdInput {
   id: ID!
 }
 
-"""
-All input for the `deleteParent` mutation.
-"""
+"""All input for the `deleteParent` mutation."""
 input DeleteParentInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -477,9 +351,7 @@ input DeleteParentInput {
   rowId: Int!
 }
 
-"""
-The output of our delete `Parent` mutation.
-"""
+"""The output of our delete `Parent` mutation."""
 type DeleteParentPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
@@ -488,18 +360,12 @@ type DeleteParentPayload {
   clientMutationId: String
   deletedParentId: ID
 
-  """
-  The `Parent` that was deleted by this mutation.
-  """
+  """The `Parent` that was deleted by this mutation."""
   parent: Parent
 
-  """
-  An edge for our `Parent`. May be used by Relay 1.
-  """
+  """An edge for our `Parent`. May be used by Relay 1."""
   parentEdge(
-    """
-    The method to use when ordering `Parent`.
-    """
+    """The method to use when ordering `Parent`."""
     orderBy: [ParentOrderBy!]! = [PRIMARY_KEY_ASC]
   ): ParentEdge
 
@@ -513,9 +379,7 @@ type DeleteParentPayload {
 The root mutation type which contains root level fields which mutate data.
 """
 type Mutation {
-  """
-  Creates a single `Child`.
-  """
+  """Creates a single `Child`."""
   createChild(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -523,9 +387,7 @@ type Mutation {
     input: CreateChildInput!
   ): CreateChildPayload
 
-  """
-  Creates a single `Parent`.
-  """
+  """Creates a single `Parent`."""
   createParent(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -533,9 +395,7 @@ type Mutation {
     input: CreateParentInput!
   ): CreateParentPayload
 
-  """
-  Deletes a single `Child` using a unique key.
-  """
+  """Deletes a single `Child` using a unique key."""
   deleteChild(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -543,9 +403,7 @@ type Mutation {
     input: DeleteChildInput!
   ): DeleteChildPayload
 
-  """
-  Deletes a single `Child` using its globally unique id.
-  """
+  """Deletes a single `Child` using its globally unique id."""
   deleteChildById(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -553,9 +411,7 @@ type Mutation {
     input: DeleteChildByIdInput!
   ): DeleteChildPayload
 
-  """
-  Deletes a single `Parent` using a unique key.
-  """
+  """Deletes a single `Parent` using a unique key."""
   deleteParent(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -563,9 +419,7 @@ type Mutation {
     input: DeleteParentInput!
   ): DeleteParentPayload
 
-  """
-  Deletes a single `Parent` using its globally unique id.
-  """
+  """Deletes a single `Parent` using its globally unique id."""
   deleteParentById(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -573,9 +427,7 @@ type Mutation {
     input: DeleteParentByIdInput!
   ): DeleteParentPayload
 
-  """
-  Updates a single `Child` using a unique key and a patch.
-  """
+  """Updates a single `Child` using a unique key and a patch."""
   updateChild(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -583,9 +435,7 @@ type Mutation {
     input: UpdateChildInput!
   ): UpdateChildPayload
 
-  """
-  Updates a single `Child` using its globally unique id and a patch.
-  """
+  """Updates a single `Child` using its globally unique id and a patch."""
   updateChildById(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -593,9 +443,7 @@ type Mutation {
     input: UpdateChildByIdInput!
   ): UpdateChildPayload
 
-  """
-  Updates a single `Parent` using a unique key and a patch.
-  """
+  """Updates a single `Parent` using a unique key and a patch."""
   updateParent(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -603,9 +451,7 @@ type Mutation {
     input: UpdateParentInput!
   ): UpdateParentPayload
 
-  """
-  Updates a single `Parent` using its globally unique id and a patch.
-  """
+  """Updates a single `Parent` using its globally unique id and a patch."""
   updateParentById(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -614,9 +460,7 @@ type Mutation {
   ): UpdateParentPayload
 }
 
-"""
-An object with a globally unique `ID`.
-"""
+"""An object with a globally unique `ID`."""
 interface Node {
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
@@ -624,44 +468,28 @@ interface Node {
   id: ID!
 }
 
-"""
-Information about pagination in a connection.
-"""
+"""Information about pagination in a connection."""
 type PageInfo {
-  """
-  When paginating forwards, the cursor to continue.
-  """
+  """When paginating forwards, the cursor to continue."""
   endCursor: Cursor
 
-  """
-  When paginating forwards, are there more items?
-  """
+  """When paginating forwards, are there more items?"""
   hasNextPage: Boolean!
 
-  """
-  When paginating backwards, are there more items?
-  """
+  """When paginating backwards, are there more items?"""
   hasPreviousPage: Boolean!
 
-  """
-  When paginating backwards, the cursor to continue.
-  """
+  """When paginating backwards, the cursor to continue."""
   startCursor: Cursor
 }
 
 type Parent implements Node {
-  """
-  Reads and enables pagination through a set of `Child`.
-  """
+  """Reads and enables pagination through a set of `Child`."""
   childrenByDadParentId(
-    """
-    Read all values in the set after (below) this cursor.
-    """
+    """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """
-    Read all values in the set before (above) this cursor.
-    """
+    """Read all values in the set before (above) this cursor."""
     before: Cursor
 
     """
@@ -669,14 +497,10 @@ type Parent implements Node {
     """
     condition: ChildCondition
 
-    """
-    Only read the first `n` values of the set.
-    """
+    """Only read the first `n` values of the set."""
     first: Int
 
-    """
-    Only read the last `n` values of the set.
-    """
+    """Only read the last `n` values of the set."""
     last: Int
 
     """
@@ -685,24 +509,16 @@ type Parent implements Node {
     """
     offset: Int
 
-    """
-    The method to use when ordering `Child`.
-    """
+    """The method to use when ordering `Child`."""
     orderBy: [ChildOrderBy!] = [PRIMARY_KEY_ASC]
   ): ChildConnection!
 
-  """
-  Reads and enables pagination through a set of `Child`.
-  """
+  """Reads and enables pagination through a set of `Child`."""
   childrenByMomParentId(
-    """
-    Read all values in the set after (below) this cursor.
-    """
+    """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """
-    Read all values in the set before (above) this cursor.
-    """
+    """Read all values in the set before (above) this cursor."""
     before: Cursor
 
     """
@@ -710,14 +526,10 @@ type Parent implements Node {
     """
     condition: ChildCondition
 
-    """
-    Only read the first `n` values of the set.
-    """
+    """Only read the first `n` values of the set."""
     first: Int
 
-    """
-    Only read the last `n` values of the set.
-    """
+    """Only read the last `n` values of the set."""
     last: Int
 
     """
@@ -726,9 +538,7 @@ type Parent implements Node {
     """
     offset: Int
 
-    """
-    The method to use when ordering `Child`.
-    """
+    """The method to use when ordering `Child`."""
     orderBy: [ChildOrderBy!] = [PRIMARY_KEY_ASC]
   ): ChildConnection!
 
@@ -738,18 +548,12 @@ type Parent implements Node {
   id: ID!
   parentName: String!
 
-  """
-  Reads and enables pagination through a set of `Parent`.
-  """
+  """Reads and enables pagination through a set of `Parent`."""
   parentsByChildDadParentIdAndMomParentId(
-    """
-    Read all values in the set after (below) this cursor.
-    """
+    """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """
-    Read all values in the set before (above) this cursor.
-    """
+    """Read all values in the set before (above) this cursor."""
     before: Cursor
 
     """
@@ -757,14 +561,10 @@ type Parent implements Node {
     """
     condition: ParentCondition
 
-    """
-    Only read the first `n` values of the set.
-    """
+    """Only read the first `n` values of the set."""
     first: Int
 
-    """
-    Only read the last `n` values of the set.
-    """
+    """Only read the last `n` values of the set."""
     last: Int
 
     """
@@ -773,24 +573,33 @@ type Parent implements Node {
     """
     offset: Int
 
-    """
-    The method to use when ordering `Parent`.
-    """
+    """The method to use when ordering `Parent`."""
     orderBy: [ParentOrderBy!] = [PRIMARY_KEY_ASC]
   ): ParentParentsByChildDadParentIdAndMomParentIdManyToManyConnection!
 
-  """
-  Reads and enables pagination through a set of `Parent`.
-  """
+  """Reads and enables pagination through a set of `Parent`."""
+  parentsByChildDadParentIdAndMomParentIdList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ParentCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `Parent`."""
+    orderBy: [ParentOrderBy!]
+  ): [Parent!]!
+
+  """Reads and enables pagination through a set of `Parent`."""
   parentsByChildMomParentIdAndDadParentId(
-    """
-    Read all values in the set after (below) this cursor.
-    """
+    """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """
-    Read all values in the set before (above) this cursor.
-    """
+    """Read all values in the set before (above) this cursor."""
     before: Cursor
 
     """
@@ -798,14 +607,10 @@ type Parent implements Node {
     """
     condition: ParentCondition
 
-    """
-    Only read the first `n` values of the set.
-    """
+    """Only read the first `n` values of the set."""
     first: Int
 
-    """
-    Only read the last `n` values of the set.
-    """
+    """Only read the last `n` values of the set."""
     last: Int
 
     """
@@ -814,11 +619,26 @@ type Parent implements Node {
     """
     offset: Int
 
-    """
-    The method to use when ordering `Parent`.
-    """
+    """The method to use when ordering `Parent`."""
     orderBy: [ParentOrderBy!] = [PRIMARY_KEY_ASC]
   ): ParentParentsByChildMomParentIdAndDadParentIdManyToManyConnection!
+
+  """Reads and enables pagination through a set of `Parent`."""
+  parentsByChildMomParentIdAndDadParentIdList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ParentCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `Parent`."""
+    orderBy: [ParentOrderBy!]
+  ): [Parent!]!
   rowId: Int!
 }
 
@@ -826,72 +646,48 @@ type Parent implements Node {
 A condition to be used against `Parent` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
 input ParentCondition {
-  """
-  Checks for equality with the object’s `rowId` field.
-  """
+  """Checks for equality with the object’s `rowId` field."""
   rowId: Int
 }
 
-"""
-A connection to a list of `Parent` values.
-"""
+"""A connection to a list of `Parent` values."""
 type ParentConnection {
   """
   A list of edges which contains the `Parent` and cursor to aid in pagination.
   """
   edges: [ParentEdge]!
 
-  """
-  A list of `Parent` objects.
-  """
+  """A list of `Parent` objects."""
   nodes: [Parent]!
 
-  """
-  Information to aid in pagination.
-  """
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """
-  The count of *all* `Parent` you could get from the connection.
-  """
+  """The count of *all* `Parent` you could get from the connection."""
   totalCount: Int!
 }
 
-"""
-A `Parent` edge in the connection.
-"""
+"""A `Parent` edge in the connection."""
 type ParentEdge {
-  """
-  A cursor for use in pagination.
-  """
+  """A cursor for use in pagination."""
   cursor: Cursor
 
-  """
-  The `Parent` at the end of the edge.
-  """
+  """The `Parent` at the end of the edge."""
   node: Parent
 }
 
-"""
-An input for mutations affecting `Parent`
-"""
+"""An input for mutations affecting `Parent`"""
 input ParentInput {
-  """
-  Input for the nested mutation of `child in the `ParentInput` mutation
-  """
+  """Nested mutation for child"""
   childrenToIdUsingDadParentId: ChildDadParentIdFKeyInverseInput
 
-  """
-  Input for the nested mutation of `child in the `ParentInput` mutation
-  """
+  """Nested mutation for child"""
   childrenToIdUsingMomParentId: ChildMomParentIdFKeyInverseInput
   parentName: String!
   rowId: Int
 }
 
-"""
-The globally unique `ID` to be used in the connection.
-"""
+"""The globally unique `ID` to be used in the connection."""
 input ParentNodeIdConnect {
   """
   The globally unique `ID` which identifies a single `parent` to be connected.
@@ -899,39 +695,23 @@ input ParentNodeIdConnect {
   id: ID!
 }
 
-"""
-The globally unique `ID` look up for the row to update
-"""
+"""The globally unique `ID` to be used in the connection."""
 input ParentOnChildForChildDadParentIdNodeIdUpdate {
   """
-  The globally unique `ID` which identifies a signle `parent` to be connected
+  The globally unique `ID` which identifies a single `parent` to be updated.
   """
   id: ID!
-
-  """
-  The nested patch object for ParentInput
-  """
-  patch: ParentPatch!
 }
 
-"""
-The globally unique `ID` look up for the row to update
-"""
+"""The globally unique `ID` to be used in the connection."""
 input ParentOnChildForChildMomParentIdNodeIdUpdate {
   """
-  The globally unique `ID` which identifies a signle `parent` to be connected
+  The globally unique `ID` which identifies a single `parent` to be updated.
   """
   id: ID!
-
-  """
-  The nested patch object for ParentInput
-  """
-  patch: ParentPatch!
 }
 
-"""
-Methods to use when ordering `Parent`.
-"""
+"""Methods to use when ordering `Parent`."""
 enum ParentOrderBy {
   ID_ASC
   ID_DESC
@@ -940,47 +720,31 @@ enum ParentOrderBy {
   PRIMARY_KEY_DESC
 }
 
-"""
-A connection to a list of `Parent` values, with data from `Child`.
-"""
+"""A connection to a list of `Parent` values, with data from `Child`."""
 type ParentParentsByChildDadParentIdAndMomParentIdManyToManyConnection {
   """
   A list of edges which contains the `Parent`, info from the `Child`, and the cursor to aid in pagination.
   """
   edges: [ParentParentsByChildDadParentIdAndMomParentIdManyToManyEdge!]!
 
-  """
-  A list of `Parent` objects.
-  """
+  """A list of `Parent` objects."""
   nodes: [Parent]!
 
-  """
-  Information to aid in pagination.
-  """
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """
-  The count of *all* `Parent` you could get from the connection.
-  """
+  """The count of *all* `Parent` you could get from the connection."""
   totalCount: Int!
 }
 
-"""
-A `Parent` edge in the connection, with data from `Child`.
-"""
+"""A `Parent` edge in the connection, with data from `Child`."""
 type ParentParentsByChildDadParentIdAndMomParentIdManyToManyEdge {
-  """
-  Reads and enables pagination through a set of `Child`.
-  """
+  """Reads and enables pagination through a set of `Child`."""
   childrenByMomParentId(
-    """
-    Read all values in the set after (below) this cursor.
-    """
+    """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """
-    Read all values in the set before (above) this cursor.
-    """
+    """Read all values in the set before (above) this cursor."""
     before: Cursor
 
     """
@@ -988,14 +752,10 @@ type ParentParentsByChildDadParentIdAndMomParentIdManyToManyEdge {
     """
     condition: ChildCondition
 
-    """
-    Only read the first `n` values of the set.
-    """
+    """Only read the first `n` values of the set."""
     first: Int
 
-    """
-    Only read the last `n` values of the set.
-    """
+    """Only read the last `n` values of the set."""
     last: Int
 
     """
@@ -1004,64 +764,59 @@ type ParentParentsByChildDadParentIdAndMomParentIdManyToManyEdge {
     """
     offset: Int
 
-    """
-    The method to use when ordering `Child`.
-    """
+    """The method to use when ordering `Child`."""
     orderBy: [ChildOrderBy!] = [PRIMARY_KEY_ASC]
   ): ChildConnection!
 
-  """
-  A cursor for use in pagination.
-  """
+  """Reads and enables pagination through a set of `Child`."""
+  childrenByMomParentIdList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ChildCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `Child`."""
+    orderBy: [ChildOrderBy!]
+  ): [Child!]!
+
+  """A cursor for use in pagination."""
   cursor: Cursor
 
-  """
-  The `Parent` at the end of the edge.
-  """
+  """The `Parent` at the end of the edge."""
   node: Parent
 }
 
-"""
-A connection to a list of `Parent` values, with data from `Child`.
-"""
+"""A connection to a list of `Parent` values, with data from `Child`."""
 type ParentParentsByChildMomParentIdAndDadParentIdManyToManyConnection {
   """
   A list of edges which contains the `Parent`, info from the `Child`, and the cursor to aid in pagination.
   """
   edges: [ParentParentsByChildMomParentIdAndDadParentIdManyToManyEdge!]!
 
-  """
-  A list of `Parent` objects.
-  """
+  """A list of `Parent` objects."""
   nodes: [Parent]!
 
-  """
-  Information to aid in pagination.
-  """
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """
-  The count of *all* `Parent` you could get from the connection.
-  """
+  """The count of *all* `Parent` you could get from the connection."""
   totalCount: Int!
 }
 
-"""
-A `Parent` edge in the connection, with data from `Child`.
-"""
+"""A `Parent` edge in the connection, with data from `Child`."""
 type ParentParentsByChildMomParentIdAndDadParentIdManyToManyEdge {
-  """
-  Reads and enables pagination through a set of `Child`.
-  """
+  """Reads and enables pagination through a set of `Child`."""
   childrenByDadParentId(
-    """
-    Read all values in the set after (below) this cursor.
-    """
+    """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """
-    Read all values in the set before (above) this cursor.
-    """
+    """Read all values in the set before (above) this cursor."""
     before: Cursor
 
     """
@@ -1069,14 +824,10 @@ type ParentParentsByChildMomParentIdAndDadParentIdManyToManyEdge {
     """
     condition: ChildCondition
 
-    """
-    Only read the first `n` values of the set.
-    """
+    """Only read the first `n` values of the set."""
     first: Int
 
-    """
-    Only read the last `n` values of the set.
-    """
+    """Only read the last `n` values of the set."""
     last: Int
 
     """
@@ -1085,20 +836,31 @@ type ParentParentsByChildMomParentIdAndDadParentIdManyToManyEdge {
     """
     offset: Int
 
-    """
-    The method to use when ordering `Child`.
-    """
+    """The method to use when ordering `Child`."""
     orderBy: [ChildOrderBy!] = [PRIMARY_KEY_ASC]
   ): ChildConnection!
 
-  """
-  A cursor for use in pagination.
-  """
+  """Reads and enables pagination through a set of `Child`."""
+  childrenByDadParentIdList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ChildCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `Child`."""
+    orderBy: [ChildOrderBy!]
+  ): [Child!]!
+
+  """A cursor for use in pagination."""
   cursor: Cursor
 
-  """
-  The `Parent` at the end of the edge.
-  """
+  """The `Parent` at the end of the edge."""
   node: Parent
 }
 
@@ -1106,50 +868,32 @@ type ParentParentsByChildMomParentIdAndDadParentIdManyToManyEdge {
 Represents an update to a `Parent`. Fields that are set will be updated.
 """
 input ParentPatch {
-  """
-  Input for the nested mutation of `child in the `ParentPatch` mutation
-  """
+  """Nested mutation for child"""
   childrenToIdUsingDadParentId: ChildDadParentIdFKeyInverseInput
 
-  """
-  Input for the nested mutation of `child in the `ParentPatch` mutation
-  """
+  """Nested mutation for child"""
   childrenToIdUsingMomParentId: ChildMomParentIdFKeyInverseInput
   parentName: String
   rowId: Int
 }
 
-"""
-The root query type which gives access points into the data universe.
-"""
+"""The root query type which gives access points into the data universe."""
 type Query implements Node {
-  """
-  Get a single `Child`.
-  """
+  """Get a single `Child`."""
   child(rowId: Int!): Child
 
-  """
-  Reads a single `Child` using its globally unique `ID`.
-  """
+  """Reads a single `Child` using its globally unique `ID`."""
   childById(
-    """
-    The globally unique `ID` to be used in selecting a single `Child`.
-    """
+    """The globally unique `ID` to be used in selecting a single `Child`."""
     id: ID!
   ): Child
 
-  """
-  Reads and enables pagination through a set of `Child`.
-  """
+  """Reads and enables pagination through a set of `Child`."""
   children(
-    """
-    Read all values in the set after (below) this cursor.
-    """
+    """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """
-    Read all values in the set before (above) this cursor.
-    """
+    """Read all values in the set before (above) this cursor."""
     before: Cursor
 
     """
@@ -1157,14 +901,10 @@ type Query implements Node {
     """
     condition: ChildCondition
 
-    """
-    Only read the first `n` values of the set.
-    """
+    """Only read the first `n` values of the set."""
     first: Int
 
-    """
-    Only read the last `n` values of the set.
-    """
+    """Only read the last `n` values of the set."""
     last: Int
 
     """
@@ -1173,9 +913,7 @@ type Query implements Node {
     """
     offset: Int
 
-    """
-    The method to use when ordering `Child`.
-    """
+    """The method to use when ordering `Child`."""
     orderBy: [ChildOrderBy!] = [PRIMARY_KEY_ASC]
   ): ChildConnection
 
@@ -1184,43 +922,27 @@ type Query implements Node {
   """
   id: ID!
 
-  """
-  Fetches an object given its globally unique `ID`.
-  """
+  """Fetches an object given its globally unique `ID`."""
   node(
-    """
-    The globally unique `ID`.
-    """
+    """The globally unique `ID`."""
     id: ID!
   ): Node
 
-  """
-  Get a single `Parent`.
-  """
+  """Get a single `Parent`."""
   parent(rowId: Int!): Parent
 
-  """
-  Reads a single `Parent` using its globally unique `ID`.
-  """
+  """Reads a single `Parent` using its globally unique `ID`."""
   parentById(
-    """
-    The globally unique `ID` to be used in selecting a single `Parent`.
-    """
+    """The globally unique `ID` to be used in selecting a single `Parent`."""
     id: ID!
   ): Parent
 
-  """
-  Reads and enables pagination through a set of `Parent`.
-  """
+  """Reads and enables pagination through a set of `Parent`."""
   parents(
-    """
-    Read all values in the set after (below) this cursor.
-    """
+    """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """
-    Read all values in the set before (above) this cursor.
-    """
+    """Read all values in the set before (above) this cursor."""
     before: Cursor
 
     """
@@ -1228,14 +950,10 @@ type Query implements Node {
     """
     condition: ParentCondition
 
-    """
-    Only read the first `n` values of the set.
-    """
+    """Only read the first `n` values of the set."""
     first: Int
 
-    """
-    Only read the last `n` values of the set.
-    """
+    """Only read the last `n` values of the set."""
     last: Int
 
     """
@@ -1244,9 +962,7 @@ type Query implements Node {
     """
     offset: Int
 
-    """
-    The method to use when ordering `Parent`.
-    """
+    """The method to use when ordering `Parent`."""
     orderBy: [ParentOrderBy!] = [PRIMARY_KEY_ASC]
   ): ParentConnection
 
@@ -1257,9 +973,7 @@ type Query implements Node {
   query: Query!
 }
 
-"""
-All input for the `updateChildById` mutation.
-"""
+"""All input for the `updateChildById` mutation."""
 input UpdateChildByIdInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -1278,9 +992,7 @@ input UpdateChildByIdInput {
   patch: ChildPatch!
 }
 
-"""
-All input for the `updateChild` mutation.
-"""
+"""All input for the `updateChild` mutation."""
 input UpdateChildInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -1295,22 +1007,14 @@ input UpdateChildInput {
   rowId: Int!
 }
 
-"""
-The output of our update `Child` mutation.
-"""
+"""The output of our update `Child` mutation."""
 type UpdateChildPayload {
-  """
-  The `Child` that was updated by this mutation.
-  """
+  """The `Child` that was updated by this mutation."""
   child: Child
 
-  """
-  An edge for our `Child`. May be used by Relay 1.
-  """
+  """An edge for our `Child`. May be used by Relay 1."""
   childEdge(
-    """
-    The method to use when ordering `Child`.
-    """
+    """The method to use when ordering `Child`."""
     orderBy: [ChildOrderBy!]! = [PRIMARY_KEY_ASC]
   ): ChildEdge
 
@@ -1326,9 +1030,7 @@ type UpdateChildPayload {
   query: Query
 }
 
-"""
-All input for the `updateParentById` mutation.
-"""
+"""All input for the `updateParentById` mutation."""
 input UpdateParentByIdInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -1347,9 +1049,7 @@ input UpdateParentByIdInput {
   patch: ParentPatch!
 }
 
-"""
-All input for the `updateParent` mutation.
-"""
+"""All input for the `updateParent` mutation."""
 input UpdateParentInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -1364,9 +1064,7 @@ input UpdateParentInput {
   rowId: Int!
 }
 
-"""
-The output of our update `Parent` mutation.
-"""
+"""The output of our update `Parent` mutation."""
 type UpdateParentPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
@@ -1374,18 +1072,12 @@ type UpdateParentPayload {
   """
   clientMutationId: String
 
-  """
-  The `Parent` that was updated by this mutation.
-  """
+  """The `Parent` that was updated by this mutation."""
   parent: Parent
 
-  """
-  An edge for our `Parent`. May be used by Relay 1.
-  """
+  """An edge for our `Parent`. May be used by Relay 1."""
   parentEdge(
-    """
-    The method to use when ordering `Parent`.
-    """
+    """The method to use when ordering `Parent`."""
     orderBy: [ParentOrderBy!]! = [PRIMARY_KEY_ASC]
   ): ParentEdge
 

@@ -1,7 +1,7 @@
 import type {GraphileBuild} from 'graphile-build';
 import type {__InputListStep, __InputObjectStep} from 'postgraphile/grafast';
 import {isInsertOrUpdate} from '../helpers.ts';
-import type {PgNestedMutationRelationship} from '../interfaces.ts';
+import type {PgNestedMutationRelationship} from '../../v4_to_v5/interfaces.ts';
 import {nestedCreateStep} from '../steps/nested-create-step.ts';
 
 export function buildCreateField(

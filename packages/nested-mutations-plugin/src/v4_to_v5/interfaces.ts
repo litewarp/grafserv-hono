@@ -9,16 +9,14 @@ import type {
 } from '@dataplan/pg';
 import type {PgTableResource} from '@graphile-contrib/pg-many-to-many';
 import type {} from 'postgraphile';
-import type {pgNestedMutationFields} from './get-nested-relationships';
+import type {pgNestedMutationFields} from './get-nested-relationships.ts';
 
 export type PgNestedConnectorsInflectionFn = (
   this: GraphileBuild.Inflection,
   details: Omit<PgNestedMutationRelationship, 'mutationFields'>
 ) => string;
 
-export type PgTableRelationship = ReturnType<
-  PgTableResource['getRelations']
->[1];
+export type PgTableRelationship = ReturnType<PgTableResource['getRelations']>[1];
 
 export type BuildInputObjectArguments = Parameters<
   GraphileBuild.Build['registerInputObjectType']
@@ -36,8 +34,7 @@ export type PgNestedDataPlanStep =
   | PgUpdateSingleStep
   | PgDeleteSingleStep;
 
-export type PgNestedMutationFieldNames =
-  (typeof pgNestedMutationFields)[number];
+export type PgNestedMutationFieldNames = (typeof pgNestedMutationFields)[number];
 
 export interface PgNestedMutationFieldDetails {
   typeName: string;
@@ -51,9 +48,12 @@ export interface PgNestedTableMutationFields {
   connectByNodeId?: PgNestedMutationFieldDetails;
   updateByKeys?: PgNestedMutationFieldDetails[];
   updateByNodeId?: PgNestedMutationFieldDetails;
+  deleteByKeys?: PgNestedMutationFieldDetails[];
+  deleteByNodeId?: PgNestedMutationFieldDetails;
 }
 
 export interface PgNestedMutationRelationship {
+  fieldName: string;
   leftTable: PgTableResource;
   rightTable: PgTableResource;
   relationName: string;
@@ -68,6 +68,7 @@ export interface PgNestedMutationRelationship {
 }
 
 declare global {
+  // biome-ignore lint/style/noNamespace: idk
   namespace GraphileBuild {
     interface BehaviorEntities {
       pgNestedCreate: PgNestedMutationRelationship;
@@ -77,10 +78,7 @@ declare global {
       /**
        *
        */
-      pgNestedMutationRelationships: Map<
-        PgCodec,
-        PgNestedMutationRelationship[]
-      >;
+      pgNestedMutationRelationships: Map<PgCodec, PgNestedMutationRelationship[]>;
 
       /**
        * Store of types created to deduplicate
@@ -117,6 +115,14 @@ declare global {
       nestedUpdateByKeyFieldName: PgNestedConnectorsInflectionFn;
       nestedUpdatePatchType: PgNestedConnectorsInflectionFn;
 
+      /**
+       * Delete Fields
+       */
+      nestedDeleteByNodeIdInputType: PgNestedConnectorsInflectionFn;
+      nestedDeleteByNodeIdFieldName: PgNestedConnectorsInflectionFn;
+      nestedDeleteByKeyInputType: PgNestedConnectorsInflectionFn;
+      nestedDeleteByKeyFieldName: PgNestedConnectorsInflectionFn;
+      /**
       /**
        * Input type and field for the connector
        */
@@ -176,6 +182,10 @@ declare global {
       isNestedMutationInputField?: boolean;
     }
 
-    interface ScopeInputObjectFieldsField {}
+    interface ScopeObjectFieldsField {
+      isPgCreateMutationField?: boolean;
+      isPgUpdateMutationField?: boolean;
+      isPgDeleteMutationField?: boolean;
+    }
   }
 }

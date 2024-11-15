@@ -4,7 +4,7 @@
  * Should be run after connect-plugin, since it gathers all the relations
  */
 
-import {isPgTableResource} from '../helpers.js';
+import {isPgTableResource} from '../../helpers.ts';
 
 export const PostGraphileNestedMutationsCreatePlugin: GraphileConfig.Plugin = {
   name: 'PgNestedMutationCreatePlugin',

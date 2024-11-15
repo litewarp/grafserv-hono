@@ -1,5 +1,5 @@
 import {EXPORTABLE} from 'postgraphile/tamedevil';
-import {isPgTableResource} from '../helpers';
+import {isPgTableResource} from '../../helpers.ts';
 
 export const PostGraphileNestedMutationsUpdatePlugin: GraphileConfig.Plugin = {
   name: 'PgNestedMutationUpdatePlugin',

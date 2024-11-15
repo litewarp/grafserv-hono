@@ -14,7 +14,7 @@ import {
 } from 'postgraphile/grafast';
 import {type SQL, sql} from 'postgraphile/pg-sql2';
 import {inspect} from '../helpers.ts';
-import type {PgNestedMutationRelationship} from '../interfaces.ts';
+import type {PgNestedMutationRelationship} from '../../v4_to_v5/interfaces.ts';
 
 type PgNestedAttributeMap<TResource extends PgTableResource = PgTableResource> =
   {

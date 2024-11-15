@@ -4,8 +4,8 @@
  * Should be run first, since it gathers all the relations
  */
 
-import {getNestedRelationships} from '../get-nested-relationships';
-import {isPgTableResource} from '../helpers';
+import {getNestedRelationships} from '../../get-nested-relationships.ts';
+import {isPgTableResource} from '../../helpers.ts';
 
 export const PostGraphileNestedMutationsConnectPlugin: GraphileConfig.Plugin = {
   name: 'PgNestedMutationConnectPlugin',
