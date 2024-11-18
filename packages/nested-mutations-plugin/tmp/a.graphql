@@ -98,14 +98,66 @@ input ChildPatch {
   rowId: Int
 }
 
-input ChildrenByTheirDadParentIdInput {
-  """A Child created and linked to this object"""
-  createChild: [CreateChildrenByTheirDadParentIdInput!]
+"""Relationship connect by node id for childrenByTheirDadParentId"""
+input ChildrenByTheirDadParentIdConnectByNodeIdInput {
+  """
+  The node id input field to connect child in the childrenByTheirDadParentId relationship
+  """
+  id: ID!
 }
 
-input ChildrenByTheirMomParentIdInput {
+"""The Child to be created by this mutation."""
+input ChildrenByTheirDadParentIdCreateInput {
+  dadParentId: Int
+  momParentId: Int
+  name: String!
+
+  """Nested connector type for parentByMyDadParentId"""
+  parentByMyDadParentId: ParentByMyDadParentIdInput
+
+  """Nested connector type for parentByMyMomParentId"""
+  parentByMyMomParentId: ParentByMyMomParentIdInput
+  rowId: Int
+}
+
+"""Relationship input type for childrenByTheirDadParentId"""
+input ChildrenByTheirDadParentIdInput {
+  """Connect childrenByTheirDadParentId by node id"""
+  connectByNodeId: [ChildrenByTheirDadParentIdConnectByNodeIdInput!]
+
   """A Child created and linked to this object"""
-  createChild: [CreateChildrenByTheirMomParentIdInput!]
+  create: [ChildrenByTheirDadParentIdCreateInput!]
+}
+
+"""Relationship connect by node id for childrenByTheirMomParentId"""
+input ChildrenByTheirMomParentIdConnectByNodeIdInput {
+  """
+  The node id input field to connect child in the childrenByTheirMomParentId relationship
+  """
+  id: ID!
+}
+
+"""The Child to be created by this mutation."""
+input ChildrenByTheirMomParentIdCreateInput {
+  dadParentId: Int
+  momParentId: Int
+  name: String!
+
+  """Nested connector type for parentByMyDadParentId"""
+  parentByMyDadParentId: ParentByMyDadParentIdInput
+
+  """Nested connector type for parentByMyMomParentId"""
+  parentByMyMomParentId: ParentByMyMomParentIdInput
+  rowId: Int
+}
+
+"""Relationship input type for childrenByTheirMomParentId"""
+input ChildrenByTheirMomParentIdInput {
+  """Connect childrenByTheirMomParentId by node id"""
+  connectByNodeId: [ChildrenByTheirMomParentIdConnectByNodeIdInput!]
+
+  """A Child created and linked to this object"""
+  create: [ChildrenByTheirMomParentIdCreateInput!]
 }
 
 """All input for the create `Child` mutation."""
@@ -141,56 +193,6 @@ type CreateChildPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-}
-
-"""The Child to be created by this mutation."""
-input CreateChildrenByTheirDadParentIdInput {
-  dadParentId: Int
-  momParentId: Int
-  name: String!
-
-  """Nested connector type for parentByMyDadParentId"""
-  parentByMyDadParentId: ParentByMyDadParentIdInput
-
-  """Nested connector type for parentByMyMomParentId"""
-  parentByMyMomParentId: ParentByMyMomParentIdInput
-  rowId: Int
-}
-
-"""The Child to be created by this mutation."""
-input CreateChildrenByTheirMomParentIdInput {
-  dadParentId: Int
-  momParentId: Int
-  name: String!
-
-  """Nested connector type for parentByMyDadParentId"""
-  parentByMyDadParentId: ParentByMyDadParentIdInput
-
-  """Nested connector type for parentByMyMomParentId"""
-  parentByMyMomParentId: ParentByMyMomParentIdInput
-  rowId: Int
-}
-
-"""The Parent to be created by this mutation."""
-input CreateParentByMyDadParentIdInput {
-  """Nested connector type for childrenByTheirDadParentId"""
-  childrenByTheirDadParentId: ChildrenByTheirDadParentIdInput
-
-  """Nested connector type for childrenByTheirMomParentId"""
-  childrenByTheirMomParentId: ChildrenByTheirMomParentIdInput
-  parentName: String!
-  rowId: Int
-}
-
-"""The Parent to be created by this mutation."""
-input CreateParentByMyMomParentIdInput {
-  """Nested connector type for childrenByTheirDadParentId"""
-  childrenByTheirDadParentId: ChildrenByTheirDadParentIdInput
-
-  """Nested connector type for childrenByTheirMomParentId"""
-  childrenByTheirMomParentId: ChildrenByTheirMomParentIdInput
-  parentName: String!
-  rowId: Int
 }
 
 """All input for the create `Parent` mutation."""
@@ -594,14 +596,60 @@ type Parent implements Node {
   rowId: Int!
 }
 
-input ParentByMyDadParentIdInput {
-  """A Parent created and linked to this object"""
-  createParent: CreateParentByMyDadParentIdInput
+"""Relationship connect by node id for parentByMyDadParentId"""
+input ParentByMyDadParentIdConnectByNodeIdInput {
+  """
+  The node id input field to connect parent in the parentByMyDadParentId relationship
+  """
+  id: ID!
 }
 
-input ParentByMyMomParentIdInput {
+"""The Parent to be created by this mutation."""
+input ParentByMyDadParentIdCreateInput {
+  """Nested connector type for childrenByTheirDadParentId"""
+  childrenByTheirDadParentId: ChildrenByTheirDadParentIdInput
+
+  """Nested connector type for childrenByTheirMomParentId"""
+  childrenByTheirMomParentId: ChildrenByTheirMomParentIdInput
+  parentName: String!
+  rowId: Int
+}
+
+"""Relationship input type for parentByMyDadParentId"""
+input ParentByMyDadParentIdInput {
+  """Connect parentByMyDadParentId by node id"""
+  connectByNodeId: ParentByMyDadParentIdConnectByNodeIdInput
+
   """A Parent created and linked to this object"""
-  createParent: CreateParentByMyMomParentIdInput
+  create: ParentByMyDadParentIdCreateInput
+}
+
+"""Relationship connect by node id for parentByMyMomParentId"""
+input ParentByMyMomParentIdConnectByNodeIdInput {
+  """
+  The node id input field to connect parent in the parentByMyMomParentId relationship
+  """
+  id: ID!
+}
+
+"""The Parent to be created by this mutation."""
+input ParentByMyMomParentIdCreateInput {
+  """Nested connector type for childrenByTheirDadParentId"""
+  childrenByTheirDadParentId: ChildrenByTheirDadParentIdInput
+
+  """Nested connector type for childrenByTheirMomParentId"""
+  childrenByTheirMomParentId: ChildrenByTheirMomParentIdInput
+  parentName: String!
+  rowId: Int
+}
+
+"""Relationship input type for parentByMyMomParentId"""
+input ParentByMyMomParentIdInput {
+  """Connect parentByMyMomParentId by node id"""
+  connectByNodeId: ParentByMyMomParentIdConnectByNodeIdInput
+
+  """A Parent created and linked to this object"""
+  create: ParentByMyMomParentIdCreateInput
 }
 
 """

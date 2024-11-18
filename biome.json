@@ -37,6 +37,7 @@
       "style": {
         "noNamespace": "off",
         "useAsConstAssertion": "error",
+        "noNonNullAssertion": "error",
         "useBlockStatements": "off"
       },
       "suspicious": {

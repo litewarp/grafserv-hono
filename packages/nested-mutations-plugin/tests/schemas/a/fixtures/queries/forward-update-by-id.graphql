@@ -4,8 +4,8 @@ mutation ForwardUpdateByNodeId {
       rowId: 1
       patch: {
         name: "Charlie Hustle"
-        parentToDadParentId: {
-          updateById: {
+        parentByMyDadParentId: {
+          updateByNodeId: {
             id: "WyJQYXJlbnQiLDJd"
             patch: {parentName: "revised daddy"}
           }
