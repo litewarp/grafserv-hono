@@ -1,4 +1,24 @@
+import {
+  type PgDeleteSingleStep,
+  type PgInsertSingleStep,
+  type PgUpdateSingleStep,
+  pgInsertSingle,
+} from '@dataplan/pg';
+import {EXPORTABLE} from 'graphile-build';
+import {
+  type ExecutableStep,
+  type FieldArgs,
+  type FieldInfo,
+  type ModifierStep,
+  ObjectStep,
+  type SetterStep,
+  __InputObjectStep,
+  type __InputObjectStepWithDollars,
+  __TrackedValueStep,
+  condition,
+} from 'postgraphile/grafast';
 import {isPgTableResource} from '../helpers.ts';
+import {pgNestedMutationFields} from './get-nested-relationships.ts';
 
 export const PgNestedMutationsInputTypesPlugin: GraphileConfig.Plugin = {
   name: 'PgNestedMutationsInputTypesPlugin',
@@ -15,9 +35,11 @@ export const PgNestedMutationsInputTypesPlugin: GraphileConfig.Plugin = {
     hooks: {
       init(_init, build) {
         const {
+          inflection,
           getGraphQLTypeNameByPgCodec,
           pgNestedMutationRelationships,
           pgNestedMutationInputTypes,
+          pgNestedMutationInputObjMap,
           getInputTypeByName,
           graphql: {GraphQLList, GraphQLNonNull},
         } = build;
@@ -40,8 +62,23 @@ export const PgNestedMutationsInputTypesPlugin: GraphileConfig.Plugin = {
           }
 
           for (const relationship of relationships) {
-            const {mutationFields, leftTable, rightTable, isReverse, isUnique} =
-              relationship;
+            const {
+              mutationFields,
+              leftTable,
+              rightTable,
+              isReverse,
+              isUnique,
+              tableFieldName,
+              localUnique,
+            } = relationship;
+
+            // store the fieldNames on which to add the connector type
+            pgNestedMutationInputObjMap
+              .set(inflection.createField(leftTable), leftTable.codec)
+              .set(
+                inflection.updateNodeField({resource: leftTable, unique: localUnique}),
+                leftTable.codec
+              );
 
             // check to make sure there are nested fields other than the input field
             const hasNestedFields =
@@ -69,7 +106,7 @@ export const PgNestedMutationsInputTypesPlugin: GraphileConfig.Plugin = {
             }
 
             // add the input type to the set
-            pgNestedMutationInputTypes.add(mutationFields.input.typeName);
+            pgNestedMutationInputTypes.add(input.typeName);
 
             build.recoverable(null, () => {
               build.registerInputObjectType(
@@ -78,10 +115,12 @@ export const PgNestedMutationsInputTypesPlugin: GraphileConfig.Plugin = {
                   isNestedMutationConnectorType: true,
                   isNestedInverseMutation: isReverse,
                   pgResource: leftTable,
-                  pgNestedResource: rightTable,
                 },
                 () => ({
-                  description: `Input for the nested mutation of ${leftTable.name} type`,
+                  description: build.wrapDescription(
+                    `Input for the nested mutation of ${rightTable.name} in the ${build.getGraphQLTypeNameByPgCodec(leftTable.codec, 'input')} mutation.`,
+                    'type'
+                  ),
                   fields: ({fieldWithHooks}) => ({
                     ...(create
                       ? {
@@ -90,10 +129,41 @@ export const PgNestedMutationsInputTypesPlugin: GraphileConfig.Plugin = {
                               fieldName: create.fieldName,
                               isNestedMutationInputType: true,
                               isNestedMutationCreateInputType: true,
+                              pgResource: leftTable,
                             },
                             {
                               description: `A ${getGraphQLTypeNameByPgCodec(rightTable.codec, 'input')} object that will be created and connected to this object`,
                               type: getInputType(create.typeName, !isReverse || isUnique),
+                              autoApplyAfterParentApplyPlan: true,
+                              applyPlan: EXPORTABLE(
+                                () =>
+                                  function plan($object, args, info) {
+                                    // will be ListStep or ObjectStep
+                                    // based on whether the relationship is unique and reverse
+                                    const raw = args.getRaw();
+                                    if (!isReverse || isUnique) {
+                                      // single
+                                    } else {
+                                      const obj = Object.entries(
+                                        rightTable.codec.attributes
+                                      ).reduce((memo, [attrName, attr]) => {
+                                        // todo: LIMIT TO ONLY THE ATTRIBUTES THAT ARE IN THE INPUT
+                                        const attributeName = inflection.attribute({
+                                          attributeName: attrName,
+                                          codec: rightTable.codec,
+                                        });
+                                        return {
+                                          ...memo,
+                                          [attrName]: args.get(attributeName),
+                                        };
+                                      }, {});
+                                      // list
+                                      const $insert = pgInsertSingle(rightTable, obj);
+                                      console.log($insert);
+                                    }
+                                  },
+                                []
+                              ),
                             }
                           ),
                         }
@@ -106,6 +176,7 @@ export const PgNestedMutationsInputTypesPlugin: GraphileConfig.Plugin = {
                               fieldName: connectByNodeId.fieldName,
                               isNestedMutationConnectByNodeIdType: true,
                               isNestedMutationInputType: true,
+                              pgResource: leftTable,
                             },
                             {
                               description: `A ${rightTable.name} object that will be connected by its ID`,
@@ -125,6 +196,7 @@ export const PgNestedMutationsInputTypesPlugin: GraphileConfig.Plugin = {
                               fieldName: updateByNodeId.fieldName,
                               isNestedMutationInputType: true,
                               isNestedMutationUpdateByNodeIdType: true,
+                              pgResource: leftTable,
                             },
                             {
                               description: `The primary keys and patch data for ${rightTable.name} for the far side of the relationship field`,
@@ -147,48 +219,66 @@ export const PgNestedMutationsInputTypesPlugin: GraphileConfig.Plugin = {
         }
         return _init;
       },
-      GraphQLInputObjectType_fields(field, build, context) {
+      GraphQLInputObjectType_fields(fields, build, context) {
         const {
           pgNestedMutationRelationships,
-          pgNestedMutationInputTypes,
           wrapDescription,
           getInputTypeByName,
           extend,
+          EXPORTABLE,
         } = build;
 
         const {
           fieldWithHooks,
           Self,
-          scope: {isPgRowType, pgCodec},
+          scope: {isPgRowType, pgCodec, isPgPatch, isInputType},
         } = context;
 
-        if (!isPgRowType || !pgCodec) {
-          return field;
+        // if (isNestedMutationConnectorType) {
+        //   console.log(
+        //     'nested mutation connector type',
+        //     Self.name,
+        //     Object.keys(context.scope)
+        //   );
+        // }
+
+        if ((!isPgPatch && (!isInputType || !isPgRowType)) || !pgCodec) {
+          return fields;
         }
 
         const relationships = pgNestedMutationRelationships.get(pgCodec);
         if (!relationships) {
-          return field;
+          return fields;
         }
 
         return extend(
-          field,
+          fields,
           {
             ...Object.values(relationships).reduce((acc, relationship) => {
-              const {fieldName, mutationFields, rightTable} = relationship;
-              const type = getInputTypeByName(mutationFields.input.typeName);
+              const {
+                fieldName,
+                mutationFields: {input},
+                rightTable,
+              } = relationship;
+              const type = getInputTypeByName(input.typeName);
               return {
                 ...acc,
                 [fieldName]: fieldWithHooks(
-                  {
-                    fieldName: mutationFields.input.fieldName,
-                  },
+                  {fieldName},
                   {
                     description: wrapDescription(
                       `Nested mutation for ${rightTable.name}`,
                       'type'
                     ),
                     type,
+                    autoApplyAfterParentApplyPlan: true,
+                    applyPlan: EXPORTABLE(
+                      () =>
+                        function plan($object, args) {
+                          args.apply($object);
+                        },
+                      []
+                    ),
                   }
                 ),
               };
@@ -197,28 +287,40 @@ export const PgNestedMutationsInputTypesPlugin: GraphileConfig.Plugin = {
           `Adding nested mutation fields for ${Self.name}`
         );
       },
-
-      GraphQLObjectType_fields_field(field, build, context) {
-        const {extend, behavior} = build;
+      GraphQLObjectType_fields_field: (field, build, context) => {
+        const {pgNestedMutationInputObjMap, pgNestedMutationRelationships} = build;
         const {
-          fieldWithHooks,
-          scope: {fieldName, fieldBehaviorScope, isRootMutation},
+          scope: {isRootMutation, fieldName, fieldBehaviorScope},
           Self,
         } = context;
 
-        if (!isRootMutation) {
-          return field;
-        }
-        // console.log(Self.name, field.type);
+        const codec = pgNestedMutationInputObjMap.get(fieldName);
+        if (isRootMutation && codec) {
+          const relationships = pgNestedMutationRelationships.get(codec);
 
-        // console.log(fieldName, fieldBehaviorScope, context.scope);
-        return extend(
-          field,
-          {
-            // plan($parent, args, info) {},
-          },
-          `Adding nested mutation plan for ${fieldName}`
-        );
+          if (!relationships?.[0]) {
+            return field;
+          }
+
+          const {mutationFields, tableFieldName} = relationships[0];
+
+          return {
+            ...field,
+            plan($parent: __TrackedValueStep, args, info) {
+              if (!field.plan) {
+                return;
+              }
+
+              const $parentPlan: ObjectStep<{
+                result: PgInsertSingleStep | PgUpdateSingleStep | PgDeleteSingleStep;
+              }> = field.plan($parent, args, info);
+
+              return $parentPlan;
+            },
+          };
+        }
+
+        return field;
       },
     },
   },

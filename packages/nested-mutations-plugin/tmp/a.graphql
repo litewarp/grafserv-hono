@@ -46,59 +46,6 @@ type ChildConnection {
   totalCount: Int!
 }
 
-"""Input for the nested mutation of child type"""
-input ChildDadParentIdFKeyInput {
-  """A parent object that will be connected by its ID"""
-  connectById: ParentNodeIdConnect
-
-  """A ParentInput object that will be created and connected to this object"""
-  create: ChildDadParentIdFkeyParentCreateInput
-
-  """
-  The primary keys and patch data for parent for the far side of the relationship field
-  """
-  updateById: ParentOnChildForChildDadParentIdNodeIdUpdate
-}
-
-"""Input for the nested mutation of parent type"""
-input ChildDadParentIdFKeyInverseInput {
-  """A child object that will be connected by its ID"""
-  connectById: [ChildNodeIdConnect!]
-
-  """A ChildInput object that will be created and connected to this object"""
-  create: [ChildDadParentIdFkeyChildCreateInput!]
-
-  """
-  The primary keys and patch data for child for the far side of the relationship field
-  """
-  updateById: [ChildOnParentForChildDadParentIdNodeIdUpdate!]
-}
-
-"""The `child` to be created by this mutation."""
-input ChildDadParentIdFkeyChildCreateInput {
-  dadParentId: Int
-  momParentId: Int
-  name: String!
-
-  """Nested mutation for parent"""
-  parentToDadParentId: ChildDadParentIdFKeyInput
-
-  """Nested mutation for parent"""
-  parentToMomParentId: ChildMomParentIdFKeyInput
-  rowId: Int
-}
-
-"""The `parent` to be created by this mutation."""
-input ChildDadParentIdFkeyParentCreateInput {
-  """Nested mutation for child"""
-  childrenToIdUsingDadParentId: ChildDadParentIdFKeyInverseInput
-
-  """Nested mutation for child"""
-  childrenToIdUsingMomParentId: ChildMomParentIdFKeyInverseInput
-  parentName: String!
-  rowId: Int
-}
-
 """A `Child` edge in the connection."""
 type ChildEdge {
   """A cursor for use in pagination."""
@@ -114,91 +61,12 @@ input ChildInput {
   momParentId: Int
   name: String!
 
-  """Nested mutation for parent"""
-  parentToDadParentId: ChildDadParentIdFKeyInput
+  """Nested connector type for parentByMyDadParentId"""
+  parentByMyDadParentId: ParentByMyDadParentIdInput
 
-  """Nested mutation for parent"""
-  parentToMomParentId: ChildMomParentIdFKeyInput
+  """Nested connector type for parentByMyMomParentId"""
+  parentByMyMomParentId: ParentByMyMomParentIdInput
   rowId: Int
-}
-
-"""Input for the nested mutation of child type"""
-input ChildMomParentIdFKeyInput {
-  """A parent object that will be connected by its ID"""
-  connectById: ParentNodeIdConnect
-
-  """A ParentInput object that will be created and connected to this object"""
-  create: ChildMomParentIdFkeyParentCreateInput
-
-  """
-  The primary keys and patch data for parent for the far side of the relationship field
-  """
-  updateById: ParentOnChildForChildMomParentIdNodeIdUpdate
-}
-
-"""Input for the nested mutation of parent type"""
-input ChildMomParentIdFKeyInverseInput {
-  """A child object that will be connected by its ID"""
-  connectById: [ChildNodeIdConnect!]
-
-  """A ChildInput object that will be created and connected to this object"""
-  create: [ChildMomParentIdFkeyChildCreateInput!]
-
-  """
-  The primary keys and patch data for child for the far side of the relationship field
-  """
-  updateById: [ChildOnParentForChildMomParentIdNodeIdUpdate!]
-}
-
-"""The `child` to be created by this mutation."""
-input ChildMomParentIdFkeyChildCreateInput {
-  dadParentId: Int
-  momParentId: Int
-  name: String!
-
-  """Nested mutation for parent"""
-  parentToDadParentId: ChildDadParentIdFKeyInput
-
-  """Nested mutation for parent"""
-  parentToMomParentId: ChildMomParentIdFKeyInput
-  rowId: Int
-}
-
-"""The `parent` to be created by this mutation."""
-input ChildMomParentIdFkeyParentCreateInput {
-  """Nested mutation for child"""
-  childrenToIdUsingDadParentId: ChildDadParentIdFKeyInverseInput
-
-  """Nested mutation for child"""
-  childrenToIdUsingMomParentId: ChildMomParentIdFKeyInverseInput
-  parentName: String!
-  rowId: Int
-}
-
-"""The globally unique `ID` to be used in the connection."""
-input ChildNodeIdConnect {
-  """
-  The globally unique `ID` which identifies a single `child` to be connected.
-  """
-  id: ID!
-}
-
-"""The globally unique `ID` to be used in the connection."""
-input ChildOnParentForChildDadParentIdNodeIdUpdate {
-  """
-  The globally unique `ID` which identifies a single `child` to be updated.
-  """
-  id: ID!
-  patch: UpdateChildOnParentForChildDadParentIdPatch
-}
-
-"""The globally unique `ID` to be used in the connection."""
-input ChildOnParentForChildMomParentIdNodeIdUpdate {
-  """
-  The globally unique `ID` which identifies a single `child` to be updated.
-  """
-  id: ID!
-  patch: UpdateChildOnParentForChildMomParentIdPatch
 }
 
 """Methods to use when ordering `Child`."""
@@ -222,12 +90,22 @@ input ChildPatch {
   momParentId: Int
   name: String
 
-  """Nested mutation for parent"""
-  parentToDadParentId: ChildDadParentIdFKeyInput
+  """Nested connector type for parentByMyDadParentId"""
+  parentByMyDadParentId: ParentByMyDadParentIdInput
 
-  """Nested mutation for parent"""
-  parentToMomParentId: ChildMomParentIdFKeyInput
+  """Nested connector type for parentByMyMomParentId"""
+  parentByMyMomParentId: ParentByMyMomParentIdInput
   rowId: Int
+}
+
+input ChildrenByTheirDadParentIdInput {
+  """A Child created and linked to this object"""
+  createChild: [CreateChildrenByTheirDadParentIdInput!]
+}
+
+input ChildrenByTheirMomParentIdInput {
+  """A Child created and linked to this object"""
+  createChild: [CreateChildrenByTheirMomParentIdInput!]
 }
 
 """All input for the create `Child` mutation."""
@@ -263,6 +141,56 @@ type CreateChildPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
+}
+
+"""The Child to be created by this mutation."""
+input CreateChildrenByTheirDadParentIdInput {
+  dadParentId: Int
+  momParentId: Int
+  name: String!
+
+  """Nested connector type for parentByMyDadParentId"""
+  parentByMyDadParentId: ParentByMyDadParentIdInput
+
+  """Nested connector type for parentByMyMomParentId"""
+  parentByMyMomParentId: ParentByMyMomParentIdInput
+  rowId: Int
+}
+
+"""The Child to be created by this mutation."""
+input CreateChildrenByTheirMomParentIdInput {
+  dadParentId: Int
+  momParentId: Int
+  name: String!
+
+  """Nested connector type for parentByMyDadParentId"""
+  parentByMyDadParentId: ParentByMyDadParentIdInput
+
+  """Nested connector type for parentByMyMomParentId"""
+  parentByMyMomParentId: ParentByMyMomParentIdInput
+  rowId: Int
+}
+
+"""The Parent to be created by this mutation."""
+input CreateParentByMyDadParentIdInput {
+  """Nested connector type for childrenByTheirDadParentId"""
+  childrenByTheirDadParentId: ChildrenByTheirDadParentIdInput
+
+  """Nested connector type for childrenByTheirMomParentId"""
+  childrenByTheirMomParentId: ChildrenByTheirMomParentIdInput
+  parentName: String!
+  rowId: Int
+}
+
+"""The Parent to be created by this mutation."""
+input CreateParentByMyMomParentIdInput {
+  """Nested connector type for childrenByTheirDadParentId"""
+  childrenByTheirDadParentId: ChildrenByTheirDadParentIdInput
+
+  """Nested connector type for childrenByTheirMomParentId"""
+  childrenByTheirMomParentId: ChildrenByTheirMomParentIdInput
+  parentName: String!
+  rowId: Int
 }
 
 """All input for the create `Parent` mutation."""
@@ -666,6 +594,16 @@ type Parent implements Node {
   rowId: Int!
 }
 
+input ParentByMyDadParentIdInput {
+  """A Parent created and linked to this object"""
+  createParent: CreateParentByMyDadParentIdInput
+}
+
+input ParentByMyMomParentIdInput {
+  """A Parent created and linked to this object"""
+  createParent: CreateParentByMyMomParentIdInput
+}
+
 """
 A condition to be used against `Parent` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
@@ -702,39 +640,13 @@ type ParentEdge {
 
 """An input for mutations affecting `Parent`"""
 input ParentInput {
-  """Nested mutation for child"""
-  childrenToIdUsingDadParentId: ChildDadParentIdFKeyInverseInput
+  """Nested connector type for childrenByTheirDadParentId"""
+  childrenByTheirDadParentId: ChildrenByTheirDadParentIdInput
 
-  """Nested mutation for child"""
-  childrenToIdUsingMomParentId: ChildMomParentIdFKeyInverseInput
+  """Nested connector type for childrenByTheirMomParentId"""
+  childrenByTheirMomParentId: ChildrenByTheirMomParentIdInput
   parentName: String!
   rowId: Int
-}
-
-"""The globally unique `ID` to be used in the connection."""
-input ParentNodeIdConnect {
-  """
-  The globally unique `ID` which identifies a single `parent` to be connected.
-  """
-  id: ID!
-}
-
-"""The globally unique `ID` to be used in the connection."""
-input ParentOnChildForChildDadParentIdNodeIdUpdate {
-  """
-  The globally unique `ID` which identifies a single `parent` to be updated.
-  """
-  id: ID!
-  patch: UpdateParentOnChildForChildDadParentIdPatch
-}
-
-"""The globally unique `ID` to be used in the connection."""
-input ParentOnChildForChildMomParentIdNodeIdUpdate {
-  """
-  The globally unique `ID` which identifies a single `parent` to be updated.
-  """
-  id: ID!
-  patch: UpdateParentOnChildForChildMomParentIdPatch
 }
 
 """Methods to use when ordering `Parent`."""
@@ -894,11 +806,11 @@ type ParentParentsByChildMomParentIdAndDadParentIdManyToManyEdge {
 Represents an update to a `Parent`. Fields that are set will be updated.
 """
 input ParentPatch {
-  """Nested mutation for child"""
-  childrenToIdUsingDadParentId: ChildDadParentIdFKeyInverseInput
+  """Nested connector type for childrenByTheirDadParentId"""
+  childrenByTheirDadParentId: ChildrenByTheirDadParentIdInput
 
-  """Nested mutation for child"""
-  childrenToIdUsingMomParentId: ChildMomParentIdFKeyInverseInput
+  """Nested connector type for childrenByTheirMomParentId"""
+  childrenByTheirMomParentId: ChildrenByTheirMomParentIdInput
   parentName: String
   rowId: Int
 }
@@ -1033,32 +945,6 @@ input UpdateChildInput {
   rowId: Int!
 }
 
-input UpdateChildOnParentForChildDadParentIdPatch {
-  dadParentId: Int
-  momParentId: Int
-  name: String
-
-  """Nested mutation for parent"""
-  parentToDadParentId: ChildDadParentIdFKeyInput
-
-  """Nested mutation for parent"""
-  parentToMomParentId: ChildMomParentIdFKeyInput
-  rowId: Int
-}
-
-input UpdateChildOnParentForChildMomParentIdPatch {
-  dadParentId: Int
-  momParentId: Int
-  name: String
-
-  """Nested mutation for parent"""
-  parentToDadParentId: ChildDadParentIdFKeyInput
-
-  """Nested mutation for parent"""
-  parentToMomParentId: ChildMomParentIdFKeyInput
-  rowId: Int
-}
-
 """The output of our update `Child` mutation."""
 type UpdateChildPayload {
   """The `Child` that was updated by this mutation."""
@@ -1114,26 +1000,6 @@ input UpdateParentInput {
   """
   patch: ParentPatch!
   rowId: Int!
-}
-
-input UpdateParentOnChildForChildDadParentIdPatch {
-  """Nested mutation for child"""
-  childrenToIdUsingDadParentId: ChildDadParentIdFKeyInverseInput
-
-  """Nested mutation for child"""
-  childrenToIdUsingMomParentId: ChildMomParentIdFKeyInverseInput
-  parentName: String
-  rowId: Int
-}
-
-input UpdateParentOnChildForChildMomParentIdPatch {
-  """Nested mutation for child"""
-  childrenToIdUsingDadParentId: ChildDadParentIdFKeyInverseInput
-
-  """Nested mutation for child"""
-  childrenToIdUsingMomParentId: ChildMomParentIdFKeyInverseInput
-  parentName: String
-  rowId: Int
 }
 
 """The output of our update `Parent` mutation."""

@@ -62,6 +62,20 @@ type CreateJobRelationshipPayload {
   query: Query
 }
 
+"""The JobRelationship to be created by this mutation."""
+input CreateJobRelationshipsByTheirFromJobIdInput {
+  fromJobId: Int
+  toJobId: Int
+  type: String
+}
+
+"""The JobRelationship to be created by this mutation."""
+input CreateJobRelationshipsByTheirToJobIdInput {
+  fromJobId: Int
+  toJobId: Int
+  type: String
+}
+
 """A location in a connection that can be used for resuming pagination."""
 scalar Cursor
 
@@ -308,11 +322,11 @@ type JobEdge {
 
 """An input for mutations affecting `Job`"""
 input JobInput {
-  """Nested mutation for job_relationship"""
-  jobRelationshipsToIdUsingFromJobId: JobRelationshipFromJobIdFKeyInverseInput
+  """Nested connector type for jobRelationshipsByTheirFromJobId"""
+  jobRelationshipsByTheirFromJobId: JobRelationshipsByTheirFromJobIdInput
 
-  """Nested mutation for job_relationship"""
-  jobRelationshipsToIdUsingToJobId: JobRelationshipToJobIdFKeyInverseInput
+  """Nested connector type for jobRelationshipsByTheirToJobId"""
+  jobRelationshipsByTheirToJobId: JobRelationshipsByTheirToJobIdInput
   name: String
   rowId: Int
 }
@@ -465,32 +479,6 @@ type JobJobsByJobRelationshipToJobIdAndFromJobIdManyToManyEdge {
   node: Job
 }
 
-"""The globally unique `ID` to be used in the connection."""
-input JobNodeIdConnect {
-  """
-  The globally unique `ID` which identifies a single `job` to be connected.
-  """
-  id: ID!
-}
-
-"""The globally unique `ID` to be used in the connection."""
-input JobOnJobRelationshipForJobRelationshipFromJobIdNodeIdUpdate {
-  """
-  The globally unique `ID` which identifies a single `job` to be updated.
-  """
-  id: ID!
-  patch: UpdateJobOnJobRelationshipForJobRelationshipFromJobIdPatch
-}
-
-"""The globally unique `ID` to be used in the connection."""
-input JobOnJobRelationshipForJobRelationshipToJobIdNodeIdUpdate {
-  """
-  The globally unique `ID` which identifies a single `job` to be updated.
-  """
-  id: ID!
-  patch: UpdateJobOnJobRelationshipForJobRelationshipToJobIdPatch
-}
-
 """Methods to use when ordering `Job`."""
 enum JobOrderBy {
   ID_ASC
@@ -502,11 +490,11 @@ enum JobOrderBy {
 
 """Represents an update to a `Job`. Fields that are set will be updated."""
 input JobPatch {
-  """Nested mutation for job_relationship"""
-  jobRelationshipsToIdUsingFromJobId: JobRelationshipFromJobIdFKeyInverseInput
+  """Nested connector type for jobRelationshipsByTheirFromJobId"""
+  jobRelationshipsByTheirFromJobId: JobRelationshipsByTheirFromJobIdInput
 
-  """Nested mutation for job_relationship"""
-  jobRelationshipsToIdUsingToJobId: JobRelationshipToJobIdFKeyInverseInput
+  """Nested connector type for jobRelationshipsByTheirToJobId"""
+  jobRelationshipsByTheirToJobId: JobRelationshipsByTheirToJobIdInput
   name: String
   rowId: Int
 }
@@ -562,97 +550,11 @@ type JobRelationshipEdge {
   node: JobRelationship
 }
 
-"""Input for the nested mutation of job_relationship type"""
-input JobRelationshipFromJobIdFKeyInput {
-  """A job object that will be connected by its ID"""
-  connectById: JobNodeIdConnect
-
-  """A JobInput object that will be created and connected to this object"""
-  create: JobRelationshipFromJobIdFkeyJobCreateInput
-
-  """
-  The primary keys and patch data for job for the far side of the relationship field
-  """
-  updateById: JobOnJobRelationshipForJobRelationshipFromJobIdNodeIdUpdate
-}
-
-"""Input for the nested mutation of job type"""
-input JobRelationshipFromJobIdFKeyInverseInput {
-  """A job_relationship object that will be connected by its ID"""
-  connectById: [JobRelationshipNodeIdConnect!]
-
-  """
-  A JobRelationshipInput object that will be created and connected to this object
-  """
-  create: [JobRelationshipFromJobIdFkeyJobRelationshipCreateInput!]
-
-  """
-  The primary keys and patch data for job_relationship for the far side of the relationship field
-  """
-  updateById: [JobRelationshipOnJobForJobRelationshipFromJobIdNodeIdUpdate!]
-}
-
-"""The `job` to be created by this mutation."""
-input JobRelationshipFromJobIdFkeyJobCreateInput {
-  """Nested mutation for job_relationship"""
-  jobRelationshipsToIdUsingFromJobId: JobRelationshipFromJobIdFKeyInverseInput
-
-  """Nested mutation for job_relationship"""
-  jobRelationshipsToIdUsingToJobId: JobRelationshipToJobIdFKeyInverseInput
-  name: String
-  rowId: Int
-}
-
-"""The `job_relationship` to be created by this mutation."""
-input JobRelationshipFromJobIdFkeyJobRelationshipCreateInput {
-  fromJobId: Int
-
-  """Nested mutation for job"""
-  jobToFromJobId: JobRelationshipFromJobIdFKeyInput
-
-  """Nested mutation for job"""
-  jobToToJobId: JobRelationshipToJobIdFKeyInput
-  toJobId: Int
-  type: String
-}
-
 """An input for mutations affecting `JobRelationship`"""
 input JobRelationshipInput {
   fromJobId: Int
-
-  """Nested mutation for job"""
-  jobToFromJobId: JobRelationshipFromJobIdFKeyInput
-
-  """Nested mutation for job"""
-  jobToToJobId: JobRelationshipToJobIdFKeyInput
   toJobId: Int
   type: String
-}
-
-"""The globally unique `ID` to be used in the connection."""
-input JobRelationshipNodeIdConnect {
-  """
-  The globally unique `ID` which identifies a single `job_relationship` to be connected.
-  """
-  id: ID!
-}
-
-"""The globally unique `ID` to be used in the connection."""
-input JobRelationshipOnJobForJobRelationshipFromJobIdNodeIdUpdate {
-  """
-  The globally unique `ID` which identifies a single `job_relationship` to be updated.
-  """
-  id: ID!
-  patch: UpdateJobRelationshipOnJobForJobRelationshipFromJobIdPatch
-}
-
-"""The globally unique `ID` to be used in the connection."""
-input JobRelationshipOnJobForJobRelationshipToJobIdNodeIdUpdate {
-  """
-  The globally unique `ID` which identifies a single `job_relationship` to be updated.
-  """
-  id: ID!
-  patch: UpdateJobRelationshipOnJobForJobRelationshipToJobIdPatch
 }
 
 """Methods to use when ordering `JobRelationship`."""
@@ -664,58 +566,14 @@ enum JobRelationshipOrderBy {
   TO_JOB_ID_DESC
 }
 
-"""Input for the nested mutation of job_relationship type"""
-input JobRelationshipToJobIdFKeyInput {
-  """A job object that will be connected by its ID"""
-  connectById: JobNodeIdConnect
-
-  """A JobInput object that will be created and connected to this object"""
-  create: JobRelationshipToJobIdFkeyJobCreateInput
-
-  """
-  The primary keys and patch data for job for the far side of the relationship field
-  """
-  updateById: JobOnJobRelationshipForJobRelationshipToJobIdNodeIdUpdate
+input JobRelationshipsByTheirFromJobIdInput {
+  """A JobRelationship created and linked to this object"""
+  createJobRelationship: [CreateJobRelationshipsByTheirFromJobIdInput!]
 }
 
-"""Input for the nested mutation of job type"""
-input JobRelationshipToJobIdFKeyInverseInput {
-  """A job_relationship object that will be connected by its ID"""
-  connectById: [JobRelationshipNodeIdConnect!]
-
-  """
-  A JobRelationshipInput object that will be created and connected to this object
-  """
-  create: [JobRelationshipToJobIdFkeyJobRelationshipCreateInput!]
-
-  """
-  The primary keys and patch data for job_relationship for the far side of the relationship field
-  """
-  updateById: [JobRelationshipOnJobForJobRelationshipToJobIdNodeIdUpdate!]
-}
-
-"""The `job` to be created by this mutation."""
-input JobRelationshipToJobIdFkeyJobCreateInput {
-  """Nested mutation for job_relationship"""
-  jobRelationshipsToIdUsingFromJobId: JobRelationshipFromJobIdFKeyInverseInput
-
-  """Nested mutation for job_relationship"""
-  jobRelationshipsToIdUsingToJobId: JobRelationshipToJobIdFKeyInverseInput
-  name: String
-  rowId: Int
-}
-
-"""The `job_relationship` to be created by this mutation."""
-input JobRelationshipToJobIdFkeyJobRelationshipCreateInput {
-  fromJobId: Int
-
-  """Nested mutation for job"""
-  jobToFromJobId: JobRelationshipFromJobIdFKeyInput
-
-  """Nested mutation for job"""
-  jobToToJobId: JobRelationshipToJobIdFKeyInput
-  toJobId: Int
-  type: String
+input JobRelationshipsByTheirToJobIdInput {
+  """A JobRelationship created and linked to this object"""
+  createJobRelationship: [CreateJobRelationshipsByTheirToJobIdInput!]
 }
 
 """
@@ -915,26 +773,6 @@ input UpdateJobInput {
   rowId: Int!
 }
 
-input UpdateJobOnJobRelationshipForJobRelationshipFromJobIdPatch {
-  """Nested mutation for job_relationship"""
-  jobRelationshipsToIdUsingFromJobId: JobRelationshipFromJobIdFKeyInverseInput
-
-  """Nested mutation for job_relationship"""
-  jobRelationshipsToIdUsingToJobId: JobRelationshipToJobIdFKeyInverseInput
-  name: String
-  rowId: Int
-}
-
-input UpdateJobOnJobRelationshipForJobRelationshipToJobIdPatch {
-  """Nested mutation for job_relationship"""
-  jobRelationshipsToIdUsingFromJobId: JobRelationshipFromJobIdFKeyInverseInput
-
-  """Nested mutation for job_relationship"""
-  jobRelationshipsToIdUsingToJobId: JobRelationshipToJobIdFKeyInverseInput
-  name: String
-  rowId: Int
-}
-
 """The output of our update `Job` mutation."""
 type UpdateJobPayload {
   """
@@ -956,28 +794,4 @@ type UpdateJobPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-}
-
-input UpdateJobRelationshipOnJobForJobRelationshipFromJobIdPatch {
-  fromJobId: Int
-
-  """Nested mutation for job"""
-  jobToFromJobId: JobRelationshipFromJobIdFKeyInput
-
-  """Nested mutation for job"""
-  jobToToJobId: JobRelationshipToJobIdFKeyInput
-  toJobId: Int
-  type: String
-}
-
-input UpdateJobRelationshipOnJobForJobRelationshipToJobIdPatch {
-  fromJobId: Int
-
-  """Nested mutation for job"""
-  jobToFromJobId: JobRelationshipFromJobIdFKeyInput
-
-  """Nested mutation for job"""
-  jobToToJobId: JobRelationshipToJobIdFKeyInput
-  toJobId: Int
-  type: String
 }

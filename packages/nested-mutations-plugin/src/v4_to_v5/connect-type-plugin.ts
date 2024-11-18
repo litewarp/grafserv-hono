@@ -50,7 +50,7 @@ export const PgNestedMutationsConnectTypesPlugin: GraphileConfig.Plugin = {
                   },
                   () => ({
                     description: build.wrapDescription(
-                      `The globally unique \`ID\` to be used in the connection.`,
+                      `The globally unique \`ID\` look up for the row to connect.`,
                       'type'
                     ),
                     fields: ({fieldWithHooks}) => ({

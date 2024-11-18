@@ -12,7 +12,7 @@ export const PgNestedMutationsUpdateTypesPlugin: GraphileConfig.Plugin = {
           inflection,
           pgNestedMutationRelationships,
           pgNestedMutationInputTypes,
-          graphql: {GraphQLID, GraphQLNonNull, GraphQLInputObjectType},
+          graphql: {GraphQLID, GraphQLNonNull, GraphQLInputObjectType, isInputObjectType},
         } = build;
 
         for (const resource of Object.values(build.input.pgRegistry.pgResources)) {
@@ -58,21 +58,27 @@ export const PgNestedMutationsUpdateTypesPlugin: GraphileConfig.Plugin = {
                         description: `The globally unique \`ID\` which identifies a single \`${rightTable.name}\` to be updated.`,
                         type: new GraphQLNonNull(GraphQLID),
                       })),
-                      patch: fieldWithHooks({fieldName: 'patch'}, () => {
-                        const tablePatchType = build.getGraphQLTypeByPgCodec(
-                          rightTable.codec,
-                          'patch'
-                        );
-                        const fields = (
-                          tablePatchType as GraphQLInputObjectType
-                        ).getFields();
-                        return {
-                          type: new GraphQLInputObjectType({
-                            name: inflection.nestedUpdatePatchType(relationship),
-                            fields: {...fields},
-                          }),
-                        };
-                      }),
+                      patch: fieldWithHooks(
+                        {fieldName: 'patch', pgResource: rightTable},
+                        () => {
+                          const tablePatchType = build.getGraphQLTypeByPgCodec(
+                            rightTable.codec,
+                            'patch'
+                          );
+                          if (!isInputObjectType(tablePatchType)) {
+                            throw new Error(
+                              `Expected ${rightTable.name} to be an input object type`
+                            );
+                          }
+                          const fields = tablePatchType.getFields();
+                          return {
+                            type: new GraphQLInputObjectType({
+                              name: inflection.nestedUpdatePatchType(relationship),
+                              fields: {...fields},
+                            }),
+                          };
+                        }
+                      ),
                     }),
                   }),
                   `Adding update by nodeId input type for ${rightTable.name}`

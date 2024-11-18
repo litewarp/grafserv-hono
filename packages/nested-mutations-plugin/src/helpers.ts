@@ -1,11 +1,41 @@
-import type {PgResource} from '@dataplan/pg';
+import type {
+  PgCodecRelation,
+  PgCodecWithAttributes,
+  PgRegistry,
+  PgResource,
+  PgResourceUnique,
+} from '@dataplan/pg';
 import {PgInsertSingleStep, PgUpdateSingleStep} from '@dataplan/pg';
-import type {PgTableResource} from '@graphile-contrib/pg-many-to-many';
-import type {ExecutableStep} from 'grafast';
+import type {ExecutableStep} from 'postgraphile/grafast';
 
 export function isPgTableResource(r: PgResource): r is PgTableResource {
   return Boolean(r.codec.attributes) && !r.parameters;
 }
+
+export interface PgCodecRelationWithName extends PgCodecRelation {
+  relationName: string;
+}
+export type PgTableResource = PgResource<
+  string,
+  PgCodecWithAttributes,
+  PgResourceUnique[],
+  undefined,
+  PgRegistry
+>;
+
+export const isNestedMutableResource = (
+  build: GraphileBuild.Build,
+  resource: PgResource
+): r is PgTableResource => {
+  if (resource.parameters) return false;
+  if (!resource.codec.attributes) return false;
+  if (resource.codec.polymorphism) return false;
+  if (resource.codec.isAnonymous) return false;
+  const behaviors = ['resource:insert', 'resource:update', 'resource:delete'] as const;
+  return behaviors.some((behavior) =>
+    build.behavior.pgResourceMatches(resource, behavior)
+  );
+};
 
 export const isInsertable = (
   build: GraphileBuild.Build,
@@ -63,15 +93,10 @@ export const getCRUDBehavior = (
 export function isInsertOrUpdate(
   $step: ExecutableStep
 ): $step is PgInsertSingleStep | PgUpdateSingleStep {
-  return (
-    $step instanceof PgInsertSingleStep || $step instanceof PgUpdateSingleStep
-  );
+  return $step instanceof PgInsertSingleStep || $step instanceof PgUpdateSingleStep;
 }
 
-export let inspect: (
-  obj: any,
-  options?: {colors?: boolean; depth?: number}
-) => string;
+export let inspect: (obj: any, options?: {colors?: boolean; depth?: number}) => string;
 
 try {
   inspect = require('node:util').inspect;

@@ -1,4 +1,5 @@
-import type {GraphQLInputObjectType} from 'graphql';
+import {EXPORTABLE} from 'graphile-build';
+import {type GraphQLInputObjectType, isInputObjectType} from 'graphql';
 import {isPgTableResource} from '../helpers.ts';
 
 export const PgNestedMutationsCreateTypesPlugin: GraphileConfig.Plugin = {
@@ -51,17 +52,26 @@ export const PgNestedMutationsCreateTypesPlugin: GraphileConfig.Plugin = {
                         rightTable.codec,
                         'input'
                       );
-                      const fields = (tableType as GraphQLInputObjectType).getFields();
-                      return Object.entries(fields).reduce(
-                        (memo, [attributeName, attribute]) => {
+                      if (!isInputObjectType(tableType)) {
+                        throw new Error(
+                          `Expected ${rightTable.name} to be an input object type`
+                        );
+                      }
+
+                      return Object.entries(tableType.getFields()).reduce(
+                        (memo, [fieldName, attribute]) => {
                           return {
                             ...memo,
-                            [attributeName]: fieldWithHooks(
-                              {
-                                fieldName: attributeName,
-                              },
-                              {...attribute}
-                            ),
+                            [fieldName]: fieldWithHooks({fieldName}, () => ({
+                              ...attribute,
+                              applyPlan: EXPORTABLE(
+                                () =>
+                                  function plan($parent, args) {
+                                    $parent.set(fieldName, args.get());
+                                  },
+                                []
+                              ),
+                            })),
                           };
                         },
                         {}

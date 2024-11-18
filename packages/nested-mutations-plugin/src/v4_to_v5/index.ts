@@ -4,16 +4,18 @@ import {PgNestedMutationsDeleteTypesPlugin} from './delete-type-plugin.ts';
 import {PgNestedMutationsInflectionPlugin} from './inflection-plugin.ts';
 import {PgNestedMutationsInitSchemaPlugin} from './init-schema-plugin.ts';
 import {PgNestedMutationsInputTypesPlugin} from './input-type-plugin.ts';
+import {PgNestedMutationsPlanResolverPlugin} from './plan-resolver-plugin.ts';
 import {PgNestedMutationsUpdateTypesPlugin} from './update-type-plugin.ts';
 
 export const Plugins = [
   PgNestedMutationsInflectionPlugin,
   PgNestedMutationsInitSchemaPlugin,
-  PgNestedMutationsConnectTypesPlugin,
-  PgNestedMutationsUpdateTypesPlugin,
-  PgNestedMutationsDeleteTypesPlugin,
-  PgNestedMutationsCreateTypesPlugin,
-  PgNestedMutationsInputTypesPlugin,
+  // PgNestedMutationsConnectTypesPlugin,
+  // PgNestedMutationsUpdateTypesPlugin,
+  // PgNestedMutationsDeleteTypesPlugin,
+  // PgNestedMutationsCreateTypesPlugin,
+  // PgNestedMutationsInputTypesPlugin,
+  // PgNestedMutationsPlanResolverPlugin,
 ];
 
 export const NestedMutationPreset: GraphileConfig.Preset = {
