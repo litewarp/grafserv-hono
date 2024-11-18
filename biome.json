@@ -35,7 +35,7 @@
       },
       "nursery": { "noCommonJs": "error", "useSortedClasses": "warn" },
       "style": {
-        "noNamespace": "error",
+        "noNamespace": "off",
         "useAsConstAssertion": "error",
         "useBlockStatements": "off"
       },
