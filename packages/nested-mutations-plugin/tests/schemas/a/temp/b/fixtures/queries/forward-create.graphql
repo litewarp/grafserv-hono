@@ -1,6 +1,6 @@
 mutation {
   createJob(
-    input: {job: {jobRelationshipsToIdUsingToJobId: {create: [{type: "test"}]}}}
+    input: {job: {jobRelationshipsByTheirToJobId: {create: [{type: "test"}]}}}
   ) {
     job {
       id

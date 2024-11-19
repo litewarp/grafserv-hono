@@ -137,6 +137,24 @@ exports[`a query=reverse-update-by-id.graphql 1`] = `
 }
 `;
 
+exports[`b query=forward-create.graphql 1`] = `
+{
+  "data": {
+    "createJob": {
+      "job": {
+        "id": "WyJKb2IiLDFd",
+        "jobRelationshipsByFromJobId": {
+          "nodes": [],
+        },
+        "jobRelationshipsByToJobId": {
+          "nodes": [],
+        },
+      },
+    },
+  },
+}
+`;
+
 exports[`b query=test.graphql 1`] = `
 {
   "data": {

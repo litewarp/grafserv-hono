@@ -4,8 +4,8 @@ mutation {
     input: {
       parent: {
         parentName: "test f1"
-        childrenToIdUsingMomParentId: {create: [{name: "child 2 of test f1"}]}
-        childrenToIdUsingDadParentId: {create: [{name: "child 1 of test f1"}]}
+        childrenByTheirMomParentId: {create: [{name: "child 2 of test f1"}]}
+        childrenByTheirDadParentId: {create: [{name: "child 1 of test f1"}]}
       }
     }
   ) {
