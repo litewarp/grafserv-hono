@@ -5,7 +5,7 @@ mutation AddChildAndConnectToParentByNodeId {
     input: {
       child: {
         name: "My baby"
-        parentByMyDadParentId: {connectByNodeId: {id: "WyJQYXJlbnQiLDJd"}}
+        parentByMyDadParentId: {connectByNodeId: {id: "WyJQYXJlbnQiLDJd=="}}
       }
     }
   ) {

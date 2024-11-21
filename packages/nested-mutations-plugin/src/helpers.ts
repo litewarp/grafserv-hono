@@ -12,7 +12,8 @@ export function isPgTableResource(r: PgResource): r is PgTableResource {
   return Boolean(r.codec.attributes) && !r.parameters;
 }
 
-export interface PgCodecRelationWithName extends PgCodecRelation {
+export interface PgCodecRelationWithName
+  extends PgCodecRelation<PgCodecWithAttributes, PgTableResource> {
   relationName: string;
 }
 export type PgTableResource = PgResource<

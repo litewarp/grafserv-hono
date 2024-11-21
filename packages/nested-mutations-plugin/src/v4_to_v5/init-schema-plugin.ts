@@ -15,15 +15,19 @@ import {
   ObjectStep,
   type SetterStep,
   __InputListStep,
+  type __InputObjectStep,
   type __TrackedValueStep,
   applyTransforms,
   each,
   lambda,
+  list,
   listTransform,
   loadMany,
   loadOne,
+  node,
   object,
   sideEffect,
+  specFromNodeId,
 } from 'postgraphile/grafast';
 import {memo} from 'postgraphile/grafserv';
 import {
@@ -35,6 +39,8 @@ import {
   isPgTableResource,
   isUpdatable,
 } from '../helpers.ts';
+import {pgRelationshipReverseConnectByNodeIdStep} from './steps/reverse-connect-by-id.ts';
+import {pgRelationshipReverseInsertStep} from './steps/reverse-insert.ts';
 
 interface ResourceRelationshipMutationFields {
   insertable?: {name: string; type: string};
@@ -67,7 +73,7 @@ const mapPgRelationshipRootFields = <
   const fieldNames: string[] = [];
   const paths: string[][] = [];
   const isLocalResourceInsertable = isInsertable(build, resource);
-  const isLocalResourceUpdatable = isUpdatable(build, resource);
+  // const isLocalResourceUpdatable = isUpdatable(build, resource);
 
   if (isLocalResourceInsertable) {
     fieldNames.push(build.inflection.createField(resource));
@@ -215,7 +221,7 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
         const {
           behavior,
           inflection,
-          grafast: {isObjectLikeStep, isListLikeStep},
+          grafast: {isObjectLikeStep},
           graphql: {GraphQLList, GraphQLNonNull, GraphQLID},
           wrapDescription,
           EXPORTABLE,
@@ -352,10 +358,10 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
 
               // TODO: ADD TO BEHAVIORS
               // CONNECT BY KEYS
-              const connectByKeysName = inflection.relationshipConnectFieldName({
-                ...relationship,
-                mode: 'key',
-              });
+              // const connectByKeysName = inflection.relationshipConnectFieldName({
+              //   ...relationship,
+              //   mode: 'key',
+              // });
               const connectByKeysType = inflection.relationshipConnectInputType({
                 ...relationship,
                 mode: 'key',
@@ -467,12 +473,11 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                                   isUnique,
                                   isReferencee,
                                   isObjectLikeStep,
-                                  isListLikeStep,
                                   pgInsertSingle,
                                   remoteResource
                                 ) =>
                                   function plan(
-                                    $object: SetterStep,
+                                    $object: PgInsertSingleStep | PgUpdateSingleStep,
                                     args: FieldArgs,
                                     _info: {
                                       schema: GraphQLSchema;
@@ -532,20 +537,25 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                                       );
                                     } else {
                                       // sanity check
+
                                       const $input = args.get();
-                                      if (!isListLikeStep($input)) {
+                                      if (!($input instanceof ListStep)) {
                                         throw new Error(
                                           `Expected input to be a list, but got ${typeof $input}`
                                         );
                                       }
-                                      console.log($object);
+                                      pgRelationshipReverseInsertStep(
+                                        build,
+                                        args.get() as ListStep<__InputObjectStep[]>,
+                                        $object,
+                                        relationship
+                                      );
                                     }
                                   },
                                 [
                                   isUnique,
                                   isReferencee,
                                   isObjectLikeStep,
-                                  isListLikeStep,
                                   pgInsertSingle,
                                   remoteResource,
                                 ]
@@ -581,9 +591,56 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                                     ),
                               applyPlan: EXPORTABLE(
                                 () =>
-                                  function plan($object: SetterStep, args: FieldArgs) {
-                                    // const $input = args.get();
-                                    // where you would connect the node id
+                                  function plan(
+                                    $object: PgUpdateSingleStep | PgInsertSingleStep,
+                                    args: FieldArgs
+                                  ) {
+                                    if (!build.getNodeIdHandler) {
+                                      throw new Error('getNodeIdHandler not found');
+                                    }
+                                    const $input = args.get();
+                                    const {localAttributes, remoteAttributes} =
+                                      relationship;
+                                    // handle single connect
+                                    const tableTypeName = inflection.tableType(
+                                      remoteResource.codec
+                                    );
+                                    const handler = build.getNodeIdHandler(tableTypeName);
+                                    if (!handler) {
+                                      throw new Error(
+                                        `Could not find node handler for ${tableTypeName}`
+                                      );
+                                    }
+                                    if (isUnique || !isReferencee) {
+                                      const $id = ($input as ObjectStep).get('id');
+
+                                      const spec = specFromNodeId(handler, $id);
+
+                                      Object.keys(spec).forEach((key) => {
+                                        const remoteAttrIndex =
+                                          remoteAttributes.indexOf(key);
+                                        const inLocal = localAttributes[remoteAttrIndex];
+                                        if (!inLocal) {
+                                          throw new Error(
+                                            `Could not find ${key} in local or remote attributes`
+                                          );
+                                        }
+                                        $object.set(inLocal, spec[key]);
+                                      });
+                                    } else {
+                                      if (!($input instanceof ListStep)) {
+                                        throw new Error(
+                                          `Expected input to be a list, but got ${typeof $input}`
+                                        );
+                                      }
+                                      pgRelationshipReverseConnectByNodeIdStep(
+                                        build,
+                                        handler,
+                                        $input,
+                                        $object,
+                                        relationship
+                                      );
+                                    }
                                   },
                                 []
                               ),
@@ -637,12 +694,10 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                     applyPlan: EXPORTABLE(
                       () =>
                         function plan($object: SetterStep, args: FieldArgs) {
-                          // args.apply($object);
-                          if ($object instanceof PgInsertSingleStep) {
-                            // $object.set('parent', args.get());
-                            sideEffect($object.get('id'), (id) => {
-                              console.log(id);
-                            });
+                          if (
+                            $object instanceof PgInsertSingleStep ||
+                            $object instanceof PgUpdateSingleStep
+                          ) {
                             args.apply($object);
                           }
                         },
@@ -673,13 +728,9 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
         return fields;
       },
       GraphQLObjectType_fields_field(field, build, context) {
+        const {EXPORTABLE, pgRelationshipMutationRootFields} = build;
         const {
-          EXPORTABLE,
-          graphql: {isObjectType},
-          pgRelationshipMutationRootFields,
-        } = build;
-        const {
-          scope: {isRootMutation, fieldName, fieldBehaviorScope},
+          scope: {isRootMutation, fieldName},
         } = context;
 
         if (isRootMutation) {
@@ -689,7 +740,10 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
             plan: EXPORTABLE(
               () =>
                 function plan($parent, fieldArgs, info) {
-                  const $resolved = field.plan!($parent, fieldArgs, info);
+                  if (!field.plan) {
+                    return $parent;
+                  }
+                  const $resolved = field.plan($parent, fieldArgs, info);
 
                   const $result = $resolved.get('result');
                   // apply field args to all connector fields in the relationship mutation input
@@ -697,7 +751,6 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                     return $resolved;
                   }
                   rootFields.forEach((path) => {
-                    console.log(path);
                     fieldArgs.apply($result, path);
                   });
                   return $resolved;

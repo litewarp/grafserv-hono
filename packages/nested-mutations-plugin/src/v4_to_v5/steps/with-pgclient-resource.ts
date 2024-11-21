@@ -1,9 +1,4 @@
-import {
-  type PgClient,
-  type PgCodec,
-  PgResource,
-  type WithPgClient,
-} from '@dataplan/pg';
+import {type PgClient, type PgCodec, PgResource, type WithPgClient} from '@dataplan/pg';
 import type {PgTableResource} from '@graphile-contrib/pg-many-to-many';
 import {
   type AccessStep,
@@ -133,20 +128,19 @@ export class WithTypedResourcePgClientStep<
         })
         .filter((v): v is [string, any] => v !== null);
 
-      return withPgClient(pgSettings, (client) =>
+      const $result = withPgClient(pgSettings, (client) =>
         this.callback(client, data, {
           values: setValues,
           attributes: [...this.attributes.keys()],
         })
       );
+      return $result;
     });
   }
 
   setPlan(): SetterStep<Record<PgResourceAttributes<TResource>, any>, this> {
     if (this.locked) {
-      throw new Error(
-        `${this}: cannot set values once plan is locked ('setPlan')`
-      );
+      throw new Error(`${this}: cannot set values once plan is locked ('setPlan')`);
     }
     return setter(this);
   }
@@ -214,9 +208,7 @@ export function withPgClientResource<
     }
   ) => Promise<Record<PgResourceAttributes<TResource>, any>>
 ): WithTypedResourcePgClientStep<TResource> {
-  return new WithTypedResourcePgClientStep(
-    resource,
-    $data,
-    (client, data, selections) => callback(client, data, selections)
+  return new WithTypedResourcePgClientStep(resource, $data, (client, data, selections) =>
+    callback(client, data, selections)
   );
 }
