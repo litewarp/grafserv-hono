@@ -14,19 +14,28 @@ CREATE TABLE a.child (
   CONSTRAINT child_dad_parent_fkey FOREIGN key (dad_parent_id) REFERENCES a.parent (id)
 );
 
-CREATE TABLE a.schools (id serial PRIMARY KEY, name TEXT NOT NULL);
+CREATE TABLE a.school (id serial PRIMARY KEY, name TEXT NOT NULL);
 
-CREATE TABLE a.school_student (
-  id serial PRIMARY KEY,
-  school_id INTEGER,
-  student_id INTEGER,
-  CONSTRAINT school_student_school_id_fkey FOREIGN key (school_id) REFERENCES a.schools (id),
-  CONSTRAINT school_student_student_id_fkey FOREIGN key (student_id) REFERENCES a.child (id)
+CREATE TABLE a.student (
+  school_id INTEGER NOT NULL,
+  student_id INTEGER NOT NULL,
+  CONSTRAINT student_child_fkey FOREIGN KEY (student_id) REFERENCES a.child (id),
+  CONSTRAINT student_school_fkey FOREIGN key (school_id) REFERENCES a.school (id),
+  PRIMARY KEY (school_id, student_id)
 );
 
-CREATE INDEX ON a.school_student (school_id);
+CREATE TABLE a.teacher (
+  other_id serial PRIMARY KEY,
+  name TEXT NOT NULL,
+  school_id INTEGER NOT NULL,
+  CONSTRAINT teacher_school_id_fkey FOREIGN key (school_id) REFERENCES a.school (id)
+);
 
-CREATE INDEX ON a.school_student (student_id);
+CREATE INDEX ON a.teacher (school_id);
+
+CREATE INDEX ON a.student (school_id);
+
+CREATE INDEX ON a.student (student_id);
 
 CREATE INDEX ON a.child (mom_parent_id);
 

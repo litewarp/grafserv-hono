@@ -552,14 +552,6 @@ enum JobRelationshipOrderBy {
   TO_JOB_ID_DESC
 }
 
-"""Relationship connect by node id for jobRelationshipsByTheirFromJobId"""
-input JobRelationshipsByTheirFromJobIdConnectByNodeIdInput {
-  """
-  The node id input field to connect job_relationship in the jobRelationshipsByTheirFromJobId relationship
-  """
-  id: ID!
-}
-
 """The JobRelationship to be created by this mutation."""
 input JobRelationshipsByTheirFromJobIdCreateInput {
   fromJobId: Int
@@ -569,19 +561,8 @@ input JobRelationshipsByTheirFromJobIdCreateInput {
 
 """Relationship input type for jobRelationshipsByTheirFromJobId"""
 input JobRelationshipsByTheirFromJobIdInput {
-  """Connect jobRelationshipsByTheirFromJobId by node id"""
-  connectByNodeId: [JobRelationshipsByTheirFromJobIdConnectByNodeIdInput!]
-
   """A JobRelationship created and linked to this object"""
   create: [JobRelationshipsByTheirFromJobIdCreateInput!]
-}
-
-"""Relationship connect by node id for jobRelationshipsByTheirToJobId"""
-input JobRelationshipsByTheirToJobIdConnectByNodeIdInput {
-  """
-  The node id input field to connect job_relationship in the jobRelationshipsByTheirToJobId relationship
-  """
-  id: ID!
 }
 
 """The JobRelationship to be created by this mutation."""
@@ -593,9 +574,6 @@ input JobRelationshipsByTheirToJobIdCreateInput {
 
 """Relationship input type for jobRelationshipsByTheirToJobId"""
 input JobRelationshipsByTheirToJobIdInput {
-  """Connect jobRelationshipsByTheirToJobId by node id"""
-  connectByNodeId: [JobRelationshipsByTheirToJobIdConnectByNodeIdInput!]
-
   """A JobRelationship created and linked to this object"""
   create: [JobRelationshipsByTheirToJobIdCreateInput!]
 }

@@ -1,7 +1,7 @@
 import {existsSync, readdirSync} from 'node:fs';
 import {readFile, writeFile} from 'node:fs/promises';
 import path from 'node:path';
-import adaptor, {makePgService} from '@dataplan/pg/adaptors/pg';
+import {makePgService} from '@dataplan/pg/adaptors/pg';
 import {PgManyToManyPreset} from '@graphile-contrib/pg-many-to-many';
 import {PgSimplifyInflectionPreset} from '@graphile/simplify-inflection';
 import type {SchemaResult} from 'graphile-build';
@@ -12,7 +12,7 @@ import type {Pool} from 'pg';
 import {makeWithPgClientViaPgClientAlreadyInTransaction} from 'postgraphile/adaptors/pg';
 import {execute, hookArgs} from 'postgraphile/grafast';
 import {PostGraphileAmberPreset} from 'postgraphile/presets/amber';
-import {NestedMutationPreset} from '../src/index.ts';
+import {RelationshipMutationsPreset} from '../src/index.ts';
 import {withPgClient, withPgPool} from './helpers.ts';
 import {printOrderedSchema} from './print-ordered-schema.ts';
 
@@ -28,7 +28,7 @@ const createPostGraphileSchema = async (pgPool: Pool, sqlSchema: string) => {
       PostGraphileAmberPreset,
       PgSimplifyInflectionPreset,
       PgManyToManyPreset,
-      NestedMutationPreset,
+      RelationshipMutationsPreset,
     ],
     pgServices: [
       makePgService({

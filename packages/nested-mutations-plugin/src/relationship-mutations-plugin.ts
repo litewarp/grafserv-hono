@@ -18,8 +18,10 @@ import {
   isUpdatable,
 } from './helpers.ts';
 import {pgRelationshipForwardConnectByNodeIdStep} from './steps/forward-connect-by-id.ts';
+import {pgRelationshipForwardConnectByKeysStep} from './steps/forward-connect-by-keys.ts';
 import {pgRelationshipForwardInsertStep} from './steps/forward-insert.ts';
 import {pgRelationshipReverseConnectByNodeIdStep} from './steps/reverse-connect-by-id.ts';
+import {pgRelationshipReverseConnectByKeysStep} from './steps/reverse-connect-by-keys.ts';
 import {pgRelationshipReverseInsertStep} from './steps/reverse-insert.ts';
 
 interface ResourceRelationshipMutationFields {
@@ -222,7 +224,7 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
             const relationshipTypeName = inflection.relationshipInputType(relationship);
 
             if (relationshipInputTypes.has(relationshipTypeName)) {
-              console.log(`Skipping ${relationshipTypeName}: already exists`);
+              // console.log(`Skipping ${relationshipTypeName}: already exists`);
               return;
             }
             relationshipInputTypes.add(relationshipTypeName);
@@ -230,9 +232,9 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
             const insertable = isInsertable(build, remoteResource);
             const updateable = isUpdatable(build, remoteResource);
             const deletable = isDeletable(build, remoteResource);
-            // TODO: Move out of insertable conditional once behaviors are implemented
-            // for now, if you're insertable, you are connectable
-            const connectable = insertable;
+            // TODO: Move out of conditional once behaviors are implemented
+            // for now, if you're updateable, you are connectable
+            const connectable = updateable;
 
             const fields: ResourceRelationshipMutationFields = {
               connectable: {},
@@ -266,18 +268,13 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                       return {
                         ...Object.entries(
                           (TableType as GraphQLInputObjectType).getFields()
-                        ).reduce((memo, [fieldName, attribute]) => {
-                          return {
+                        ).reduce(
+                          (memo, [name, field]) => ({
                             ...memo,
-                            [fieldName]: fieldWithHooks(
-                              {fieldName},
-                              {
-                                ...attribute,
-                                // applyPlan
-                              }
-                            ),
-                          };
-                        }, Object.create(null)),
+                            [name]: fieldWithHooks({fieldName: name}, field),
+                          }),
+                          Object.create(null)
+                        ),
                       };
                     },
                   }),
@@ -335,11 +332,11 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
               });
 
               // TODO: ADD TO BEHAVIORS
-              // CONNECT BY KEYS
-              // const connectByKeysName = inflection.relationshipConnectFieldName({
-              //   ...relationship,
-              //   mode: 'key',
-              // });
+
+              const connectByKeysName = inflection.relationshipConnectFieldName({
+                ...relationship,
+                mode: 'key',
+              });
               const connectByKeysType = inflection.relationshipConnectInputType({
                 ...relationship,
                 mode: 'key',
@@ -348,7 +345,9 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
               build.recoverable(null, () => {
                 build.registerInputObjectType(
                   connectByKeysType,
-                  {},
+                  {
+                    isRelationshipKeysConnectInputType: true,
+                  },
                   () => ({
                     assertStep: ObjectStep,
                     description: wrapDescription(
@@ -398,8 +397,8 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                 );
               });
               fields.connectable.byKeys = {
-                name: connectByIdName,
-                type: connectByIdTypeName,
+                name: connectByKeysName,
+                type: connectByKeysType,
               };
             }
 
@@ -448,10 +447,12 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                               ),
                               applyPlan: EXPORTABLE(
                                 (
-                                  isUnique,
+                                  build,
                                   isReferencee,
+                                  isUnique,
                                   pgRelationshipForwardInsertStep,
-                                  pgRelationshipReverseInsertStep
+                                  pgRelationshipReverseInsertStep,
+                                  relationship
                                 ) =>
                                   function plan(
                                     $parent: PgInsertSingleStep | PgUpdateSingleStep,
@@ -478,10 +479,12 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                                     }
                                   },
                                 [
-                                  isUnique,
+                                  build,
                                   isReferencee,
+                                  isUnique,
                                   pgRelationshipForwardInsertStep,
                                   pgRelationshipReverseInsertStep,
+                                  relationship,
                                 ]
                               ),
                             }
@@ -515,10 +518,14 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                                     ),
                               applyPlan: EXPORTABLE(
                                 (
-                                  isUnique,
+                                  build,
+                                  inflection,
                                   isReferencee,
+                                  isUnique,
                                   pgRelationshipForwardConnectByNodeIdStep,
-                                  pgRelationshipReverseConnectByNodeIdStep
+                                  pgRelationshipReverseConnectByNodeIdStep,
+                                  relationship,
+                                  remoteResource
                                 ) =>
                                   function plan(
                                     $object: PgUpdateSingleStep | PgInsertSingleStep,
@@ -553,10 +560,14 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                                     }
                                   },
                                 [
-                                  isUnique,
+                                  build,
+                                  inflection,
                                   isReferencee,
+                                  isUnique,
                                   pgRelationshipForwardConnectByNodeIdStep,
                                   pgRelationshipReverseConnectByNodeIdStep,
+                                  relationship,
+                                  remoteResource,
                                 ]
                               ),
                               autoApplyAfterParentApplyPlan: true,
@@ -564,6 +575,80 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                           ),
                         }
                       : {}),
+                    ...(fields.connectable.byKeys
+                      ? {
+                          [fields.connectable.byKeys.name]: fieldWithHooks(
+                            {
+                              fieldName: fields.connectable.byKeys.name,
+                              remoteResource,
+                              isRelationshipKeysConnectField: true,
+                            },
+                            {
+                              description: wrapDescription(
+                                `Connect ${relationName} by key`,
+                                'field'
+                              ),
+                              type:
+                                isUnique || !isReferencee
+                                  ? build.getInputTypeByName(
+                                      fields.connectable.byKeys.type
+                                    )
+                                  : new GraphQLList(
+                                      new GraphQLNonNull(
+                                        build.getInputTypeByName(
+                                          fields.connectable.byKeys.type
+                                        )
+                                      )
+                                    ),
+                              applyPlan: EXPORTABLE(
+                                (
+                                  build,
+                                  isReferencee,
+                                  isUnique,
+                                  pgRelationshipForwardConnectByKeysStep,
+                                  pgRelationshipReverseConnectByKeysStep,
+                                  relationship
+                                ) =>
+                                  function plan(
+                                    $object: PgUpdateSingleStep | PgInsertSingleStep,
+                                    args: FieldArgs
+                                  ) {
+                                    if (isUnique || !isReferencee) {
+                                      pgRelationshipForwardConnectByKeysStep(
+                                        build,
+                                        args.get() as ObjectStep,
+                                        $object,
+                                        relationship
+                                      );
+                                    } else {
+                                      pgRelationshipReverseConnectByKeysStep(
+                                        build,
+                                        args.get() as ListStep<__InputObjectStep[]>,
+                                        $object,
+                                        relationship
+                                      );
+                                    }
+                                  },
+                                [
+                                  build,
+                                  isReferencee,
+                                  isUnique,
+                                  pgRelationshipForwardConnectByKeysStep,
+                                  pgRelationshipReverseConnectByKeysStep,
+                                  relationship,
+                                ]
+                              ),
+                              autoApplyAfterParentApplyPlan: true,
+                            }
+                          ),
+                        }
+                      : {}),
+
+                    ...(fields.updateable.byNodeId ? {} : {}),
+                    ...(fields.updateable.byKeys ? {} : {}),
+
+                    ...(fields.deletable.byNodeId ? {} : {}),
+                    ...(fields.deletable.byKeys ? {} : {}),
                   }),
                 }),
                 `Creating input type for relationship ${relationName}`
@@ -607,7 +692,7 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                     type: InputType,
                     autoApplyAfterParentApplyPlan: true,
                     applyPlan: EXPORTABLE(
-                      () =>
+                      (PgInsertSingleStep, PgUpdateSingleStep) =>
                         function plan($object: SetterStep, args: FieldArgs) {
                           if (
                             $object instanceof PgInsertSingleStep ||
@@ -616,7 +701,7 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                             args.apply($object);
                           }
                         },
-                      []
+                      [PgInsertSingleStep, PgUpdateSingleStep]
                     ),
                   })
                 ),
@@ -653,7 +738,7 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
           return {
             ...field,
             plan: EXPORTABLE(
-              () =>
+              (field, rootFields) =>
                 function plan($parent, fieldArgs, info) {
                   if (!field.plan) {
                     return $parent;
@@ -670,7 +755,7 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                   });
                   return $resolved;
                 },
-              []
+              [field, rootFields]
             ),
           };
         }

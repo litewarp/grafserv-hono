@@ -6,7 +6,6 @@ import {
 import {
   type ExecutableStep,
   ListStep,
-  type NodeIdHandler,
   type __InputObjectStep,
   list,
   object,
@@ -14,11 +13,10 @@ import {
 import {type SQL} from 'postgraphile/pg-sql2';
 import {type PgCodecRelationWithName, inspect} from '../helpers.ts';
 
-export function pgRelationshipReverseConnectByNodeIdStep<
+export function pgRelationshipReverseConnectByKeysStep<
   TRelationship extends PgCodecRelationWithName,
 >(
   build: GraphileBuild.Build,
-  remoteHandler: NodeIdHandler,
   $items: ListStep<__InputObjectStep[]>,
   $parent: PgInsertSingleStep | PgUpdateSingleStep,
   relationship: TRelationship
@@ -64,15 +62,6 @@ export function pgRelationshipReverseConnectByNodeIdStep<
     remoteResource.executor,
     list([$items, $parentKeys]),
     async (client, [items, parentKeys]) => {
-      // unwrap the node ids
-      const children = items.map((item) => remoteHandler.codec.decode(item.id)[1]);
-
-      const childPrimaryUnique = remoteResource.uniques.find((u) => u.isPrimary);
-
-      if (!childPrimaryUnique) {
-        throw new Error(`Cannot find primary unique for ${remoteResource.name}`);
-      }
-
       Object.entries(parentKeys).forEach(([key, value]) => {
         const attrCodec = remoteResource.codec.attributes[key]?.codec;
         if (!attrCodec) return;
@@ -80,17 +69,17 @@ export function pgRelationshipReverseConnectByNodeIdStep<
         sqlSets.push(
           sql`${sql.identifier(key)} = ${sql.value(attrCodec.toPg(value))}::${attrCodec.sqlType}`
         );
-        children.forEach((childId) => {
-          childPrimaryUnique.attributes.forEach((attr) => {
-            const whereClauses = [];
+        items.forEach((obj) => {
+          const whereClauses: SQL[] = [];
+          Object.entries(obj).forEach(([attr, childId]) => {
             const remoteAttrCodec = remoteResource.codec.attributes[attr]?.codec;
             if (remoteAttrCodec) {
               whereClauses.push(
                 sql`${sql.identifier(attr)} = ${sql.value(remoteAttrCodec.toPg(childId))}::${remoteAttrCodec.sqlType}`
               );
             }
-            sqlWhereClauses.push(whereClauses);
           });
+          sqlWhereClauses.push(whereClauses);
         });
       });
       const set = sql` set ${sql.join(sqlSets, ', ')}`;

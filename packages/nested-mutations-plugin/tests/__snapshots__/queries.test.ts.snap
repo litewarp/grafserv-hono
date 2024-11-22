@@ -17,6 +17,23 @@ exports[`a query=forward-connect-by-id.graphql 1`] = `
 }
 `;
 
+exports[`a query=forward-connect-by-keys.graphql 1`] = `
+{
+  "data": {
+    "createChild": {
+      "child": {
+        "id": "WyJDaGlsZCIsM10=",
+        "momParent": {
+          "id": "WyJQYXJlbnQiLDFd",
+          "parentName": "mom",
+        },
+        "name": "My baby",
+      },
+    },
+  },
+}
+`;
+
 exports[`a query=forward-create.graphql 1`] = `
 {
   "data": {
@@ -84,6 +101,30 @@ exports[`a query=reverse-connect-by-id.graphql 1`] = `
 }
 `;
 
+exports[`a query=reverse-connect-by-keys.graphql 1`] = `
+{
+  "data": {
+    "createChild": {
+      "child": {
+        "id": "WyJDaGlsZCIsM10=",
+        "name": "My baby",
+        "studentsByStudentId": {
+          "nodes": [
+            {
+              "school": {
+                "id": "WyJTY2hvb2wiLDJd",
+                "name": "pine",
+              },
+              "studentId": 3,
+            },
+          ],
+        },
+      },
+    },
+  },
+}
+`;
+
 exports[`a query=reverse-create.graphql 1`] = `
 {
   "data": {
@@ -127,7 +168,7 @@ exports[`a query=reverse-create.graphql 1`] = `
 }
 `;
 
-exports[`a query=triple-nested.graphql 1`] = `
+exports[`a query=triple-nested-create.graphql 1`] = `
 {
   "data": {
     "createChild": {
