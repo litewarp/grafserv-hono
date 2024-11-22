@@ -35,6 +35,32 @@ exports[`a query=forward-create.graphql 1`] = `
 }
 `;
 
+exports[`a query=mixed-multi-level-insert.graphql 1`] = `
+{
+  "data": {
+    "createChild": {
+      "child": {
+        "dadParent": {
+          "childrenByDadParentId": {
+            "nodes": [
+              {
+                "id": "WyJDaGlsZCIsM10=",
+                "name": "Sandra Day",
+              },
+            ],
+          },
+          "id": "WyJQYXJlbnQiLDNd",
+          "parentName": "John Q. Washington",
+        },
+        "id": "WyJDaGlsZCIsM10=",
+        "momParent": null,
+        "name": "Sandra Day",
+      },
+    },
+  },
+}
+`;
+
 exports[`a query=reverse-connect-by-id.graphql 1`] = `
 {
   "data": {
@@ -95,6 +121,23 @@ exports[`a query=reverse-create.graphql 1`] = `
         },
         "id": "WyJQYXJlbnQiLDNd",
         "parentName": "test f1",
+      },
+    },
+  },
+}
+`;
+
+exports[`a query=triple-nested.graphql 1`] = `
+{
+  "data": {
+    "createChild": {
+      "child": {
+        "id": "WyJDaGlsZCIsM10=",
+        "momParent": {
+          "id": "WyJQYXJlbnQiLDNd",
+          "parentName": "Sandra Day O'Connor",
+        },
+        "name": "Hugo Black",
       },
     },
   },

@@ -1,8 +1,6 @@
 import {
-  type PgCodec,
   PgInsertSingleStep,
   PgUpdateSingleStep,
-  withPgClient,
   withPgClientTransaction,
 } from '@dataplan/pg';
 import {
@@ -12,12 +10,8 @@ import {
   list,
   object,
 } from 'postgraphile/grafast';
-import {type SQL, sql} from 'postgraphile/pg-sql2';
-import {
-  type PgCodecRelationWithName,
-  type PgTableResource,
-  inspect,
-} from '../../helpers.ts';
+import {type SQL} from 'postgraphile/pg-sql2';
+import {type PgCodecRelationWithName, type PgTableResource, inspect} from '../helpers.ts';
 
 export function pgRelationshipReverseInsertStep<
   TRelationship extends PgCodecRelationWithName,
@@ -54,7 +48,7 @@ export function pgRelationshipReverseInsertStep<
   const table = sql`${remoteResource.from} as ${alias}`;
   const attrs: SQL[] = [];
   const vals: SQL[][] = [];
-  const sels = new Map<string, PgCodec>();
+  // const sels = new Map<string, PgCodec>();
 
   const $parentKeys = object<Record<string, ExecutableStep>>({
     ...localAttributes.reduce((memo, attr, index) => {

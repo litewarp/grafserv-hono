@@ -31,7 +31,8 @@
       },
       "correctness": {
         "noUnusedVariables": "error",
-        "useArrayLiterals": "off"
+        "useArrayLiterals": "off",
+        "noUnusedImports": "error"
       },
       "nursery": { "noCommonJs": "error", "useSortedClasses": "warn" },
       "style": {

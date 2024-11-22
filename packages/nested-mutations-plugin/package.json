@@ -18,6 +18,8 @@
   "devDependencies": {
     "@dataplan/json": "0.0.1-beta.25",
     "@dataplan/pg": "0.0.1-beta.27",
+    "@eslint/compat": "^1.2.3",
+    "@eslint/eslintrc": "^3.2.0",
     "@grafserv/persisted": "0.0.0-beta.28",
     "@graphile-contrib/pg-many-to-many": "2.0.0-beta.5",
     "@graphile-contrib/pg-omit-archived": "4.0.0-beta.3",
@@ -30,6 +32,8 @@
     "@types/node": "^20.11.16",
     "@types/pg": "^8.11.0",
     "env-cmd": "^10.1.0",
+    "eslint": "^9.15.0",
+    "eslint-plugin-graphile-export": "0.0.2-beta.4",
     "graphile-build": "5.0.0-beta.28",
     "graphile-build-pg": "5.0.0-beta.32",
     "graphile-config": "0.0.1-beta.11",
@@ -42,6 +46,7 @@
     "postgraphile": "5.0.0-beta.33",
     "tsup": "^8.0.1",
     "typescript": "^5.6.3",
+    "typescript-eslint": "^8.15.0",
     "util": "^0.12.5"
   },
   "peerDependencies": {

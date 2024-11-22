@@ -15,7 +15,6 @@
   "devDependencies": {
     "@dataplan/json": "0.0.1-beta.25",
     "@dataplan/pg": "0.0.1-beta.27",
-    "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/jsonwebtoken": "^9.0.7",
     "bun": "^1.1.31",

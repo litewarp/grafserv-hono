@@ -1,8 +1,6 @@
 import {
-  type PgCodec,
   PgInsertSingleStep,
   PgUpdateSingleStep,
-  withPgClient,
   withPgClientTransaction,
 } from '@dataplan/pg';
 import {
@@ -14,11 +12,7 @@ import {
   object,
 } from 'postgraphile/grafast';
 import {type SQL, sql} from 'postgraphile/pg-sql2';
-import {
-  type PgCodecRelationWithName,
-  type PgTableResource,
-  inspect,
-} from '../../helpers.ts';
+import {type PgCodecRelationWithName, inspect} from '../../helpers.ts';
 
 export function pgRelationshipReverseConnectByNodeIdStep<
   TRelationship extends PgCodecRelationWithName,
@@ -30,7 +24,7 @@ export function pgRelationshipReverseConnectByNodeIdStep<
   relationship: TRelationship
   // selections: [] = []
 ): ExecutableStep {
-  const {inflection, sql} = build;
+  const {sql} = build;
 
   const {localAttributes, remoteAttributes, remoteResource} = relationship;
 
@@ -106,7 +100,6 @@ export function pgRelationshipReverseConnectByNodeIdStep<
       )}`;
 
       const query = sql`update ${table}${set}${where} returning *`;
-      console.log(sql.compile(query).text);
 
       const res = await client.withTransaction((tx) =>
         tx.query(sql.compile(query)).then((r) => r.rows)

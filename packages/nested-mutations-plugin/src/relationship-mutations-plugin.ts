@@ -1,12 +1,4 @@
-import {
-  type PgCodec,
-  type PgCodecWithAttributes,
-  PgInsertSingleStep,
-  type PgResource,
-  PgUpdateSingleStep,
-  pgInsertSingle,
-  withPgClient,
-} from '@dataplan/pg';
+import {PgInsertSingleStep, type PgResource, PgUpdateSingleStep} from '@dataplan/pg';
 import type {} from 'graphile-build-pg';
 import type {GraphQLInputField, GraphQLInputObjectType, GraphQLSchema} from 'graphql';
 import {
@@ -14,22 +6,8 @@ import {
   ListStep,
   ObjectStep,
   type SetterStep,
-  __InputListStep,
   type __InputObjectStep,
-  type __TrackedValueStep,
-  applyTransforms,
-  each,
-  lambda,
-  list,
-  listTransform,
-  loadMany,
-  loadOne,
-  node,
-  object,
-  sideEffect,
-  specFromNodeId,
 } from 'postgraphile/grafast';
-import {memo} from 'postgraphile/grafserv';
 import {
   type PgCodecRelationWithName,
   type PgTableResource,
@@ -38,7 +16,9 @@ import {
   isNestedMutableResource,
   isPgTableResource,
   isUpdatable,
-} from '../helpers.ts';
+} from './helpers.ts';
+import {pgRelationshipForwardConnectByNodeIdStep} from './steps/forward-connect-by-id.ts';
+import {pgRelationshipForwardInsertStep} from './steps/forward-insert.ts';
 import {pgRelationshipReverseConnectByNodeIdStep} from './steps/reverse-connect-by-id.ts';
 import {pgRelationshipReverseInsertStep} from './steps/reverse-insert.ts';
 
@@ -219,9 +199,7 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
 
       init(_, build) {
         const {
-          behavior,
           inflection,
-          grafast: {isObjectLikeStep},
           graphql: {GraphQLList, GraphQLNonNull, GraphQLID},
           wrapDescription,
           EXPORTABLE,
@@ -472,82 +450,29 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                                 (
                                   isUnique,
                                   isReferencee,
-                                  isObjectLikeStep,
-                                  pgInsertSingle,
-                                  remoteResource
+                                  pgRelationshipForwardInsertStep,
+                                  pgRelationshipReverseInsertStep
                                 ) =>
                                   function plan(
-                                    $object: PgInsertSingleStep | PgUpdateSingleStep,
+                                    $parent: PgInsertSingleStep | PgUpdateSingleStep,
                                     args: FieldArgs,
                                     _info: {
                                       schema: GraphQLSchema;
                                       entity: GraphQLInputField;
                                     }
                                   ) {
-                                    const insertableAttributes = Object.keys(
-                                      remoteResource.codec.attributes
-                                    ).filter((name) =>
-                                      behavior.pgCodecAttributeMatches(
-                                        [remoteResource.codec, name],
-                                        'attribute:insert'
-                                      )
-                                    );
-
-                                    const primaryKey = (
-                                      remoteResource as PgTableResource
-                                    ).uniques.find((u) => u.isPrimary);
-
                                     if (isUnique || !isReferencee) {
-                                      const $input = args.get();
-                                      // sanity check
-                                      if (!isObjectLikeStep($input)) {
-                                        throw new Error(
-                                          `Expected input to be an object, but got ${typeof $input}`
-                                        );
-                                      }
-
-                                      const $insert = pgInsertSingle(remoteResource);
-
-                                      insertableAttributes.forEach((name) => {
-                                        if (primaryKey?.attributes.includes(name)) {
-                                          return;
-                                        }
-
-                                        $insert.set(
-                                          name,
-                                          $input.get(
-                                            inflection.attribute({
-                                              attributeName: name,
-                                              codec: remoteResource.codec,
-                                            })
-                                          )
-                                        );
-                                      });
-
-                                      relationship.remoteAttributes.forEach(
-                                        (remoteAttr, index) => {
-                                          const localAttr =
-                                            relationship.localAttributes[index];
-
-                                          if (!localAttr) {
-                                            throw new Error('Local attribute not found');
-                                          }
-                                          $object.set(localAttr, $insert.get(remoteAttr));
-                                        }
+                                      pgRelationshipForwardInsertStep(
+                                        build,
+                                        args.get() as ObjectStep,
+                                        $parent,
+                                        relationship
                                       );
                                     } else {
-                                      // sanity check
-
-                                      const $input = args.get();
-                                      if (!($input instanceof ListStep)) {
-                                        throw new Error(
-                                          `Expected input to be a list, but got ${typeof $input}`
-                                        );
-                                      }
                                       pgRelationshipReverseInsertStep(
                                         build,
                                         args.get() as ListStep<__InputObjectStep[]>,
-                                        $object,
+                                        $parent,
                                         relationship
                                       );
                                     }
@@ -555,9 +480,8 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                                 [
                                   isUnique,
                                   isReferencee,
-                                  isObjectLikeStep,
-                                  pgInsertSingle,
-                                  remoteResource,
+                                  pgRelationshipForwardInsertStep,
+                                  pgRelationshipReverseInsertStep,
                                 ]
                               ),
                             }
@@ -590,59 +514,50 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                                       )
                                     ),
                               applyPlan: EXPORTABLE(
-                                () =>
+                                (
+                                  isUnique,
+                                  isReferencee,
+                                  pgRelationshipForwardConnectByNodeIdStep,
+                                  pgRelationshipReverseConnectByNodeIdStep
+                                ) =>
                                   function plan(
                                     $object: PgUpdateSingleStep | PgInsertSingleStep,
                                     args: FieldArgs
                                   ) {
-                                    if (!build.getNodeIdHandler) {
-                                      throw new Error('getNodeIdHandler not found');
-                                    }
-                                    const $input = args.get();
-                                    const {localAttributes, remoteAttributes} =
-                                      relationship;
-                                    // handle single connect
-                                    const tableTypeName = inflection.tableType(
-                                      remoteResource.codec
-                                    );
-                                    const handler = build.getNodeIdHandler(tableTypeName);
+                                    const handler =
+                                      build.getNodeIdHandler &&
+                                      build.getNodeIdHandler(
+                                        inflection.tableType(remoteResource.codec)
+                                      );
                                     if (!handler) {
                                       throw new Error(
-                                        `Could not find node handler for ${tableTypeName}`
+                                        `Could not find node handler for ${inflection.tableType(remoteResource.codec)}`
                                       );
                                     }
                                     if (isUnique || !isReferencee) {
-                                      const $id = ($input as ObjectStep).get('id');
-
-                                      const spec = specFromNodeId(handler, $id);
-
-                                      Object.keys(spec).forEach((key) => {
-                                        const remoteAttrIndex =
-                                          remoteAttributes.indexOf(key);
-                                        const inLocal = localAttributes[remoteAttrIndex];
-                                        if (!inLocal) {
-                                          throw new Error(
-                                            `Could not find ${key} in local or remote attributes`
-                                          );
-                                        }
-                                        $object.set(inLocal, spec[key]);
-                                      });
+                                      pgRelationshipForwardConnectByNodeIdStep(
+                                        build,
+                                        handler,
+                                        args.get() as ObjectStep,
+                                        $object,
+                                        relationship
+                                      );
                                     } else {
-                                      if (!($input instanceof ListStep)) {
-                                        throw new Error(
-                                          `Expected input to be a list, but got ${typeof $input}`
-                                        );
-                                      }
                                       pgRelationshipReverseConnectByNodeIdStep(
                                         build,
                                         handler,
-                                        $input,
+                                        args.get() as ListStep<__InputObjectStep[]>,
                                         $object,
                                         relationship
                                       );
                                     }
                                   },
-                                []
+                                [
+                                  isUnique,
+                                  isReferencee,
+                                  pgRelationshipForwardConnectByNodeIdStep,
+                                  pgRelationshipReverseConnectByNodeIdStep,
+                                ]
                               ),
                               autoApplyAfterParentApplyPlan: true,
                             }
