@@ -1,39 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`a query=forward-connect-by-id.graphql 1`] = `
-{
-  "data": {
-    "createChild": {
-      "child": {
-        "dadParent": {
-          "id": "WyJQYXJlbnQiLDJd",
-          "parentName": "dad",
-        },
-        "id": "WyJDaGlsZCIsM10=",
-        "name": "My baby",
-      },
-    },
-  },
-}
-`;
-
-exports[`a query=forward-connect-by-keys.graphql 1`] = `
-{
-  "data": {
-    "createChild": {
-      "child": {
-        "id": "WyJDaGlsZCIsM10=",
-        "momParent": {
-          "id": "WyJQYXJlbnQiLDFd",
-          "parentName": "mom",
-        },
-        "name": "My baby",
-      },
-    },
-  },
-}
-`;
-
 exports[`a query=forward-create.graphql 1`] = `
 {
   "data": {
@@ -41,11 +7,11 @@ exports[`a query=forward-create.graphql 1`] = `
       "child": {
         "dadParent": {
           "id": "WyJQYXJlbnQiLDNd",
-          "parentName": "my father this of thee",
+          "parentName": "Jimmy Constraint",
         },
         "id": "WyJDaGlsZCIsM10=",
         "momParent": null,
-        "name": "Me first but what about required constraints",
+        "name": "Johnny Q. Constraint",
       },
     },
   },
@@ -64,61 +30,22 @@ exports[`a query=mixed-multi-level-insert.graphql 1`] = `
                 "id": "WyJDaGlsZCIsM10=",
                 "name": "Sandra Day",
               },
+              {
+                "id": "",
+                "name": "George Washington"
+              },
+              {
+                "id": "",
+                "name": "Martha Washington"
+              }
             ],
+            "totalCount": 3,
           },
           "id": "WyJQYXJlbnQiLDNd",
           "parentName": "John Q. Washington",
         },
         "id": "WyJDaGlsZCIsM10=",
-        "momParent": null,
         "name": "Sandra Day",
-      },
-    },
-  },
-}
-`;
-
-exports[`a query=reverse-connect-by-id.graphql 1`] = `
-{
-  "data": {
-    "createParent": {
-      "parent": {
-        "childrenByDadParentId": {
-          "edges": [
-            {
-              "node": {
-                "id": "WyJDaGlsZCIsMl0=",
-                "name": "child 2",
-              },
-            },
-          ],
-        },
-        "id": "WyJQYXJlbnQiLDNd",
-        "parentName": "Daddy-O",
-      },
-    },
-  },
-}
-`;
-
-exports[`a query=reverse-connect-by-keys.graphql 1`] = `
-{
-  "data": {
-    "createChild": {
-      "child": {
-        "id": "WyJDaGlsZCIsM10=",
-        "name": "My baby",
-        "studentsByStudentId": {
-          "nodes": [
-            {
-              "school": {
-                "id": "WyJTY2hvb2wiLDJd",
-                "name": "pine",
-              },
-              "studentId": 3,
-            },
-          ],
-        },
       },
     },
   },
@@ -128,83 +55,10 @@ exports[`a query=reverse-connect-by-keys.graphql 1`] = `
 exports[`a query=reverse-create.graphql 1`] = `
 {
   "data": {
-    "createParent": {
-      "parent": {
-        "childrenByDadParentId": {
-          "nodes": [
-            {
-              "dadParent": {
-                "id": "WyJQYXJlbnQiLDNd",
-              },
-              "id": "WyJDaGlsZCIsM10=",
-              "momParent": null,
-              "name": "child 1 of test f1",
-            },
-          ],
-        },
-        "childrenByMomParentId": {
-          "nodes": [
-            {
-              "id": "WyJDaGlsZCIsNF0=",
-              "momParent": {
-                "id": "WyJQYXJlbnQiLDNd",
-              },
-              "name": "child 2 of test f1",
-            },
-            {
-              "id": "WyJDaGlsZCIsNV0=",
-              "momParent": {
-                "id": "WyJQYXJlbnQiLDNd",
-              },
-              "name": "child 3 of test f1",
-            },
-          ],
-        },
-        "id": "WyJQYXJlbnQiLDNd",
-        "parentName": "test f1",
-      },
-    },
+    "createParent": null,
   },
-}
-`;
-
-exports[`a query=triple-nested-create.graphql 1`] = `
-{
-  "data": {
-    "createChild": {
-      "child": {
-        "id": "WyJDaGlsZCIsM10=",
-        "momParent": {
-          "id": "WyJQYXJlbnQiLDNd",
-          "parentName": "Sandra Day O'Connor",
-        },
-        "name": "Hugo Black",
-      },
-    },
-  },
-}
-`;
-
-exports[`b query=forward-create.graphql 1`] = `
-{
-  "data": {
-    "createJob": {
-      "job": {
-        "id": "WyJKb2IiLDFd",
-        "jobRelationshipsByFromJobId": {
-          "nodes": [],
-        },
-        "jobRelationshipsByToJobId": {
-          "nodes": [
-            {
-              "fromJobId": null,
-              "toJobId": 1,
-              "type": "test",
-            },
-          ],
-        },
-      },
-    },
-  },
+  "errors": [
+    [GraphQLError: $items must be a ListStep and $parent must be a PgInsertSingleStep or PgUpdateSingleStep],
+  ],
 }
 `;

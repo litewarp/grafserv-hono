@@ -2,7 +2,6 @@ import {existsSync, readdirSync} from 'node:fs';
 import {readFile, writeFile} from 'node:fs/promises';
 import path from 'node:path';
 import {makePgService} from '@dataplan/pg/adaptors/pg';
-import {PgManyToManyPreset} from '@graphile-contrib/pg-many-to-many';
 import {PgSimplifyInflectionPreset} from '@graphile/simplify-inflection';
 import type {SchemaResult} from 'graphile-build';
 import {makeSchema} from 'graphile-build';
@@ -27,7 +26,6 @@ const createPostGraphileSchema = async (pgPool: Pool, sqlSchema: string) => {
     extends: [
       PostGraphileAmberPreset,
       PgSimplifyInflectionPreset,
-      PgManyToManyPreset,
       RelationshipMutationsPreset,
     ],
     pgServices: [

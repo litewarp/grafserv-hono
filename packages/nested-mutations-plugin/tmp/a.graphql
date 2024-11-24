@@ -14,52 +14,6 @@ type Child implements Node {
   name: String!
   rowId: Int!
 
-  """Reads and enables pagination through a set of `School`."""
-  schoolsByStudentStudentIdAndSchoolId(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: SchoolCondition
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `School`."""
-    orderBy: [SchoolOrderBy!] = [PRIMARY_KEY_ASC]
-  ): ChildSchoolsByStudentStudentIdAndSchoolIdManyToManyConnection!
-
-  """Reads and enables pagination through a set of `School`."""
-  schoolsByStudentStudentIdAndSchoolIdList(
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: SchoolCondition
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Skip the first `n` values."""
-    offset: Int
-
-    """The method to use when ordering `School`."""
-    orderBy: [SchoolOrderBy!]
-  ): [School!]!
-
   """Reads and enables pagination through a set of `Student`."""
   studentsByStudentId(
     """Read all values in the set after (below) this cursor."""
@@ -95,15 +49,7 @@ input ChildByMyStudentIdConnectByIdInput {
   """
   The id input field to connect child in the childByMyStudentId relationship
   """
-  id: Int!
-}
-
-"""Relationship connect by node id for childByMyStudentId"""
-input ChildByMyStudentIdConnectByNodeIdInput {
-  """
-  The node id input field to connect child in the childByMyStudentId relationship
-  """
-  id: ID!
+  rowId: Int!
 }
 
 """The Child to be created by this mutation."""
@@ -113,23 +59,20 @@ input ChildByMyStudentIdCreateInput {
   name: String!
 
   """Nested connector type for parentByMyDadParentId"""
-  parentByMyDadParentId: ParentByMyDadParentIdInput
+  parentByDadParentId: ParentByMyDadParentIdInput
 
   """Nested connector type for parentByMyMomParentId"""
-  parentByMyMomParentId: ParentByMyMomParentIdInput
+  parentByMomParentId: ParentByMyMomParentIdInput
   rowId: Int
 
   """Nested connector type for studentsByTheirStudentId"""
-  studentsByTheirStudentId: StudentsByTheirStudentIdInput
+  studentsByStudentId: StudentsByTheirStudentIdInput
 }
 
 """Relationship input type for childByMyStudentId"""
 input ChildByMyStudentIdInput {
   """Connect childByMyStudentId by key"""
   connectById: ChildByMyStudentIdConnectByIdInput
-
-  """Connect childByMyStudentId by node id"""
-  connectByNodeId: ChildByMyStudentIdConnectByNodeIdInput
 
   """A Child created and linked to this object"""
   create: ChildByMyStudentIdCreateInput
@@ -182,14 +125,14 @@ input ChildInput {
   name: String!
 
   """Nested connector type for parentByMyDadParentId"""
-  parentByMyDadParentId: ParentByMyDadParentIdInput
+  parentByDadParentId: ParentByMyDadParentIdInput
 
   """Nested connector type for parentByMyMomParentId"""
-  parentByMyMomParentId: ParentByMyMomParentIdInput
+  parentByMomParentId: ParentByMyMomParentIdInput
   rowId: Int
 
   """Nested connector type for studentsByTheirStudentId"""
-  studentsByTheirStudentId: StudentsByTheirStudentIdInput
+  studentsByStudentId: StudentsByTheirStudentIdInput
 }
 
 """Methods to use when ordering `Child`."""
@@ -214,40 +157,14 @@ input ChildPatch {
   name: String
 
   """Nested connector type for parentByMyDadParentId"""
-  parentByMyDadParentId: ParentByMyDadParentIdInput
+  parentByDadParentId: ParentByMyDadParentIdInput
 
   """Nested connector type for parentByMyMomParentId"""
-  parentByMyMomParentId: ParentByMyMomParentIdInput
+  parentByMomParentId: ParentByMyMomParentIdInput
   rowId: Int
 
   """Nested connector type for studentsByTheirStudentId"""
-  studentsByTheirStudentId: StudentsByTheirStudentIdInput
-}
-
-"""A connection to a list of `School` values, with data from `Student`."""
-type ChildSchoolsByStudentStudentIdAndSchoolIdManyToManyConnection {
-  """
-  A list of edges which contains the `School`, info from the `Student`, and the cursor to aid in pagination.
-  """
-  edges: [ChildSchoolsByStudentStudentIdAndSchoolIdManyToManyEdge!]!
-
-  """A list of `School` objects."""
-  nodes: [School]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `School` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A `School` edge in the connection, with data from `Student`."""
-type ChildSchoolsByStudentStudentIdAndSchoolIdManyToManyEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `School` at the end of the edge."""
-  node: School
+  studentsByStudentId: StudentsByTheirStudentIdInput
 }
 
 """Relationship connect by keys for childrenByTheirDadParentId"""
@@ -255,7 +172,7 @@ input ChildrenByTheirDadParentIdConnectByDadParentIdInput {
   """
   The dad_parent_id input field to connect child in the childrenByTheirDadParentId relationship
   """
-  dad_parent_id: Int!
+  dadParentId: Int!
 }
 
 """Relationship connect by node id for childrenByTheirDadParentId"""
@@ -273,14 +190,14 @@ input ChildrenByTheirDadParentIdCreateInput {
   name: String!
 
   """Nested connector type for parentByMyDadParentId"""
-  parentByMyDadParentId: ParentByMyDadParentIdInput
+  parentByDadParentId: ParentByMyDadParentIdInput
 
   """Nested connector type for parentByMyMomParentId"""
-  parentByMyMomParentId: ParentByMyMomParentIdInput
+  parentByMomParentId: ParentByMyMomParentIdInput
   rowId: Int
 
   """Nested connector type for studentsByTheirStudentId"""
-  studentsByTheirStudentId: StudentsByTheirStudentIdInput
+  studentsByStudentId: StudentsByTheirStudentIdInput
 }
 
 """Relationship input type for childrenByTheirDadParentId"""
@@ -289,7 +206,7 @@ input ChildrenByTheirDadParentIdInput {
   connectByDadParentId: [ChildrenByTheirDadParentIdConnectByDadParentIdInput!]
 
   """Connect childrenByTheirDadParentId by node id"""
-  connectByNodeId: [ChildrenByTheirDadParentIdConnectByNodeIdInput!]
+  connectById: [ChildrenByTheirDadParentIdConnectByNodeIdInput!]
 
   """A Child created and linked to this object"""
   create: [ChildrenByTheirDadParentIdCreateInput!]
@@ -300,7 +217,7 @@ input ChildrenByTheirMomParentIdConnectByMomParentIdInput {
   """
   The mom_parent_id input field to connect child in the childrenByTheirMomParentId relationship
   """
-  mom_parent_id: Int!
+  momParentId: Int!
 }
 
 """Relationship connect by node id for childrenByTheirMomParentId"""
@@ -318,23 +235,23 @@ input ChildrenByTheirMomParentIdCreateInput {
   name: String!
 
   """Nested connector type for parentByMyDadParentId"""
-  parentByMyDadParentId: ParentByMyDadParentIdInput
+  parentByDadParentId: ParentByMyDadParentIdInput
 
   """Nested connector type for parentByMyMomParentId"""
-  parentByMyMomParentId: ParentByMyMomParentIdInput
+  parentByMomParentId: ParentByMyMomParentIdInput
   rowId: Int
 
   """Nested connector type for studentsByTheirStudentId"""
-  studentsByTheirStudentId: StudentsByTheirStudentIdInput
+  studentsByStudentId: StudentsByTheirStudentIdInput
 }
 
 """Relationship input type for childrenByTheirMomParentId"""
 input ChildrenByTheirMomParentIdInput {
+  """Connect childrenByTheirMomParentId by node id"""
+  connectById: [ChildrenByTheirMomParentIdConnectByNodeIdInput!]
+
   """Connect childrenByTheirMomParentId by key"""
   connectByMomParentId: [ChildrenByTheirMomParentIdConnectByMomParentIdInput!]
-
-  """Connect childrenByTheirMomParentId by node id"""
-  connectByNodeId: [ChildrenByTheirMomParentIdConnectByNodeIdInput!]
 
   """A Child created and linked to this object"""
   create: [ChildrenByTheirMomParentIdCreateInput!]
@@ -1051,98 +968,6 @@ type Parent implements Node {
   """
   id: ID!
   parentName: String!
-
-  """Reads and enables pagination through a set of `Parent`."""
-  parentsByChildDadParentIdAndMomParentId(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: ParentCondition
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `Parent`."""
-    orderBy: [ParentOrderBy!] = [PRIMARY_KEY_ASC]
-  ): ParentParentsByChildDadParentIdAndMomParentIdManyToManyConnection!
-
-  """Reads and enables pagination through a set of `Parent`."""
-  parentsByChildDadParentIdAndMomParentIdList(
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: ParentCondition
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Skip the first `n` values."""
-    offset: Int
-
-    """The method to use when ordering `Parent`."""
-    orderBy: [ParentOrderBy!]
-  ): [Parent!]!
-
-  """Reads and enables pagination through a set of `Parent`."""
-  parentsByChildMomParentIdAndDadParentId(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: ParentCondition
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `Parent`."""
-    orderBy: [ParentOrderBy!] = [PRIMARY_KEY_ASC]
-  ): ParentParentsByChildMomParentIdAndDadParentIdManyToManyConnection!
-
-  """Reads and enables pagination through a set of `Parent`."""
-  parentsByChildMomParentIdAndDadParentIdList(
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: ParentCondition
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Skip the first `n` values."""
-    offset: Int
-
-    """The method to use when ordering `Parent`."""
-    orderBy: [ParentOrderBy!]
-  ): [Parent!]!
   rowId: Int!
 }
 
@@ -1151,24 +976,16 @@ input ParentByMyDadParentIdConnectByIdInput {
   """
   The id input field to connect parent in the parentByMyDadParentId relationship
   """
-  id: Int!
-}
-
-"""Relationship connect by node id for parentByMyDadParentId"""
-input ParentByMyDadParentIdConnectByNodeIdInput {
-  """
-  The node id input field to connect parent in the parentByMyDadParentId relationship
-  """
-  id: ID!
+  rowId: Int!
 }
 
 """The Parent to be created by this mutation."""
 input ParentByMyDadParentIdCreateInput {
   """Nested connector type for childrenByTheirDadParentId"""
-  childrenByTheirDadParentId: ChildrenByTheirDadParentIdInput
+  childrenByDadParentId: ChildrenByTheirDadParentIdInput
 
   """Nested connector type for childrenByTheirMomParentId"""
-  childrenByTheirMomParentId: ChildrenByTheirMomParentIdInput
+  childrenByMomParentId: ChildrenByTheirMomParentIdInput
   parentName: String!
   rowId: Int
 }
@@ -1177,9 +994,6 @@ input ParentByMyDadParentIdCreateInput {
 input ParentByMyDadParentIdInput {
   """Connect parentByMyDadParentId by key"""
   connectById: ParentByMyDadParentIdConnectByIdInput
-
-  """Connect parentByMyDadParentId by node id"""
-  connectByNodeId: ParentByMyDadParentIdConnectByNodeIdInput
 
   """A Parent created and linked to this object"""
   create: ParentByMyDadParentIdCreateInput
@@ -1190,24 +1004,16 @@ input ParentByMyMomParentIdConnectByIdInput {
   """
   The id input field to connect parent in the parentByMyMomParentId relationship
   """
-  id: Int!
-}
-
-"""Relationship connect by node id for parentByMyMomParentId"""
-input ParentByMyMomParentIdConnectByNodeIdInput {
-  """
-  The node id input field to connect parent in the parentByMyMomParentId relationship
-  """
-  id: ID!
+  rowId: Int!
 }
 
 """The Parent to be created by this mutation."""
 input ParentByMyMomParentIdCreateInput {
   """Nested connector type for childrenByTheirDadParentId"""
-  childrenByTheirDadParentId: ChildrenByTheirDadParentIdInput
+  childrenByDadParentId: ChildrenByTheirDadParentIdInput
 
   """Nested connector type for childrenByTheirMomParentId"""
-  childrenByTheirMomParentId: ChildrenByTheirMomParentIdInput
+  childrenByMomParentId: ChildrenByTheirMomParentIdInput
   parentName: String!
   rowId: Int
 }
@@ -1216,9 +1022,6 @@ input ParentByMyMomParentIdCreateInput {
 input ParentByMyMomParentIdInput {
   """Connect parentByMyMomParentId by key"""
   connectById: ParentByMyMomParentIdConnectByIdInput
-
-  """Connect parentByMyMomParentId by node id"""
-  connectByNodeId: ParentByMyMomParentIdConnectByNodeIdInput
 
   """A Parent created and linked to this object"""
   create: ParentByMyMomParentIdCreateInput
@@ -1261,10 +1064,10 @@ type ParentEdge {
 """An input for mutations affecting `Parent`"""
 input ParentInput {
   """Nested connector type for childrenByTheirDadParentId"""
-  childrenByTheirDadParentId: ChildrenByTheirDadParentIdInput
+  childrenByDadParentId: ChildrenByTheirDadParentIdInput
 
   """Nested connector type for childrenByTheirMomParentId"""
-  childrenByTheirMomParentId: ChildrenByTheirMomParentIdInput
+  childrenByMomParentId: ChildrenByTheirMomParentIdInput
   parentName: String!
   rowId: Int
 }
@@ -1278,159 +1081,15 @@ enum ParentOrderBy {
   PRIMARY_KEY_DESC
 }
 
-"""A connection to a list of `Parent` values, with data from `Child`."""
-type ParentParentsByChildDadParentIdAndMomParentIdManyToManyConnection {
-  """
-  A list of edges which contains the `Parent`, info from the `Child`, and the cursor to aid in pagination.
-  """
-  edges: [ParentParentsByChildDadParentIdAndMomParentIdManyToManyEdge!]!
-
-  """A list of `Parent` objects."""
-  nodes: [Parent]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `Parent` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A `Parent` edge in the connection, with data from `Child`."""
-type ParentParentsByChildDadParentIdAndMomParentIdManyToManyEdge {
-  """Reads and enables pagination through a set of `Child`."""
-  childrenByMomParentId(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: ChildCondition
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `Child`."""
-    orderBy: [ChildOrderBy!] = [PRIMARY_KEY_ASC]
-  ): ChildConnection!
-
-  """Reads and enables pagination through a set of `Child`."""
-  childrenByMomParentIdList(
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: ChildCondition
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Skip the first `n` values."""
-    offset: Int
-
-    """The method to use when ordering `Child`."""
-    orderBy: [ChildOrderBy!]
-  ): [Child!]!
-
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `Parent` at the end of the edge."""
-  node: Parent
-}
-
-"""A connection to a list of `Parent` values, with data from `Child`."""
-type ParentParentsByChildMomParentIdAndDadParentIdManyToManyConnection {
-  """
-  A list of edges which contains the `Parent`, info from the `Child`, and the cursor to aid in pagination.
-  """
-  edges: [ParentParentsByChildMomParentIdAndDadParentIdManyToManyEdge!]!
-
-  """A list of `Parent` objects."""
-  nodes: [Parent]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `Parent` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A `Parent` edge in the connection, with data from `Child`."""
-type ParentParentsByChildMomParentIdAndDadParentIdManyToManyEdge {
-  """Reads and enables pagination through a set of `Child`."""
-  childrenByDadParentId(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: ChildCondition
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `Child`."""
-    orderBy: [ChildOrderBy!] = [PRIMARY_KEY_ASC]
-  ): ChildConnection!
-
-  """Reads and enables pagination through a set of `Child`."""
-  childrenByDadParentIdList(
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: ChildCondition
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Skip the first `n` values."""
-    offset: Int
-
-    """The method to use when ordering `Child`."""
-    orderBy: [ChildOrderBy!]
-  ): [Child!]!
-
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `Parent` at the end of the edge."""
-  node: Parent
-}
-
 """
 Represents an update to a `Parent`. Fields that are set will be updated.
 """
 input ParentPatch {
   """Nested connector type for childrenByTheirDadParentId"""
-  childrenByTheirDadParentId: ChildrenByTheirDadParentIdInput
+  childrenByDadParentId: ChildrenByTheirDadParentIdInput
 
   """Nested connector type for childrenByTheirMomParentId"""
-  childrenByTheirMomParentId: ChildrenByTheirMomParentIdInput
+  childrenByMomParentId: ChildrenByTheirMomParentIdInput
   parentName: String
   rowId: Int
 }
@@ -1646,52 +1305,6 @@ type Query implements Node {
 }
 
 type School implements Node {
-  """Reads and enables pagination through a set of `Child`."""
-  childrenByStudentSchoolIdAndStudentId(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: ChildCondition
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `Child`."""
-    orderBy: [ChildOrderBy!] = [PRIMARY_KEY_ASC]
-  ): SchoolChildrenByStudentSchoolIdAndStudentIdManyToManyConnection!
-
-  """Reads and enables pagination through a set of `Child`."""
-  childrenByStudentSchoolIdAndStudentIdList(
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: ChildCondition
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Skip the first `n` values."""
-    offset: Int
-
-    """The method to use when ordering `Child`."""
-    orderBy: [ChildOrderBy!]
-  ): [Child!]!
-
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
@@ -1763,15 +1376,7 @@ input SchoolByMySchoolIdConnectByIdInput {
   """
   The id input field to connect school in the schoolByMySchoolId relationship
   """
-  id: Int!
-}
-
-"""Relationship connect by node id for schoolByMySchoolId"""
-input SchoolByMySchoolIdConnectByNodeIdInput {
-  """
-  The node id input field to connect school in the schoolByMySchoolId relationship
-  """
-  id: ID!
+  rowId: Int!
 }
 
 """The School to be created by this mutation."""
@@ -1780,10 +1385,10 @@ input SchoolByMySchoolIdCreateInput {
   rowId: Int
 
   """Nested connector type for studentsByTheirSchoolId"""
-  studentsByTheirSchoolId: StudentsByTheirSchoolIdInput
+  studentsBySchoolId: StudentsByTheirSchoolIdInput
 
   """Nested connector type for teachersByTheirSchoolId"""
-  teachersByTheirSchoolId: TeachersByTheirSchoolIdInput
+  teachersBySchoolId: TeachersByTheirSchoolIdInput
 }
 
 """Relationship input type for schoolByMySchoolId"""
@@ -1791,37 +1396,8 @@ input SchoolByMySchoolIdInput {
   """Connect schoolByMySchoolId by key"""
   connectById: SchoolByMySchoolIdConnectByIdInput
 
-  """Connect schoolByMySchoolId by node id"""
-  connectByNodeId: SchoolByMySchoolIdConnectByNodeIdInput
-
   """A School created and linked to this object"""
   create: SchoolByMySchoolIdCreateInput
-}
-
-"""A connection to a list of `Child` values, with data from `Student`."""
-type SchoolChildrenByStudentSchoolIdAndStudentIdManyToManyConnection {
-  """
-  A list of edges which contains the `Child`, info from the `Student`, and the cursor to aid in pagination.
-  """
-  edges: [SchoolChildrenByStudentSchoolIdAndStudentIdManyToManyEdge!]!
-
-  """A list of `Child` objects."""
-  nodes: [Child]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `Child` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A `Child` edge in the connection, with data from `Student`."""
-type SchoolChildrenByStudentSchoolIdAndStudentIdManyToManyEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `Child` at the end of the edge."""
-  node: Child
 }
 
 """
@@ -1864,10 +1440,10 @@ input SchoolInput {
   rowId: Int
 
   """Nested connector type for studentsByTheirSchoolId"""
-  studentsByTheirSchoolId: StudentsByTheirSchoolIdInput
+  studentsBySchoolId: StudentsByTheirSchoolIdInput
 
   """Nested connector type for teachersByTheirSchoolId"""
-  teachersByTheirSchoolId: TeachersByTheirSchoolIdInput
+  teachersBySchoolId: TeachersByTheirSchoolIdInput
 }
 
 """Methods to use when ordering `School`."""
@@ -1887,10 +1463,10 @@ input SchoolPatch {
   rowId: Int
 
   """Nested connector type for studentsByTheirSchoolId"""
-  studentsByTheirSchoolId: StudentsByTheirSchoolIdInput
+  studentsBySchoolId: StudentsByTheirSchoolIdInput
 
   """Nested connector type for teachersByTheirSchoolId"""
-  teachersByTheirSchoolId: TeachersByTheirSchoolIdInput
+  teachersBySchoolId: TeachersByTheirSchoolIdInput
 }
 
 type Student implements Node {
@@ -1948,10 +1524,10 @@ type StudentEdge {
 """An input for mutations affecting `Student`"""
 input StudentInput {
   """Nested connector type for childByMyStudentId"""
-  childByMyStudentId: ChildByMyStudentIdInput
+  childByStudentId: ChildByMyStudentIdInput
 
   """Nested connector type for schoolByMySchoolId"""
-  schoolByMySchoolId: SchoolByMySchoolIdInput
+  schoolBySchoolId: SchoolByMySchoolIdInput
   schoolId: Int!
   studentId: Int!
 }
@@ -1972,10 +1548,10 @@ Represents an update to a `Student`. Fields that are set will be updated.
 """
 input StudentPatch {
   """Nested connector type for childByMyStudentId"""
-  childByMyStudentId: ChildByMyStudentIdInput
+  childByStudentId: ChildByMyStudentIdInput
 
   """Nested connector type for schoolByMySchoolId"""
-  schoolByMySchoolId: SchoolByMySchoolIdInput
+  schoolBySchoolId: SchoolByMySchoolIdInput
   schoolId: Int
   studentId: Int
 }
@@ -1993,16 +1569,16 @@ input StudentsByTheirSchoolIdConnectBySchoolIdInput {
   """
   The school_id input field to connect student in the studentsByTheirSchoolId relationship
   """
-  school_id: Int!
+  schoolId: Int!
 }
 
 """The Student to be created by this mutation."""
 input StudentsByTheirSchoolIdCreateInput {
   """Nested connector type for childByMyStudentId"""
-  childByMyStudentId: ChildByMyStudentIdInput
+  childByStudentId: ChildByMyStudentIdInput
 
   """Nested connector type for schoolByMySchoolId"""
-  schoolByMySchoolId: SchoolByMySchoolIdInput
+  schoolBySchoolId: SchoolByMySchoolIdInput
   schoolId: Int!
   studentId: Int!
 }
@@ -2010,7 +1586,7 @@ input StudentsByTheirSchoolIdCreateInput {
 """Relationship input type for studentsByTheirSchoolId"""
 input StudentsByTheirSchoolIdInput {
   """Connect studentsByTheirSchoolId by node id"""
-  connectByNodeId: [StudentsByTheirSchoolIdConnectByNodeIdInput!]
+  connectById: [StudentsByTheirSchoolIdConnectByNodeIdInput!]
 
   """Connect studentsByTheirSchoolId by key"""
   connectBySchoolId: [StudentsByTheirSchoolIdConnectBySchoolIdInput!]
@@ -2032,16 +1608,16 @@ input StudentsByTheirStudentIdConnectByStudentIdInput {
   """
   The student_id input field to connect student in the studentsByTheirStudentId relationship
   """
-  student_id: Int!
+  studentId: Int!
 }
 
 """The Student to be created by this mutation."""
 input StudentsByTheirStudentIdCreateInput {
   """Nested connector type for childByMyStudentId"""
-  childByMyStudentId: ChildByMyStudentIdInput
+  childByStudentId: ChildByMyStudentIdInput
 
   """Nested connector type for schoolByMySchoolId"""
-  schoolByMySchoolId: SchoolByMySchoolIdInput
+  schoolBySchoolId: SchoolByMySchoolIdInput
   schoolId: Int!
   studentId: Int!
 }
@@ -2049,7 +1625,7 @@ input StudentsByTheirStudentIdCreateInput {
 """Relationship input type for studentsByTheirStudentId"""
 input StudentsByTheirStudentIdInput {
   """Connect studentsByTheirStudentId by node id"""
-  connectByNodeId: [StudentsByTheirStudentIdConnectByNodeIdInput!]
+  connectById: [StudentsByTheirStudentIdConnectByNodeIdInput!]
 
   """Connect studentsByTheirStudentId by key"""
   connectByStudentId: [StudentsByTheirStudentIdConnectByStudentIdInput!]
@@ -2114,7 +1690,7 @@ input TeacherInput {
   otherId: Int
 
   """Nested connector type for schoolByMySchoolId"""
-  schoolByMySchoolId: SchoolByMySchoolIdInput
+  schoolBySchoolId: SchoolByMySchoolIdInput
   schoolId: Int!
 }
 
@@ -2137,7 +1713,7 @@ input TeacherPatch {
   otherId: Int
 
   """Nested connector type for schoolByMySchoolId"""
-  schoolByMySchoolId: SchoolByMySchoolIdInput
+  schoolBySchoolId: SchoolByMySchoolIdInput
   schoolId: Int
 }
 
@@ -2154,7 +1730,7 @@ input TeachersByTheirSchoolIdConnectBySchoolIdInput {
   """
   The school_id input field to connect teacher in the teachersByTheirSchoolId relationship
   """
-  school_id: Int!
+  schoolId: Int!
 }
 
 """The Teacher to be created by this mutation."""
@@ -2163,14 +1739,14 @@ input TeachersByTheirSchoolIdCreateInput {
   otherId: Int
 
   """Nested connector type for schoolByMySchoolId"""
-  schoolByMySchoolId: SchoolByMySchoolIdInput
+  schoolBySchoolId: SchoolByMySchoolIdInput
   schoolId: Int!
 }
 
 """Relationship input type for teachersByTheirSchoolId"""
 input TeachersByTheirSchoolIdInput {
   """Connect teachersByTheirSchoolId by node id"""
-  connectByNodeId: [TeachersByTheirSchoolIdConnectByNodeIdInput!]
+  connectById: [TeachersByTheirSchoolIdConnectByNodeIdInput!]
 
   """Connect teachersByTheirSchoolId by key"""
   connectBySchoolId: [TeachersByTheirSchoolIdConnectBySchoolIdInput!]

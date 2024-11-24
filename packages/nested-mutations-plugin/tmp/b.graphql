@@ -309,10 +309,10 @@ type JobEdge {
 """An input for mutations affecting `Job`"""
 input JobInput {
   """Nested connector type for jobRelationshipsByTheirFromJobId"""
-  jobRelationshipsByTheirFromJobId: JobRelationshipsByTheirFromJobIdInput
+  jobRelationshipsByFromJobId: JobRelationshipsByTheirFromJobIdInput
 
   """Nested connector type for jobRelationshipsByTheirToJobId"""
-  jobRelationshipsByTheirToJobId: JobRelationshipsByTheirToJobIdInput
+  jobRelationshipsByToJobId: JobRelationshipsByTheirToJobIdInput
   name: String
   rowId: Int
 }
@@ -477,10 +477,10 @@ enum JobOrderBy {
 """Represents an update to a `Job`. Fields that are set will be updated."""
 input JobPatch {
   """Nested connector type for jobRelationshipsByTheirFromJobId"""
-  jobRelationshipsByTheirFromJobId: JobRelationshipsByTheirFromJobIdInput
+  jobRelationshipsByFromJobId: JobRelationshipsByTheirFromJobIdInput
 
   """Nested connector type for jobRelationshipsByTheirToJobId"""
-  jobRelationshipsByTheirToJobId: JobRelationshipsByTheirToJobIdInput
+  jobRelationshipsByToJobId: JobRelationshipsByTheirToJobIdInput
   name: String
   rowId: Int
 }

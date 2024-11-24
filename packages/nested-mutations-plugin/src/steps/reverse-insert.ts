@@ -11,7 +11,8 @@ import {
   object,
 } from 'postgraphile/grafast';
 import {type SQL} from 'postgraphile/pg-sql2';
-import {type PgCodecRelationWithName, type PgTableResource, inspect} from '../helpers.ts';
+import {type PgCodecRelationWithName, type PgTableResource} from '../helpers.ts';
+import {inspect} from '../inspect.ts';
 
 export function pgRelationshipReverseInsertStep<
   TRelationship extends PgCodecRelationWithName,

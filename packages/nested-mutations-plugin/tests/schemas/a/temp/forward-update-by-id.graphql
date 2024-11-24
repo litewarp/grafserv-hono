@@ -1,14 +1,10 @@
-mutation ForwardUpdateByNodeId {
-  updateChild(
+mutation forwardUpdateByNodeId {
+  updateChildById(
     input: {
-      rowId: 1
+      id: "WyJDaGlsZCIsMV0"
       patch: {
-        name: "Charlie Hustle"
-        parentByMyDadParentId: {
-          updateByNodeId: {
-            id: "WyJQYXJlbnQiLDJd"
-            patch: {parentName: "revised daddy"}
-          }
+        parentByDadParentId: {
+          updateByNodeId: {id: "WyJQYXJlbnQiLDFd", patch: {parentName: "Sally Ride"}}
         }
       }
     }
@@ -16,13 +12,6 @@ mutation ForwardUpdateByNodeId {
     child {
       id
       name
-      dadParent {
-        id
-        parentName
-      }
-      momParent {
-        id
-      }
     }
   }
 }

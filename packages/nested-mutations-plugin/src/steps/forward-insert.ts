@@ -1,7 +1,15 @@
-import type {PgInsertSingleStep, PgUpdateSingleStep} from '@dataplan/pg';
+import type {
+  PgInsertSingleStep,
+  PgResourceUnique,
+  PgUpdateSingleStep,
+} from '@dataplan/pg';
 import {pgInsertSingle} from '@dataplan/pg';
-import {type ObjectStep, isObjectLikeStep} from 'postgraphile/grafast';
-import type {PgCodecRelationWithName, PgTableResource} from '../../helpers.ts';
+import {
+  type ExecutableStep,
+  type ObjectStep,
+  isObjectLikeStep,
+} from 'postgraphile/grafast';
+import type {PgCodecRelationWithName} from '../helpers.ts';
 
 /**
  * Utilize the built-in @dataplan/pg steps to insert a forward relationship.
@@ -14,8 +22,8 @@ export function pgRelationshipForwardInsertStep<
   $parent: PgInsertSingleStep | PgUpdateSingleStep,
   relationship: TRelationship
   // selections: [] = []
-) {
-  const {inflection, behavior} = build;
+): ExecutableStep {
+  const {inflection, behavior, sql} = build;
   const {remoteResource, remoteAttributes, localAttributes} = relationship;
 
   if (!isObjectLikeStep($item)) {
@@ -27,7 +35,7 @@ export function pgRelationshipForwardInsertStep<
       behavior.pgCodecAttributeMatches([remoteResource.codec, name], 'attribute:insert')
   );
 
-  const primaryKey = (remoteResource as PgTableResource).uniques.find((u) => u.isPrimary);
+  const primaryKey = remoteResource.uniques.find((u: PgResourceUnique) => u.isPrimary);
 
   const $insert = pgInsertSingle(remoteResource);
 
@@ -47,5 +55,5 @@ export function pgRelationshipForwardInsertStep<
       $parent.set(local, $insert.get(remote));
     }
   });
-  return $insert;
+  return $parent;
 }

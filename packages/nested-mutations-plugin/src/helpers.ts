@@ -5,8 +5,8 @@ import type {
   PgResource,
   PgResourceUnique,
 } from '@dataplan/pg';
-import {PgInsertSingleStep, PgUpdateSingleStep} from '@dataplan/pg';
-import type {ExecutableStep} from 'postgraphile/grafast';
+import type {} from '@dataplan/pg';
+import type {} from 'graphile-build-pg';
 
 export function isPgTableResource(r: PgResource): r is PgTableResource {
   return Boolean(r.codec.attributes) && !r.parameters;
@@ -14,7 +14,8 @@ export function isPgTableResource(r: PgResource): r is PgTableResource {
 
 export interface PgCodecRelationWithName
   extends PgCodecRelation<PgCodecWithAttributes, PgTableResource> {
-  relationName: string;
+  name: string;
+  resource: string;
 }
 export type PgTableResource = PgResource<
   string,
@@ -24,10 +25,27 @@ export type PgTableResource = PgResource<
   PgRegistry
 >;
 
+export const getUniqueMode = (
+  build: GraphileBuild.Build,
+  resource: PgTableResource,
+  mode: 'insert' | 'update' | 'delete'
+): 'node' | 'keys' => {
+  if (
+    build.getNodeIdCodec !== undefined &&
+    build.behavior.pgCodecMatches(
+      resource.codec,
+      `nodeId:${mode}` as keyof GraphileBuild.BehaviorStrings
+    )
+  ) {
+    return 'node';
+  }
+  return 'keys';
+};
+
 export const isNestedMutableResource = (
   build: GraphileBuild.Build,
   resource: PgResource
-): r is PgTableResource => {
+): resource is PgTableResource => {
   if (resource.parameters) return false;
   if (!resource.codec.attributes) return false;
   if (resource.codec.polymorphism) return false;
@@ -72,45 +90,3 @@ export const isDeletable = (
   if (!resource.uniques || resource.uniques.length < 1) return false;
   return Boolean(build.behavior.pgResourceMatches(resource, 'resource:delete'));
 };
-
-export const getCRUDBehavior = (
-  build: GraphileBuild.Build,
-  resource: PgResource<any, any, any, any, any>
-) => {
-  if (resource.parameters) return {};
-  if (!resource.codec.attributes) return {};
-  if (resource.codec.polymorphism) return {};
-  if (resource.codec.isAnonymous) return {};
-  if (!resource.uniques || resource.uniques.length < 1) return {};
-
-  return {
-    insertable: isInsertable(build, resource),
-    // connectable: isInsertable(build, resource), // TODO
-    updatable: isUpdatable(build, resource),
-    deletable: isDeletable(build, resource),
-  };
-};
-
-export function isInsertOrUpdate(
-  $step: ExecutableStep
-): $step is PgInsertSingleStep | PgUpdateSingleStep {
-  return $step instanceof PgInsertSingleStep || $step instanceof PgUpdateSingleStep;
-}
-
-export let inspect: (obj: any, options?: {colors?: boolean; depth?: number}) => string;
-
-try {
-  inspect = require('node:util').inspect;
-  if (typeof inspect !== 'function') {
-    throw new Error('Failed to load inspect');
-  }
-} catch {
-  inspect = (obj) => {
-    return Array.isArray(obj) ||
-      !obj ||
-      Object.getPrototypeOf(obj) === null ||
-      Object.getPrototypeOf(obj) === Object.prototype
-      ? JSON.stringify(obj)
-      : String(obj);
-  };
-}

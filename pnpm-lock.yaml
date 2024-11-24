@@ -146,15 +146,6 @@ importers:
       '@grafserv/persisted':
         specifier: 0.0.0-beta.28
         version: 0.0.0-beta.28(grafast@0.1.1-beta.13(graphile-config@0.0.1-beta.11)(graphql@16.1.0-experimental-stream-defer.6)(tamedevil@0.0.0-beta.7))(grafserv@0.1.1-beta.15(grafast@0.1.1-beta.13(graphile-config@0.0.1-beta.11)(graphql@16.1.0-experimental-stream-defer.6)(tamedevil@0.0.0-beta.7))(graphile-config@0.0.1-beta.11)(graphql@16.1.0-experimental-stream-defer.6)(ws@8.18.0))(graphile-config@0.0.1-beta.11)
-      '@graphile-contrib/pg-many-to-many':
-        specifier: 2.0.0-beta.5
-        version: 2.0.0-beta.5
-      '@graphile-contrib/pg-omit-archived':
-        specifier: 4.0.0-beta.3
-        version: 4.0.0-beta.3(dev7z2cs2zltetzvlnpihqa2be)
-      '@graphile/pg-aggregates':
-        specifier: 0.2.0-beta.7
-        version: 0.2.0-beta.7(3nfrqtzkfxbflwk2v4tjvtb7ui)
       '@graphile/simplify-inflection':
         specifier: 8.0.0-beta.5
         version: 8.0.0-beta.5
@@ -733,35 +724,9 @@ packages:
       graphile-config:
         optional: true
 
-  '@graphile-contrib/pg-many-to-many@2.0.0-beta.5':
-    resolution: {integrity: sha512-2+skRC0OKpV84Kj0zSSCFpWXH1IvbUpAzSEeleC6Raa5D2ccpzjLiw/7pjxFT5RFRWKJcW8jbRfWKbXtTe5I7A==}
-    engines: {node: '>=10'}
-
-  '@graphile-contrib/pg-omit-archived@4.0.0-beta.3':
-    resolution: {integrity: sha512-MTI9pGYF41jJH2bDvZ3aaMLcBUcu7bHuOWXTJi/uSoiCYVGqfSgo3Dr7vNmF/QFVw6hS+st1D/BzAQit2jivMA==}
-    peerDependencies:
-      '@dataplan/pg': ^0.0.1-beta.1
-      graphile-build-pg: ^5.0.0-beta.1
-      graphile-config: ^0.0.1-beta.1
-      postgraphile: ^5.0.0-beta.1
-
   '@graphile/lru@5.0.0-beta.3':
     resolution: {integrity: sha512-atoHRmLuYMCoMeCjS1pIA442eqAHwFZ3+bnjm3Mn+kAvujyXzGs8uup39gfmMgxOFjRAPNmPEiPw2oJUbOk65Q==}
     engines: {node: '>=14.17'}
-
-  '@graphile/pg-aggregates@0.2.0-beta.7':
-    resolution: {integrity: sha512-XaVAzlB1S1UzAmet7dZcoW3AnDGT2qrQqXCRIGJKeu7i76D/SIR5hZs+mytYOjfwuJsHsBBDtmlRORMaUKkJxw==}
-    peerDependencies:
-      graphile-build: ^5.0.0-beta.27
-      graphile-build-pg: ^5.0.0-beta.31
-      graphql: ^16.1.0-experimental-stream-defer.6
-    peerDependenciesMeta:
-      graphile-build:
-        optional: true
-      graphile-build-pg:
-        optional: true
-      graphql:
-        optional: true
 
   '@graphile/simplify-inflection@8.0.0-beta.5':
     resolution: {integrity: sha512-1XaXGe5i5wRR/Uh2cvkt9KlFoXq/e7a3GYSdZtQnp68gIOdgcys2T24VNYsiekBhzcp5CCCcUJJdUvV2bvS21Q==}
@@ -1486,7 +1451,6 @@ packages:
 
   bun@1.1.31:
     resolution: {integrity: sha512-fUUKI4qergVXDn7Ng/porWyu3SDi/iovtX0NtGIhb3MHDtN9yy6PDZfylPGlYgRn0pVHW293GJm+a0sWvJy9FA==}
-    cpu: [arm64, x64]
     os: [darwin, linux, win32]
     hasBin: true
 
@@ -2163,7 +2127,7 @@ packages:
     peerDependencies:
       grafast: ^0.1.1-beta.16
       graphile-config: ^0.0.1-beta.11
-      graphql: 16.1.0-experimental-stream-defer.6
+      graphql: ^16.1.0-experimental-stream-defer.6
 
   graphile-config@0.0.1-beta.11:
     resolution: {integrity: sha512-+2QLPpihQQvSYd6sSXcDrwHMMSygUrK41qWhak7u3vsXj2AGwVwl+kVvlBwuoovaoUPDsGF8zy5IevTAMgzg5Q==}
@@ -3948,24 +3912,9 @@ snapshots:
     optionalDependencies:
       graphile-config: 0.0.1-beta.11
 
-  '@graphile-contrib/pg-many-to-many@2.0.0-beta.5': {}
-
-  '@graphile-contrib/pg-omit-archived@4.0.0-beta.3(dev7z2cs2zltetzvlnpihqa2be)':
-    dependencies:
-      '@dataplan/pg': 0.0.1-beta.27(@dataplan/json@0.0.1-beta.25(grafast@0.1.1-beta.13(graphile-config@0.0.1-beta.11)(graphql@16.1.0-experimental-stream-defer.6)(tamedevil@0.0.0-beta.7)))(grafast@0.1.1-beta.13(graphile-config@0.0.1-beta.11)(graphql@16.1.0-experimental-stream-defer.6)(tamedevil@0.0.0-beta.7))(graphile-config@0.0.1-beta.11)(pg-sql2@5.0.0-beta.6)(pg@8.12.0)
-      graphile-build-pg: 5.0.0-beta.32(@dataplan/pg@0.0.1-beta.27(@dataplan/json@0.0.1-beta.25(grafast@0.1.1-beta.13(graphile-config@0.0.1-beta.11)(graphql@16.1.0-experimental-stream-defer.6)(tamedevil@0.0.0-beta.7)))(grafast@0.1.1-beta.13(graphile-config@0.0.1-beta.11)(graphql@16.1.0-experimental-stream-defer.6)(tamedevil@0.0.0-beta.7))(graphile-config@0.0.1-beta.11)(pg-sql2@5.0.0-beta.6)(pg@8.12.0))(grafast@0.1.1-beta.13(graphile-config@0.0.1-beta.11)(graphql@16.1.0-experimental-stream-defer.6)(tamedevil@0.0.0-beta.7))(graphile-build@5.0.0-beta.28(grafast@0.1.1-beta.13(graphile-config@0.0.1-beta.11)(graphql@16.1.0-experimental-stream-defer.6)(tamedevil@0.0.0-beta.7))(graphile-config@0.0.1-beta.11)(graphql@16.1.0-experimental-stream-defer.6))(graphile-config@0.0.1-beta.11)(graphql@16.1.0-experimental-stream-defer.6)(pg-sql2@5.0.0-beta.6)(pg@8.12.0)(tamedevil@0.0.0-beta.7)
-      graphile-config: 0.0.1-beta.11
-      postgraphile: 5.0.0-beta.33(yjjbw7ss4exbtgsnfldhptzbm4)
-
   '@graphile/lru@5.0.0-beta.3':
     dependencies:
       tslib: 2.8.0
-
-  '@graphile/pg-aggregates@0.2.0-beta.7(3nfrqtzkfxbflwk2v4tjvtb7ui)':
-    optionalDependencies:
-      graphile-build: 5.0.0-beta.28(grafast@0.1.1-beta.13(graphile-config@0.0.1-beta.11)(graphql@16.1.0-experimental-stream-defer.6)(tamedevil@0.0.0-beta.7))(graphile-config@0.0.1-beta.11)(graphql@16.1.0-experimental-stream-defer.6)
-      graphile-build-pg: 5.0.0-beta.32(@dataplan/pg@0.0.1-beta.27(@dataplan/json@0.0.1-beta.25(grafast@0.1.1-beta.13(graphile-config@0.0.1-beta.11)(graphql@16.1.0-experimental-stream-defer.6)(tamedevil@0.0.0-beta.7)))(grafast@0.1.1-beta.13(graphile-config@0.0.1-beta.11)(graphql@16.1.0-experimental-stream-defer.6)(tamedevil@0.0.0-beta.7))(graphile-config@0.0.1-beta.11)(pg-sql2@5.0.0-beta.6)(pg@8.12.0))(grafast@0.1.1-beta.13(graphile-config@0.0.1-beta.11)(graphql@16.1.0-experimental-stream-defer.6)(tamedevil@0.0.0-beta.7))(graphile-build@5.0.0-beta.28(grafast@0.1.1-beta.13(graphile-config@0.0.1-beta.11)(graphql@16.1.0-experimental-stream-defer.6)(tamedevil@0.0.0-beta.7))(graphile-config@0.0.1-beta.11)(graphql@16.1.0-experimental-stream-defer.6))(graphile-config@0.0.1-beta.11)(graphql@16.1.0-experimental-stream-defer.6)(pg-sql2@5.0.0-beta.6)(pg@8.12.0)(tamedevil@0.0.0-beta.7)
-      graphql: 16.1.0-experimental-stream-defer.6
 
   '@graphile/simplify-inflection@8.0.0-beta.5': {}
 

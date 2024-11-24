@@ -2,12 +2,17 @@
 # i.e., foreign key on root table
 mutation AddChildAndConnectToParentByNodeId {
   createChild(
-    input: {child: {name: "My baby", parentByMyMomParentId: {connectById: {id: 1}}}}
+    input: {
+      child: {
+        name: "My baby"
+        parentByDadParentId: {connectByNodeId: {id: "WyJQYXJlbnQiLDJd=="}}
+      }
+    }
   ) {
     child {
       id
       name
-      momParent {
+      dadParent {
         id
         parentName
       }
