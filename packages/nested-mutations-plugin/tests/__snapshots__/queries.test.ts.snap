@@ -1,5 +1,23 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`a query=forward-create.graphql 1`] = `
+{
+  "data": {
+    "createChild": {
+      "child": {
+        "dadParent": {
+          "id": "WyJQYXJlbnQiLDNd",
+          "parentName": "Jimmy Constraint",
+        },
+        "id": "WyJDaGlsZCIsM10=",
+        "momParent": null,
+        "name": "Johnny Q. Constraint",
+      },
+    },
+  },
+}
+`;
+
 exports[`a query=mixed-multi-level-insert.graphql 1`] = `
 {
   "data": {
@@ -28,6 +46,66 @@ exports[`a query=mixed-multi-level-insert.graphql 1`] = `
         },
         "id": "WyJDaGlsZCIsM10=",
         "name": "Sandra Day",
+      },
+    },
+  },
+}
+`;
+
+exports[`a query=reverse-create.graphql 1`] = `
+{
+  "data": {
+    "createParent": {
+      "parent": {
+        "childrenByDadParentId": {
+          "nodes": [
+            {
+              "dadParent": {
+                "id": "WyJQYXJlbnQiLDNd",
+              },
+              "id": "WyJDaGlsZCIsM10=",
+              "momParent": null,
+              "name": "child 1 of test f1",
+            },
+          ],
+        },
+        "childrenByMomParentId": {
+          "nodes": [
+            {
+              "id": "WyJDaGlsZCIsNF0=",
+              "momParent": {
+                "id": "WyJQYXJlbnQiLDNd",
+              },
+              "name": "child 2 of test f1",
+            },
+            {
+              "id": "WyJDaGlsZCIsNV0=",
+              "momParent": {
+                "id": "WyJQYXJlbnQiLDNd",
+              },
+              "name": "child 3 of test f1",
+            },
+          ],
+        },
+        "id": "WyJQYXJlbnQiLDNd",
+        "parentName": "test f1",
+      },
+    },
+  },
+}
+`;
+
+exports[`a query=triple-nested-create.graphql 1`] = `
+{
+  "data": {
+    "createChild": {
+      "child": {
+        "id": "WyJDaGlsZCIsM10=",
+        "momParent": {
+          "id": "WyJQYXJlbnQiLDNd",
+          "parentName": "Sandra Day O'Connor",
+        },
+        "name": "Hugo Black",
       },
     },
   },

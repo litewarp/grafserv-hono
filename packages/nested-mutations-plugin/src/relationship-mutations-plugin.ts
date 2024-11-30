@@ -1,9 +1,4 @@
-import {
-  PgInsertSingleStep,
-  type PgResource,
-  PgUpdateSingleStep,
-  pgInsertSingle,
-} from '@dataplan/pg';
+import {PgInsertSingleStep, type PgResource, PgUpdateSingleStep} from '@dataplan/pg';
 import {
   type GraphQLInputField,
   type GraphQLInputFieldConfigMap,
@@ -15,10 +10,9 @@ import {
   type FieldArgs,
   ObjectStep,
   SetterStep,
-  __InputListStep,
-  __InputObjectStep,
   type __TrackedValueStep,
 } from 'postgraphile/grafast';
+import {getNestedCreatePlanResolver} from './dorothy.ts';
 import {
   type PgTableResource,
   isDeletable,
@@ -348,102 +342,10 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                               ),
                               autoApplyAfterParentApplyPlan: true,
                               applyPlan: EXPORTABLE(
-                                (
-                                  __InputListStep,
-                                  __InputObjectStep,
-                                  inflection,
-                                  pgCodecAttributeMatches,
-                                  pgInsertSingle,
-                                  relationship,
-                                  remoteRelFieldNames,
-                                  remoteResource
-                                ) =>
-                                  function plan($obj, args) {
-                                    const prepareAttrsFromInputObject = (
-                                      $resource: __InputObjectStep
-                                    ) => {
-                                      const {codec} = remoteResource;
-                                      const primaryUniq = remoteResource.uniques.find(
-                                        (u) => u.isPrimary
-                                      );
-                                      return Object.keys(codec.attributes).reduce(
-                                        (memo, name) => {
-                                          const isInsertable = pgCodecAttributeMatches(
-                                            [codec, name],
-                                            'attribute:insert'
-                                          );
-                                          const isPrimaryKey =
-                                            primaryUniq?.attributes.includes(name);
-
-                                          if (isPrimaryKey || !isInsertable) return memo;
-
-                                          const argName = inflection.attribute({
-                                            attributeName: name,
-                                            codec,
-                                          });
-                                          return {
-                                            ...memo,
-                                            [name]: $resource.get(argName),
-                                          };
-                                        },
-                                        {}
-                                      );
-                                    };
-
-                                    const $rawArgs = args.getRaw();
-                                    if ($rawArgs instanceof __InputObjectStep) {
-                                      const attrs = prepareAttrsFromInputObject($rawArgs);
-                                      const $new = pgInsertSingle(remoteResource, attrs);
-
-                                      relationship.localAttributes.forEach((attr, i) => {
-                                        const remote = relationship.remoteAttributes[i];
-                                        if (remote) {
-                                          $obj.set(attr.name, $new.get(remote.name));
-                                        }
-                                      });
-                                      remoteRelFieldNames.forEach((fieldName) => {
-                                        args.apply($new, [fieldName]);
-                                      });
-                                    } else if ($rawArgs instanceof __InputListStep) {
-                                      const length = $rawArgs.evalLength();
-                                      for (let i = 0; i < (length ?? 0); i++) {
-                                        const $item = $rawArgs.at(i);
-                                        const attrs = prepareAttrsFromInputObject(
-                                          $item as __InputObjectStep
-                                        );
-                                        const $record = $obj.record();
-
-                                        const newAttrs =
-                                          relationship.remoteAttributes.reduce(
-                                            (memo, attr, idx) => {
-                                              const localAttributes =
-                                                relationship.localAttributes[idx];
-                                              if (attr && localAttributes) {
-                                                return {
-                                                  ...memo,
-                                                  [attr.name]: $record.get(
-                                                    localAttributes.name
-                                                  ),
-                                                };
-                                              }
-                                              return memo;
-                                            },
-                                            attrs
-                                          );
-                                        pgInsertSingle(remoteResource, newAttrs);
-                                      }
-                                    }
-                                  },
-                                [
-                                  __InputListStep,
-                                  __InputObjectStep,
-                                  inflection,
-                                  pgCodecAttributeMatches,
-                                  pgInsertSingle,
-                                  relationship,
-                                  remoteRelFieldNames,
-                                  remoteResource,
-                                ]
+                                (build, getNestedCreatePlanResolver, relationship) => {
+                                  return getNestedCreatePlanResolver(build, relationship);
+                                },
+                                [build, getNestedCreatePlanResolver, relationship]
                               ),
                             }
                           ),

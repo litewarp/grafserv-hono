@@ -1,102 +1,96 @@
-import type {
-  GetPgResourceAttributes,
-  PgInsertSingleStep,
-  PgUpdateSingleStep,
-} from '@dataplan/pg';
 import {
-  ExecutableStep,
-  type ExecutionDetails,
-  type GrafastResultsList,
+  type PgInsertSingleStep,
+  type PgUpdateSingleStep,
+  pgInsertSingle,
+} from '@dataplan/pg';
+import type {GraphQLResolveInfo} from 'graphql';
+import {
+  FieldArgs,
+  FieldPlanResolver,
+  __InputListStep,
+  __InputObjectStep,
 } from 'postgraphile/grafast';
-import {type SQL, type SQLRawValue, type SQLable, sql} from 'postgraphile/pg-sql2';
-import {type PgTableResource, isPgTableResource} from './helpers.ts';
-import {inspect} from './inspect.ts';
+import type {PgRelationshipMutationsRelationshipData} from './relationships.ts';
 
-type QueryValueDetailsBySymbol = Map<
-  symbol,
-  {depId: number; processor: (val: unknown) => SQLRawValue}
->;
+export const getNestedCreatePlanResolver = (
+  build: GraphileBuild.Build,
+  relationship: PgRelationshipMutationsRelationshipData
+): FieldPlanResolver => {
+  const {
+    behavior: {pgCodecAttributeMatches},
+    inflection,
+  } = build;
 
-interface PgInsertSingleWithRelationsStepFinalizeResults {
-  text: string;
-  /** The values to feed into the query */
-  rawSqlValues: ReadonlyArray<SQLRawValue>;
+  const {remoteResource, localResource, localAttributes, remoteAttributes} = relationship;
 
-  /** When we see the given symbol in the SQL values, what dependency do we replace it with? */
-  queryValueDetailsBySymbol: QueryValueDetailsBySymbol;
-}
+  const remoteUniq = remoteResource.uniques.find((u) => u.isPrimary);
+  const relFieldNames = (build.pgRelationshipInputTypes[remoteResource.name] ?? []).map(
+    (r) => r.fieldName
+  );
 
-export class PgInsertSingleWithRelationsStep<
-    TResource extends PgTableResource = PgTableResource,
-  >
-  extends ExecutableStep<unknown[]>
-  implements SQLable
-{
-  static $$export = {
-    moduleName: '@litewarp/pg-relation-mutations-plugin',
-    exportName: 'PgInsertSingleWithRelationsStep',
+  const prepareAttrs = ($object: __InputObjectStep) => {
+    return Object.keys(remoteResource.codec.attributes).reduce((memo, name) => {
+      const isInsertable = pgCodecAttributeMatches(
+        [remoteResource.codec, name],
+        'attribute:insert'
+      );
+      const isPrimaryKey = remoteUniq?.attributes.includes(name);
+
+      if (isInsertable && !isPrimaryKey) {
+        return {
+          ...memo,
+          [name]: $object.get(
+            inflection.attribute({attributeName: name, codec: remoteResource.codec})
+          ),
+        };
+      }
+      return memo;
+    }, Object.create(null));
   };
 
-  isSyncAndSafe = false;
+  const resolver = (
+    $object: PgInsertSingleStep | PgUpdateSingleStep,
+    args: FieldArgs,
+    _info?: GraphQLResolveInfo
+  ) => {
+    const $rawArgs = args.getRaw();
 
-  public readonly resource: TResource;
+    if ($rawArgs instanceof __InputObjectStep) {
+      // build item
+      const $item = pgInsertSingle(remoteResource, prepareAttrs($rawArgs));
+      // set foreign keys on parent object
+      localAttributes.forEach((local, i) => {
+        const remote = remoteAttributes[i];
+        if (remote) {
+          $object.set(local.name, $item.get(remote.name));
+        }
+      });
 
-  private readonly name: string;
+      relFieldNames.forEach((field) => args.apply($item, [field]));
+    } else if ($rawArgs instanceof __InputListStep) {
+      const length = $rawArgs.evalLength() ?? 0;
+      for (let i = 0; i < length; i++) {
+        const $rawArg = $rawArgs.at(i);
+        if (!($rawArg instanceof __InputObjectStep)) {
+          console.warn(`Unexpected args type: ${$rawArg.constructor.name}`);
+          continue;
+        }
+        const attrs = remoteAttributes.reduce((memo, remote, idx) => {
+          const local = localAttributes[idx];
+          if (remote && local) {
+            return {...memo, [remote.name]: $object.get(local.name)};
+          }
+          return memo;
+        }, prepareAttrs($rawArg));
 
-  private readonly symbol: symbol | string;
+        pgInsertSingle(remoteResource, attrs);
 
-  //  sql.identifier(this.symbol)
-  public readonly alias: SQL;
-
-  private attributes: Array<{
-    name: keyof GetPgResourceAttributes<TResource>;
-    depId: number;
-  }>;
-
-  private contextId: number;
-
-  private locked = false;
-
-  private finalizeResults: PgInsertSingleWithRelationsStepFinalizeResults | null = null;
-
-  constructor($parent: PgInsertSingleStep | PgUpdateSingleStep) {
-    super();
-    this.hasSideEffects = true;
-
-    if (!isPgTableResource($parent.resource)) {
-      throw new Error('Parent resource must be a table with unique constraints');
-    }
-
-    this.resource = $parent.resource as TResource;
-    this.name = this.resource.name;
-    this.symbol = Symbol(this.name);
-    this.alias = sql.identifier(this.symbol);
-    this.contextId = this.addDependency($parent);
-  }
-
-  public toStringMeta(): string | null {
-    return `${this.resource.name}WithRelations${this.attributes.map((a) => a.name)}`;
-  }
-
-  async execute({indexMap}: ExecutionDetails): Promise<GrafastResultsList<any>> {
-    if (!this.finalizeResults) {
-      throw new Error('Cannot execute PgInsertSingleWithRelationsStep before finalizing');
-    }
-    const {text} = this.finalizeResults;
-  }
-
-  public finalize(): void {
-    if (!this.isFinalized) {
-      this.locked = true;
-      const resourceSource = this.resource.from;
-      if (!sql.isSQL(resourceSource)) {
-        throw new Error(
-          `Error in ${this}: can only insert into sources defined as SQL, however ${
-            this.resource
-          } has ${inspect(resourceSource)}`
-        );
+        // relFieldNames.forEach((field) => args.apply($item, [field]));
       }
-      const table = sql`${resourceSource} as ${this.alias}`;
+    } else {
+      console.warn(`Unexpected args type: ${$rawArgs.constructor.name}`);
     }
-  }
-}
+  };
+
+  return resolver;
+};
