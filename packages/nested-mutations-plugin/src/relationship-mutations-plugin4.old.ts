@@ -1,24 +1,12 @@
-import {
-  PgInsertSingleStep,
-  type PgResource,
-  PgUpdateSingleStep,
-  pgInsertSingle,
-} from '@dataplan/pg';
-import {
-  type GraphQLInputField,
-  type GraphQLInputFieldConfigMap,
-  GraphQLInputObjectType,
-  type GraphQLSchema,
-} from 'graphql';
+import {type PgResource} from '@dataplan/pg';
+import type {GraphQLInputFieldConfigMap, GraphQLInputObjectType} from 'graphql';
 import type {} from 'postgraphile';
 import {
-  type FieldArgs,
   ObjectStep,
-  SetterStep,
-  __InputListStep,
-  __InputObjectStep,
+  type __InputObjectStep,
   type __TrackedValueStep,
 } from 'postgraphile/grafast';
+import {handleMutation} from './all-mutations.ts';
 import {
   type PgTableResource,
   isDeletable,
@@ -47,6 +35,48 @@ export interface ResourceRelationshipMutationFields {
   };
 }
 
+/**
+ * Determine the root mutation input fields on the localResource to apply the args to
+ * e.g., createParent => ['input', 'parent', 'childrenByTheirDadParentId'], ['input', 'parent', 'childrenByTheirMomParentId']
+ */
+const mapPgRelationshipRootFields = <
+  TFieldName extends string = string,
+  TResource extends PgResource = PgResource,
+>(
+  build: GraphileBuild.Build,
+  resource: TResource,
+  connectorFields: GraphQLInputFieldConfigMap
+): Record<TFieldName, string[][]> => {
+  const fieldNames: string[] = [];
+  const paths: string[][] = [];
+  const isLocalResourceInsertable = isInsertable(build, resource);
+  // const isLocalResourceUpdatable = isUpdatable(build, resource);
+
+  if (isLocalResourceInsertable) {
+    fieldNames.push(build.inflection.createField(resource));
+    paths.push(['input', build.inflection.tableFieldName(resource)]);
+  }
+  // if (isLocalResourceUpdatable) {
+  //   fieldNames.push(
+  //     build.inflection.patchField(build.inflection.tableFieldName(resource))
+  //   );
+  //   paths.push(['input', 'patch']);
+  // }
+
+  const allPaths = Object.keys(connectorFields).reduce((memo, connectorFieldName) => {
+    return [...memo, ...paths.map((path) => [...path, connectorFieldName])];
+  }, [] as string[][]);
+
+  return fieldNames.reduce(
+    (memo, fieldName) => {
+      return {
+        ...memo,
+        [fieldName]: allPaths,
+      };
+    },
+    {} as Record<TFieldName, string[][]>
+  );
+};
 interface PgRelationshipMutationFieldInfo {
   fieldName: string;
   typeName: string;
@@ -61,7 +91,6 @@ declare global {
       pgRootFieldNamesToCodec: Map<string, PgTableResource>;
       pgRelationshipMutationFieldsByType: Map<string, ResourceRelationshipMutationFields>;
       pgRelationshipInputTypes: Record<string, PgRelationshipMutationsRelationshipData[]>;
-      //
       pgRelationshipConnectorFields: Record<string, PgRelationshipMutationFieldInfo[]>;
     }
     interface Inflection {
@@ -211,9 +240,8 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
       init(_, build) {
         const {
           inflection,
-          EXPORTABLE,
-          behavior: {pgCodecAttributeMatches},
-          graphql: {GraphQLList, GraphQLNonNull},
+          graphql: {GraphQLList, GraphQLNonNull, GraphQLID},
+          wrapDescription,
         } = build;
 
         const relationshipInputTypes = new Set<string>();
@@ -227,15 +255,8 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
 
           build.pgRelationshipInputTypes[resource.name] = relationships;
 
-          const inputFields: {name: string; type: string}[] = [];
-
           relationships.forEach((relationship) => {
             const {isReferencee, isUnique, remoteResource, name} = relationship;
-
-            inputFields.push({
-              name: inflection.relationshipInputFieldName(relationship),
-              type: inflection.relationshipInputType(relationship),
-            });
 
             const relationshipTypeName = inflection.relationshipInputType(relationship);
 
@@ -271,7 +292,7 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                   },
                   () => ({
                     assertStep: ObjectStep,
-                    description: build.wrapDescription(
+                    description: wrapDescription(
                       `The ${inflection.tableType(remoteResource.codec)} to be created by this mutation.`,
                       'type'
                     ),
@@ -299,17 +320,116 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
               });
             }
 
-            if (updateable) {
-            }
-            if (deletable) {
-            }
+            // TODO: use getUniqueMode and choose one or the other
+            // const uniqueMode = getUniqueMode(build, remoteResource, 'insert');
+
             if (connectable) {
+              // TODO: ADD TO BEHAVIORS
+              const connectByNodeIdName =
+                inflection.relationshipConnectByNodeIdFieldName(relationship);
+              const connectByNodeIdTypeName =
+                inflection.relationshipConnectByNodeIdInputType(relationship);
+
+              build.recoverable(null, () => {
+                build.registerInputObjectType(
+                  connectByNodeIdTypeName,
+                  {
+                    isRelationshipNodeIdConnectInputType: true,
+                  },
+                  () => ({
+                    assertStep: ObjectStep,
+                    description: wrapDescription(
+                      `Relationship connect by node id for ${name}`,
+                      'type'
+                    ),
+                    fields: ({fieldWithHooks}) => {
+                      return {
+                        [inflection.nodeIdFieldName()]: fieldWithHooks(
+                          {fieldName: inflection.nodeIdFieldName()},
+                          () => ({
+                            description: wrapDescription(
+                              `The node id input field to connect ${remoteResource.name} in the ${name} relationship`,
+                              'field'
+                            ),
+                            type: new GraphQLNonNull(GraphQLID),
+                          })
+                        ),
+                      };
+                    },
+                  }),
+                  `Creating relationship connect by node id input type for ${name}`
+                );
+                fields.connectable.byNodeId = {
+                  name: connectByNodeIdName,
+                  type: connectByNodeIdTypeName,
+                };
+              });
+
+              const connectByKeysName =
+                inflection.relationshipConnectByKeysFieldName(relationship);
+              const connectByKeysType =
+                inflection.relationshipConnectByKeysInputType(relationship);
+
+              build.recoverable(null, () => {
+                build.registerInputObjectType(
+                  connectByKeysType,
+                  {
+                    isRelationshipKeysConnectInputType: true,
+                  },
+                  () => ({
+                    assertStep: ObjectStep,
+                    description: wrapDescription(
+                      `Relationship connect by keys for ${name}`,
+                      'type'
+                    ),
+                    fields: ({fieldWithHooks}) => {
+                      return relationship.remoteAttributes.reduce((memo, a) => {
+                        const attribute = remoteResource.codec.attributes[a.name];
+
+                        const AttributeType = attribute
+                          ? build.getGraphQLTypeByPgCodec(attribute.codec, 'input')
+                          : null;
+
+                        if (!attribute || !AttributeType) {
+                          return memo;
+                        }
+                        const fieldName = inflection.attribute({
+                          attributeName: a.name,
+                          codec: remoteResource.codec,
+                        });
+
+                        return {
+                          ...memo,
+                          [fieldName]: fieldWithHooks({fieldName: a.name}, () => ({
+                            description: wrapDescription(
+                              `The ${a.name} input field to connect ${remoteResource.name} in the ${name} relationship`,
+                              'field'
+                            ),
+                            type: new GraphQLNonNull(AttributeType),
+                          })),
+                        };
+                      }, {});
+                    },
+                  }),
+                  `Creating relationship connect by keys input type for ${name}`
+                );
+              });
+              fields.connectable.byKeys = {
+                name: connectByKeysName,
+                type: connectByKeysType,
+              };
+            }
+
+            // if (updateable) {
+            //   const updateByNodeIdName = '';
+            //   const updateByNodeIdTypeName = '';
+            //   build.registerInputObjectType();
+            // }
+
+            if (deletable) {
             }
 
             build.recoverable(null, () => {
-              const remoteRelationships =
-                build.pgRelationshipInputTypes[remoteResource.name] ?? [];
-              const remoteRelFieldNames = remoteRelationships.map((r) => r.fieldName);
               build.registerInputObjectType(
                 relationshipTypeName,
                 {
@@ -320,7 +440,7 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                 },
                 () => ({
                   assertStep: ObjectStep,
-                  description: build.wrapDescription(
+                  description: wrapDescription(
                     `Relationship input type for ${name}`,
                     'type'
                   ),
@@ -342,115 +462,72 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                                         build.getInputTypeByName(fields.insertable.type)
                                       )
                                     ),
-                              description: build.wrapDescription(
+                              description: wrapDescription(
                                 `A ${inflection.tableType(remoteResource.codec)} created and linked to this object`,
                                 'type'
-                              ),
-                              autoApplyAfterParentApplyPlan: true,
-                              applyPlan: EXPORTABLE(
-                                (
-                                  __InputListStep,
-                                  __InputObjectStep,
-                                  inflection,
-                                  pgCodecAttributeMatches,
-                                  pgInsertSingle,
-                                  relationship,
-                                  remoteRelFieldNames,
-                                  remoteResource
-                                ) =>
-                                  function plan($obj, args) {
-                                    const prepareAttrsFromInputObject = (
-                                      $resource: __InputObjectStep
-                                    ) => {
-                                      const {codec} = remoteResource;
-                                      const primaryUniq = remoteResource.uniques.find(
-                                        (u) => u.isPrimary
-                                      );
-                                      return Object.keys(codec.attributes).reduce(
-                                        (memo, name) => {
-                                          const isInsertable = pgCodecAttributeMatches(
-                                            [codec, name],
-                                            'attribute:insert'
-                                          );
-                                          const isPrimaryKey =
-                                            primaryUniq?.attributes.includes(name);
-
-                                          if (isPrimaryKey || !isInsertable) return memo;
-
-                                          const argName = inflection.attribute({
-                                            attributeName: name,
-                                            codec,
-                                          });
-                                          return {
-                                            ...memo,
-                                            [name]: $resource.get(argName),
-                                          };
-                                        },
-                                        {}
-                                      );
-                                    };
-
-                                    const $rawArgs = args.getRaw();
-                                    if ($rawArgs instanceof __InputObjectStep) {
-                                      const attrs = prepareAttrsFromInputObject($rawArgs);
-                                      const $new = pgInsertSingle(remoteResource, attrs);
-
-                                      relationship.localAttributes.forEach((attr, i) => {
-                                        const remote = relationship.remoteAttributes[i];
-                                        if (remote) {
-                                          $obj.set(attr.name, $new.get(remote.name));
-                                        }
-                                      });
-                                      remoteRelFieldNames.forEach((fieldName) => {
-                                        args.apply($new, [fieldName]);
-                                      });
-                                    } else if ($rawArgs instanceof __InputListStep) {
-                                      const length = $rawArgs.evalLength();
-                                      for (let i = 0; i < (length ?? 0); i++) {
-                                        const $item = $rawArgs.at(i);
-                                        const attrs = prepareAttrsFromInputObject(
-                                          $item as __InputObjectStep
-                                        );
-                                        const $record = $obj.record();
-
-                                        const newAttrs =
-                                          relationship.remoteAttributes.reduce(
-                                            (memo, attr, idx) => {
-                                              const localAttributes =
-                                                relationship.localAttributes[idx];
-                                              if (attr && localAttributes) {
-                                                return {
-                                                  ...memo,
-                                                  [attr.name]: $record.get(
-                                                    localAttributes.name
-                                                  ),
-                                                };
-                                              }
-                                              return memo;
-                                            },
-                                            attrs
-                                          );
-                                        pgInsertSingle(remoteResource, newAttrs);
-                                      }
-                                    }
-                                  },
-                                [
-                                  __InputListStep,
-                                  __InputObjectStep,
-                                  inflection,
-                                  pgCodecAttributeMatches,
-                                  pgInsertSingle,
-                                  relationship,
-                                  remoteRelFieldNames,
-                                  remoteResource,
-                                ]
                               ),
                             }
                           ),
                         }
                       : {}),
-                    ...(fields.connectable.byNodeId ? {} : {}),
-                    ...(fields.connectable.byKeys ? {} : {}),
+                    ...(fields.connectable.byNodeId
+                      ? {
+                          [fields.connectable.byNodeId.name]: fieldWithHooks(
+                            {
+                              fieldName: fields.connectable.byNodeId.name,
+                              remoteResource,
+                              isRelationshipNodeIdConnectField: true,
+                            },
+                            {
+                              description: wrapDescription(
+                                `Connect ${name} by node id`,
+                                'field'
+                              ),
+                              type:
+                                isUnique || !isReferencee
+                                  ? build.getInputTypeByName(
+                                      fields.connectable.byNodeId.type
+                                    )
+                                  : new GraphQLList(
+                                      new GraphQLNonNull(
+                                        build.getInputTypeByName(
+                                          fields.connectable.byNodeId.type
+                                        )
+                                      )
+                                    ),
+                            }
+                          ),
+                        }
+                      : {}),
+                    ...(fields.connectable.byKeys
+                      ? {
+                          [fields.connectable.byKeys.name]: fieldWithHooks(
+                            {
+                              fieldName: fields.connectable.byKeys.name,
+                              remoteResource,
+                              isRelationshipKeysConnectField: true,
+                            },
+                            {
+                              description: wrapDescription(
+                                `Connect ${name} by key`,
+                                'field'
+                              ),
+                              type:
+                                isUnique || !isReferencee
+                                  ? build.getInputTypeByName(
+                                      fields.connectable.byKeys.type
+                                    )
+                                  : new GraphQLList(
+                                      new GraphQLNonNull(
+                                        build.getInputTypeByName(
+                                          fields.connectable.byKeys.type
+                                        )
+                                      )
+                                    ),
+                            }
+                          ),
+                        }
+                      : {}),
 
                     ...(fields.updateable.byNodeId ? {} : {}),
                     ...(fields.updateable.byKeys ? {} : {}),
@@ -510,27 +587,13 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                       type: InputType,
                       autoApplyAfterParentApplyPlan: true,
                       applyPlan: EXPORTABLE(
-                        (PgInsertSingleStep, PgUpdateSingleStep, SetterStep) =>
-                          function plan(
-                            $obj: SetterStep,
-                            fieldArgs: FieldArgs,
-                            _info: {
-                              entity: GraphQLInputField;
-                              schema: GraphQLSchema;
-                            }
-                          ) {
-                            if (
-                              $obj instanceof PgInsertSingleStep ||
-                              $obj instanceof PgUpdateSingleStep
-                            ) {
-                              fieldArgs.apply($obj);
-                              //
-                            } else if ($obj instanceof SetterStep) {
-                              //
-                              // console.log($obj);
-                            }
+                        () =>
+                          function plan($obj, fieldArgs, info) {
+                            const $args = fieldArgs.getRaw();
+                            const _args = ($args as __InputObjectStep).evalKeys();
+                            fieldArgs.apply($obj, _args);
                           },
-                        [PgInsertSingleStep, PgUpdateSingleStep, SetterStep]
+                        []
                       ),
                     })
                   ),
@@ -576,21 +639,31 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
           return {
             ...field,
             plan: EXPORTABLE(
-              (field, rootFields) =>
+              (build, field, handleMutation, inputTypes, resource) =>
                 function plan($parent: __TrackedValueStep, fieldArgs, info) {
-                  if (!field.plan) return $parent;
-                  // const $insertSingle = pgInsertSingle(resource);
-                  // const $object = build.grafast.object({result: $insertSingle});
-                  const $object = field.plan($parent, fieldArgs, info);
-                  const $insertSingle = $object.get('result');
+                  if (!field.plan) {
+                    return $parent;
+                  }
 
-                  rootFields.forEach((path) => {
-                    fieldArgs.apply($insertSingle, path);
-                  });
+                  const $mutes = handleMutation(
+                    build,
+                    resource,
+                    fieldArgs.getRaw('input') as __InputObjectStep
+                  );
+                  const $obj = field.plan($parent, fieldArgs, info);
+                  const $result = $obj.get('result');
 
-                  return $object;
+                  inputTypes
+                    .filter((r) => !r.isReferencee)
+                    .forEach((r) => {
+                      r.localAttributes.forEach((attr) => {
+                        $result.set(attr.name, build.grafast.access($mutes, attr.name));
+                      });
+                    });
+
+                  return $obj;
                 },
-              [field, rootFields]
+              [build, field, handleMutation, inputTypes, resource]
             ),
           };
         }
@@ -599,47 +672,4 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
       },
     },
   },
-};
-
-/**
- * Determine the root mutation input fields on the localResource to apply the args to
- * e.g., createParent => ['input', 'parent', 'childrenByTheirDadParentId'], ['input', 'parent', 'childrenByTheirMomParentId']
- */
-const mapPgRelationshipRootFields = <
-  TFieldName extends string = string,
-  TResource extends PgResource = PgResource,
->(
-  build: GraphileBuild.Build,
-  resource: TResource,
-  connectorFields: GraphQLInputFieldConfigMap
-): Record<TFieldName, string[][]> => {
-  const fieldNames: string[] = [];
-  const paths: string[][] = [];
-  const isLocalResourceInsertable = isInsertable(build, resource);
-  // const isLocalResourceUpdatable = isUpdatable(build, resource);
-
-  if (isLocalResourceInsertable) {
-    fieldNames.push(build.inflection.createField(resource));
-    paths.push(['input', build.inflection.tableFieldName(resource)]);
-  }
-  // if (isLocalResourceUpdatable) {
-  //   fieldNames.push(
-  //     build.inflection.patchField(build.inflection.tableFieldName(resource))
-  //   );
-  //   paths.push(['input', 'patch']);
-  // }
-
-  const allPaths = Object.keys(connectorFields).reduce((memo, connectorFieldName) => {
-    return [...memo, ...paths.map((path) => [...path, connectorFieldName])];
-  }, [] as string[][]);
-
-  return fieldNames.reduce(
-    (memo, fieldName) => {
-      return {
-        ...memo,
-        [fieldName]: allPaths,
-      };
-    },
-    {} as Record<TFieldName, string[][]>
-  );
 };

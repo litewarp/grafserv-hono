@@ -110,10 +110,8 @@ export function pgRelationshipReverseInsertStep<
       const insertedValues = vals.map((v) => sql`(${sql.join(v, ', ')})`);
       const query = sql`insert into ${table} (${sql.join(attrs, ', ')}) values ${sql.join(insertedValues, ', ')} returning *`;
 
-      const res = await client.withTransaction((tx) =>
-        tx.query(sql.compile(query)).then((r) => r.rows)
-      );
-      return res;
+      const res = await client.withTransaction((tx) => tx.query(sql.compile(query)));
+      return res.rows[0];
     }
   );
 }

@@ -22,7 +22,7 @@
   "overrides": {
     "graphql": "16.1.0-experimental-stream-defer.6"
   },
-  "packageManager": "pnpm@9.13.0",
+  "packageManager": "pnpm@9.14.3",
   "engines": {
     "node": ">=20"
   }

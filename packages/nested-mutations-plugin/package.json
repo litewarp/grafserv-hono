@@ -13,6 +13,7 @@
     "build": "tsup",
     "lint": "eslint src/**/*.ts",
     "test": "env-cmd scripts/test --watch",
+    "test:debug": "NODE_OPTIONS='--inspect-brk' dotenv --  jest --runInBand --watch .",
     "typecheck": "tsc --noEmit --watch"
   },
   "devDependencies": {
@@ -28,6 +29,7 @@
     "@types/jest": "^29.5.12",
     "@types/node": "^20.11.16",
     "@types/pg": "^8.11.0",
+    "dotenv-cli": "^7.4.4",
     "env-cmd": "^10.1.0",
     "eslint": "^9.15.0",
     "eslint-plugin-graphile-export": "0.0.2-beta.4",
@@ -52,5 +54,8 @@
   "graphql": {
     "schema": "./tmp/schema.graphql",
     "documents": "./tests/**/*.graphql"
+  },
+  "dependencies": {
+    "ts-deepmerge": "^7.0.2"
   }
 }
