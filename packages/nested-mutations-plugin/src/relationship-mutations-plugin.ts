@@ -206,7 +206,6 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
         const {
           inflection,
           EXPORTABLE,
-          behavior: {pgCodecAttributeMatches},
           graphql: {GraphQLList, GraphQLNonNull},
         } = build;
 
@@ -224,7 +223,8 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
           const inputFields: {name: string; type: string}[] = [];
 
           relationships.forEach((relationship) => {
-            const {isReferencee, isUnique, remoteResource, name} = relationship;
+            const {isReferencee, isUnique, remoteResource, name, remoteAttributes} =
+              relationship;
 
             inputFields.push({
               name: inflection.relationshipInputFieldName(relationship),
@@ -274,22 +274,48 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                         remoteResource.codec,
                         'input'
                       );
+
                       return {
                         ...Object.entries(
                           (TableType as GraphQLInputObjectType).getFields()
-                        ).reduce(
-                          (memo, [name, field]) => ({
+                        ).reduce((memo, [name, field]) => {
+                          if (
+                            isReferencee &&
+                            remoteAttributes.find(
+                              (a) =>
+                                inflection.attribute({
+                                  attributeName: a.name,
+                                  codec: remoteResource.codec,
+                                }) === name
+                            )
+                          ) {
+                            return {
+                              ...memo,
+                              [name]: fieldWithHooks(
+                                {fieldName: name},
+                                {
+                                  ...field,
+                                  type: build.graphql.isNonNullType(field.type)
+                                    ? field.type.ofType
+                                    : field.type,
+                                }
+                              ),
+                            };
+                          }
+                          return {
                             ...memo,
                             [name]: fieldWithHooks({fieldName: name}, field),
-                          }),
-                          Object.create(null)
-                        ),
+                          };
+                        }, Object.create(null)),
                       };
                     },
                   }),
                   `Add a relationship create input type for ${remoteResource.name} on ${name}`
                 );
-                fields.insertable = {name: createFieldName, type: createTypeName};
+                fields.insertable = {
+                  name: createFieldName,
+                  type: createTypeName,
+                };
               });
             }
 
@@ -301,9 +327,7 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
             }
 
             build.recoverable(null, () => {
-              const remoteRelationships =
-                build.pgRelationshipInputTypes[remoteResource.name] ?? [];
-              const remoteRelFieldNames = remoteRelationships.map((r) => r.fieldName);
+              build.pgRelationshipInputTypes[remoteResource.name] ?? [];
               build.registerInputObjectType(
                 relationshipTypeName,
                 {
@@ -429,7 +453,6 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                               //
                             } else if ($obj instanceof SetterStep) {
                               //
-                              // console.log($obj);
                             }
                           },
                         [PgInsertSingleStep, PgUpdateSingleStep, SetterStep]

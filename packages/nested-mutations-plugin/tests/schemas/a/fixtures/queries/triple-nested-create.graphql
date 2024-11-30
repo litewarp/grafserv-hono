@@ -6,7 +6,11 @@ mutation TripleNestedRelationship {
         parentByMomParentId: {
           create: {
             parentName: "Sandra Day O'Connor"
-            childrenByMomParentId: {create: [{name: "John Roberts"}]}
+            childrenByMomParentId: {
+              create: [
+                {name: "John Roberts", studentsByStudentId: {create: [{schoolId: 2}]}}
+              ]
+            }
           }
         }
       }
@@ -18,6 +22,21 @@ mutation TripleNestedRelationship {
       momParent {
         id
         parentName
+        childrenByMomParentId {
+          totalCount
+          nodes {
+            id
+            name
+            studentsByStudentId {
+              totalCount
+              nodes {
+                id
+                schoolId
+                studentId
+              }
+            }
+          }
+        }
       }
     }
   }

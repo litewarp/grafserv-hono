@@ -3,10 +3,12 @@ import {
   type PgUpdateSingleStep,
   pgInsertSingle,
 } from '@dataplan/pg';
-import type {GraphQLResolveInfo} from 'graphql';
 import {
+  type ExecutableStep,
   FieldArgs,
-  FieldPlanResolver,
+  type FieldInfo,
+  type InputObjectFieldApplyPlanResolver,
+  type ModifierStep,
   __InputListStep,
   __InputObjectStep,
 } from 'postgraphile/grafast';
@@ -15,13 +17,16 @@ import type {PgRelationshipMutationsRelationshipData} from './relationships.ts';
 export const getNestedCreatePlanResolver = (
   build: GraphileBuild.Build,
   relationship: PgRelationshipMutationsRelationshipData
-): FieldPlanResolver => {
+): InputObjectFieldApplyPlanResolver<
+  any,
+  void | ModifierStep<ExecutableStep<any> | ModifierStep<any>> | null
+> => {
   const {
     behavior: {pgCodecAttributeMatches},
     inflection,
   } = build;
 
-  const {remoteResource, localResource, localAttributes, remoteAttributes} = relationship;
+  const {remoteResource, localAttributes, remoteAttributes} = relationship;
 
   const remoteUniq = remoteResource.uniques.find((u) => u.isPrimary);
   const relFieldNames = (build.pgRelationshipInputTypes[remoteResource.name] ?? []).map(
@@ -34,24 +39,29 @@ export const getNestedCreatePlanResolver = (
         [remoteResource.codec, name],
         'attribute:insert'
       );
-      const isPrimaryKey = remoteUniq?.attributes.includes(name);
+      const isPrimaryKey = remoteUniq?.attributes.find(
+        (a) => a === name && remoteResource.codec.attributes[a]?.hasDefault
+      );
 
-      if (isInsertable && !isPrimaryKey) {
-        return {
-          ...memo,
-          [name]: $object.get(
-            inflection.attribute({attributeName: name, codec: remoteResource.codec})
-          ),
-        };
+      if (!isInsertable) return memo;
+
+      if (isPrimaryKey) {
+        return memo;
       }
-      return memo;
+
+      return {
+        ...memo,
+        [name]: $object.get(
+          inflection.attribute({attributeName: name, codec: remoteResource.codec})
+        ),
+      };
     }, Object.create(null));
   };
 
   const resolver = (
     $object: PgInsertSingleStep | PgUpdateSingleStep,
     args: FieldArgs,
-    _info?: GraphQLResolveInfo
+    _info?: FieldInfo
   ) => {
     const $rawArgs = args.getRaw();
 
@@ -65,12 +75,12 @@ export const getNestedCreatePlanResolver = (
           $object.set(local.name, $item.get(remote.name));
         }
       });
-
       relFieldNames.forEach((field) => args.apply($item, [field]));
     } else if ($rawArgs instanceof __InputListStep) {
       const length = $rawArgs.evalLength() ?? 0;
       for (let i = 0; i < length; i++) {
         const $rawArg = $rawArgs.at(i);
+
         if (!($rawArg instanceof __InputObjectStep)) {
           console.warn(`Unexpected args type: ${$rawArg.constructor.name}`);
           continue;
@@ -83,10 +93,10 @@ export const getNestedCreatePlanResolver = (
           return memo;
         }, prepareAttrs($rawArg));
 
-        pgInsertSingle(remoteResource, attrs);
-
-        // relFieldNames.forEach((field) => args.apply($item, [field]));
+        const $item = pgInsertSingle(remoteResource, attrs);
+        relFieldNames.forEach((field) => args.apply($item, [i, field]));
       }
+      return $object;
     } else {
       console.warn(`Unexpected args type: ${$rawArgs.constructor.name}`);
     }

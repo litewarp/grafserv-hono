@@ -1475,7 +1475,7 @@ input StudentsByTheirSchoolIdCreateInput {
 
   """Nested connector type for schoolByMySchoolId"""
   schoolBySchoolId: SchoolByMySchoolIdInput
-  schoolId: Int!
+  schoolId: Int
   studentId: Int!
 }
 
@@ -1493,7 +1493,7 @@ input StudentsByTheirStudentIdCreateInput {
   """Nested connector type for schoolByMySchoolId"""
   schoolBySchoolId: SchoolByMySchoolIdInput
   schoolId: Int!
-  studentId: Int!
+  studentId: Int
 }
 
 """Relationship input type for studentsByTheirStudentId"""
@@ -1592,7 +1592,7 @@ input TeachersByTheirSchoolIdCreateInput {
 
   """Nested connector type for schoolByMySchoolId"""
   schoolBySchoolId: SchoolByMySchoolIdInput
-  schoolId: Int!
+  schoolId: Int
 }
 
 """Relationship input type for teachersByTheirSchoolId"""
