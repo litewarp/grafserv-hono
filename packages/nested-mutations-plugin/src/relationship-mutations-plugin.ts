@@ -238,7 +238,6 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
               name,
               remoteAttributes,
               localAttributes,
-              localResource,
             } = relationship;
 
             inputFields.push({
@@ -514,7 +513,7 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
 
                                       // Since we're setting fields on the parent object
                                       // we can just return it
-                                      return $object;
+                                      args.apply($object);
                                     } else if ($rawArgs instanceof __InputListStep) {
                                       // do something
                                       // keys are on the children
