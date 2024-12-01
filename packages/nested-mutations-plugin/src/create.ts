@@ -3,24 +3,22 @@ import {
   type PgUpdateSingleStep,
   pgInsertSingle,
 } from '@dataplan/pg';
+import type {} from 'graphql';
 import {
-  type ExecutableStep,
-  FieldArgs,
-  type FieldInfo,
   type InputObjectFieldApplyPlanResolver,
-  type ModifierStep,
   __InputListStep,
   __InputObjectStep,
 } from 'postgraphile/grafast';
 import type {PgRelationshipMutationsRelationshipData} from './relationships.ts';
 
-export const getNestedCreatePlanResolver = (
+export function getNestedCreatePlanResolver<
+  TFieldStep extends PgInsertSingleStep | PgUpdateSingleStep =
+    | PgInsertSingleStep
+    | PgUpdateSingleStep,
+>(
   build: GraphileBuild.Build,
   relationship: PgRelationshipMutationsRelationshipData
-): InputObjectFieldApplyPlanResolver<
-  any,
-  void | ModifierStep<ExecutableStep<any> | ModifierStep<any>> | null
-> => {
+): InputObjectFieldApplyPlanResolver<TFieldStep> {
   const {
     behavior: {pgCodecAttributeMatches},
     inflection,
@@ -69,10 +67,10 @@ export const getNestedCreatePlanResolver = (
     }, Object.create(null));
   };
 
-  const resolver = (
-    $object: PgInsertSingleStep | PgUpdateSingleStep,
-    args: FieldArgs,
-    _info?: FieldInfo
+  const resolver: InputObjectFieldApplyPlanResolver<TFieldStep> = (
+    $object,
+    args,
+    _info
   ) => {
     const $rawArgs = args.getRaw();
 
@@ -107,11 +105,10 @@ export const getNestedCreatePlanResolver = (
         const $item = pgInsertSingle(remoteResource, attrs);
         relFieldNames.forEach((field) => args.apply($item, [i, field]));
       }
-      return $object;
     } else {
       console.warn(`Unexpected args type: ${$rawArgs.constructor.name}`);
     }
   };
 
   return resolver;
-};
+}

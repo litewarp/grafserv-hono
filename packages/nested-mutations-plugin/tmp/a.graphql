@@ -183,7 +183,7 @@ input ChildrenByTheirDadParentIdConnectByNodeIdInput {
 input ChildrenByTheirDadParentIdCreateInput {
   dadParentId: Int
   momParentId: Int
-  name: String
+  name: String!
 
   """Nested connector type for parentByMyDadParentId"""
   parentByDadParentId: ParentByMyDadParentIdInput
@@ -221,7 +221,7 @@ input ChildrenByTheirMomParentIdConnectByNodeIdInput {
 input ChildrenByTheirMomParentIdCreateInput {
   dadParentId: Int
   momParentId: Int
-  name: String
+  name: String!
 
   """Nested connector type for parentByMyDadParentId"""
   parentByDadParentId: ParentByMyDadParentIdInput
@@ -1707,12 +1707,12 @@ input TeachersByTheirSchoolIdConnectByNodeIdInput {
 
 """The Teacher to be created by this mutation."""
 input TeachersByTheirSchoolIdCreateInput {
-  name: String
+  name: String!
   otherId: Int
 
   """Nested connector type for schoolByMySchoolId"""
   schoolBySchoolId: SchoolByMySchoolIdInput
-  schoolId: Int
+  schoolId: Int!
 }
 
 """Relationship input type for teachersByTheirSchoolId"""
