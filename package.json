@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/package",
   "name": "@litewarp/graphile-tools",
   "private": true,
   "scripts": {

@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/package",
   "name": "@litewarp/grafast-nested-mutations-plugin",
   "version": "0.0.2",
   "description": "Nested mutations plugin for PostGraphile v5 (aka Grafast)",
@@ -54,8 +55,5 @@
   "graphql": {
     "schema": "./tmp/schema.graphql",
     "documents": "./tests/**/*.graphql"
-  },
-  "dependencies": {
-    "ts-deepmerge": "^7.0.2"
   }
 }
