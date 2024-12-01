@@ -2,7 +2,7 @@ import {type GetPgCodecAttributes, type PgClient, withPgClient} from '@dataplan/
 import {type ExecutableStep, __InputObjectStep} from 'postgraphile/grafast';
 import type {} from 'postgraphile/pg-sql2';
 import {insertOne} from './generators/insert.ts';
-import type {PgTableResource} from './helpers.ts';
+import type {PgTableResource} from '../helpers.ts';
 
 export function handleMutation<
   TResource extends PgTableResource,

@@ -1,18 +1,15 @@
-import {PgInsertSingleStep, type PgResource, PgUpdateSingleStep} from '@dataplan/pg';
+import {PgInsertSingleStep, PgUpdateSingleStep} from '@dataplan/pg';
 import {
   type GraphQLInputFieldConfigMap,
   GraphQLInputObjectType,
   type GraphQLInputType,
 } from 'graphql';
-import type {} from 'postgraphile';
 import {
   type FieldArgs,
   ObjectStep,
   SetterStep,
   type __TrackedValueStep,
 } from 'postgraphile/grafast';
-import {getNestedConnectByIdPlanResolver} from './connect-by-node-id.ts';
-import {getNestedCreatePlanResolver} from './create.ts';
 import {
   type PgTableResource,
   isDeletable,
@@ -20,10 +17,9 @@ import {
   isPgTableResource,
   isUpdatable,
 } from './helpers.ts';
-import {
-  type PgRelationshipMutationsRelationshipData,
-  getRelationships,
-} from './relationships.ts';
+import {getNestedConnectByIdPlanResolver} from './plans/connect-node.ts';
+import {getNestedCreatePlanResolver} from './plans/create.ts';
+import {type PgRelationInputData, getRelationships} from './relationships.ts';
 
 export interface ResourceRelationshipMutationFields {
   insertable?: {name: string; type: string};
@@ -46,79 +42,71 @@ declare global {
     interface Build {
       pgRelationshipMutationRootFields: Map<string, string[][]>;
       pgRootFieldNamesToCodec: Map<string, PgTableResource>;
-      pgRelationshipInputTypes: Record<string, PgRelationshipMutationsRelationshipData[]>;
+      pgRelationshipInputTypes: Record<string, PgRelationInputData[]>;
     }
     interface Inflection {
-      relationshipConnectByNodeIdFieldName(
+      relationConnectNodeField(
         this: Inflection,
-        relationship: PgRelationshipMutationsRelationshipData
+        relationship: PgRelationInputData
       ): string;
-      relationshipConnectByNodeIdInputType(
+      relationConnectNodeInputType(
         this: Inflection,
-        relationship: PgRelationshipMutationsRelationshipData
+        relationship: PgRelationInputData
       ): string;
-      relationshipConnectByKeysFieldName(
+      relationConnectByKeysField(
         this: Inflection,
-        relationship: PgRelationshipMutationsRelationshipData
+        relationship: PgRelationInputData
       ): string;
-      relationshipConnectByKeysInputType(
+      relationConnectByKeysInputType(
         this: Inflection,
-        relationship: PgRelationshipMutationsRelationshipData
+        relationship: PgRelationInputData
       ): string;
-      relationshipCreateFieldName(
+      relationCreateField(this: Inflection, relationship: PgRelationInputData): string;
+      relationCreateInputType(
         this: Inflection,
-        relationship: PgRelationshipMutationsRelationshipData
+        relationship: PgRelationInputData
       ): string;
-      relationshipCreateInputType(
+      relationDeleteNodeField(
         this: Inflection,
-        relationship: PgRelationshipMutationsRelationshipData
+        relationship: PgRelationInputData
       ): string;
-      relationshipDeleteFieldName(
+      relationDeleteNodeInputType(
         this: Inflection,
-        relationship: PgRelationshipMutationsRelationshipData
+        relationship: PgRelationInputData
       ): string;
-      relationshipDeleteInputType(
+      relationInputField(this: Inflection, relationship: PgRelationInputData): string;
+      relationInputType(this: Inflection, relationship: PgRelationInputData): string;
+      relationUpdateNodeField(
         this: Inflection,
-        relationship: PgRelationshipMutationsRelationshipData
+        relationship: PgRelationInputData
       ): string;
-      relationshipInputFieldName(
+      relationUpdateNodeInputType(
         this: Inflection,
-        relationship: PgRelationshipMutationsRelationshipData
+        relationship: PgRelationInputData
       ): string;
-      relationshipInputType(
+      relationUpdateByKeysField(
         this: Inflection,
-        relationship: PgRelationshipMutationsRelationshipData
+        relationship: PgRelationInputData
       ): string;
-      relationshipUpdateByNodeIdFieldName(
+      relationUpdateByKeysInputType(
         this: Inflection,
-        relationship: PgRelationshipMutationsRelationshipData
-      ): string;
-      relationshipUpdateByNodeIdInputType(
-        this: Inflection,
-        relationship: PgRelationshipMutationsRelationshipData
-      ): string;
-      relationshipUpdateByKeysFieldName(
-        this: Inflection,
-        relationship: PgRelationshipMutationsRelationshipData
-      ): string;
-      relationshipUpdateByKeysInputType(
-        this: Inflection,
-        relationship: PgRelationshipMutationsRelationshipData
+        relationship: PgRelationInputData
       ): string;
     }
     interface ScopeInputObject {
-      name?: string;
-      isRelationshipCreateInputType?: boolean;
-      isRelationshipInputType?: boolean;
-      isRelationshipNodeIdConnectInputType?: boolean;
-      isRelationshipKeysConnectInputType?: boolean;
-      remoteResource?: PgTableResource;
+      relationName?: string;
+      isRelationCreateInputType?: boolean;
+      isRelationInputType?: boolean;
+      isRelationConnectNodeInputType?: boolean;
+      isRelationConnectByKeysInputType?: boolean;
+      isRelationUpdateByNodeInputType?: boolean;
     }
     interface ScopeInputObjectFieldsField {
-      isRelationshipCreateInputField?: boolean;
-      isRelationshipConnectorField?: boolean;
-      isRelationshipNodeIdConnectField?: boolean;
-      isRelationshipKeysConnectField?: boolean;
+      isRelationCreateField?: boolean;
+      isRelationConnectNodeField?: boolean;
+      isRelationConnectByKeysField?: boolean;
+      isRelationUpdateNodeField?: boolean;
+      isRelationUpdateByKeysField?: boolean;
     }
   }
 }
@@ -132,33 +120,35 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
 
   inflection: {
     add: {
-      relationshipConnectByNodeIdFieldName(_options, _relationship) {
+      relationConnectNodeField(_options, _relationship) {
         return this.camelCase(`connect-by-${this.nodeIdFieldName()}`);
       },
-      relationshipConnectByNodeIdInputType(_options, {name}) {
-        return this.upperCamelCase(`${name}-connect-by-node-id-input`);
+      relationConnectNodeInputType(_options, {relationName}) {
+        return this.upperCamelCase(`${relationName}-connect-by-node-id-input`);
       },
-      relationshipConnectByKeysFieldName(_options, {remoteAttributes}) {
+      relationConnectByKeysField(_options, {remoteAttributes}) {
         const attrs = remoteAttributes.map((a) => a.name);
         return this.camelCase(`connect-by-${attrs.join('-and-')}`);
       },
-      relationshipConnectByKeysInputType(_options, {name, remoteAttributes}) {
+      relationConnectByKeysInputType(_options, {relationName, remoteAttributes}) {
         const attrs = remoteAttributes.map((a) => a.name);
-        return this.upperCamelCase(`${name}-connect-by-${attrs.join('-and-')}-input`);
+        return this.upperCamelCase(
+          `${relationName}-connect-by-${attrs.join('-and-')}-input`
+        );
       },
-      relationshipCreateFieldName(_options, _relationship) {
+      relationCreateField(_options, _relationship) {
         return this.camelCase(`create`);
       },
-      relationshipCreateInputType(_options, {name}) {
-        return this.upperCamelCase(`${name}-create-input`);
+      relationCreateInputType(_options, {relationName}) {
+        return this.upperCamelCase(`${relationName}-create-input`);
       },
-      relationshipInputFieldName(_options, relationship) {
+      relationInputField(_options, relationship) {
         const {
-          remoteResource,
-          isUnique,
           isReferencee,
+          isUnique,
           localAttributes,
           remoteAttributes,
+          remoteResource,
         } = relationship;
 
         const attributes = (!isReferencee ? localAttributes : remoteAttributes).map(
@@ -170,8 +160,14 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
 
         return this.camelCase(`${resourceName}-by-${attributes.join('-and-')}`);
       },
-      relationshipInputType(_options, {name}) {
-        return this.upperCamelCase(`${name}Input`);
+      relationInputType(_options, {relationName}) {
+        return this.upperCamelCase(`${relationName}Input`);
+      },
+      relationUpdateNodeField(_options, _relationship) {
+        return '';
+      },
+      relationUpdateNodeInputType(_options, _relationship) {
+        return '';
       },
     },
   },
@@ -207,18 +203,10 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
 
           build.pgRelationshipInputTypes[resource.name] = relationships;
 
-          const inputFields: {name: string; type: string}[] = [];
+          relationships.forEach((relation) => {
+            const {isReferencee, isUnique, remoteResource, relationName} = relation;
 
-          relationships.forEach((relationship) => {
-            const {isReferencee, isUnique, remoteResource, name, remoteAttributes} =
-              relationship;
-
-            inputFields.push({
-              name: inflection.relationshipInputFieldName(relationship),
-              type: inflection.relationshipInputType(relationship),
-            });
-
-            const relationshipTypeName = inflection.relationshipInputType(relationship);
+            const relationshipTypeName = inflection.relationInputType(relation);
 
             if (relationshipInputTypes.has(relationshipTypeName)) {
               // console.log(`Skipping ${relationshipTypeName}: already exists`);
@@ -239,16 +227,16 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
             };
 
             if (insertable) {
-              const createFieldName =
-                inflection.relationshipCreateFieldName(relationship);
-              const createTypeName = inflection.relationshipCreateInputType(relationship);
+              const create = {
+                fieldName: inflection.relationCreateField(relation),
+                typeName: inflection.relationCreateInputType(relation),
+              };
 
               build.recoverable(null, () => {
                 build.registerInputObjectType(
-                  createTypeName,
+                  create.typeName,
                   {
-                    isRelationshipCreateInputType: true,
-                    remoteResource,
+                    isRelationCreateInputType: true,
                   },
                   () => ({
                     assertStep: ObjectStep,
@@ -302,16 +290,31 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                       };
                     },
                   }),
-                  `Add a relationship create input type for ${remoteResource.name} on ${name}`
+                  `Add a relationship create input type for ${remoteResource.name} on ${relationName}`
                 );
                 fields.insertable = {
-                  name: createFieldName,
-                  type: createTypeName,
+                  name: create.fieldName,
+                  type: create.typeName,
                 };
               });
             }
 
             if (updateable) {
+              const mode = 'node';
+              if (mode === 'node') {
+                const updateByNode = {
+                  fieldName: inflection.relationUpdateNodeField(relation),
+                  typeName: inflection.relationUpdateNodeInputType(relation),
+                };
+                build.recoverable(null, () => {
+                  build.registerInputObjectType(
+                    updateByNode.typeName,
+                    {isRelationUpdateByNodeInputType: true},
+                    () => ({}),
+                    `Creating relationship update by node id input type for ${relationName} relationship`
+                  );
+                });
+              }
             }
             if (deletable) {
             }
@@ -321,43 +324,38 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
               const mode = 'node';
 
               if (mode === 'node') {
-                const fieldName =
-                  inflection.relationshipConnectByNodeIdFieldName(relationship);
-                const typeName =
-                  inflection.relationshipConnectByNodeIdInputType(relationship);
+                const fieldName = inflection.relationConnectNodeField(relation);
+                const typeName = inflection.relationConnectNodeInputType(relation);
 
                 build.recoverable(null, () => {
                   build.registerInputObjectType(
                     typeName,
-                    {isRelationshipNodeIdConnectInputType: true},
+                    {isRelationConnectNodeInputType: true},
                     () => ({
                       description: build.wrapDescription(
-                        `Relationship connect by node id input field for ${remoteResource.name} in the ${relationship.name} relationship`,
+                        `Relationship connect by node id input field for ${remoteResource.name} in the ${relationName} relationship`,
                         `type`
                       ),
-                      fields: ({fieldWithHooks}) => {
-                        return {
-                          [inflection.nodeIdFieldName()]: fieldWithHooks(
-                            {fieldName: inflection.nodeIdFieldName()},
-                            () => ({
-                              description: build.wrapDescription(
-                                `The node id input field to connect ${remoteResource.name} in the ${relationship.name} relationship`,
-                                'field'
-                              ),
-                              type: new GraphQLNonNull(build.graphql.GraphQLID),
-                            })
-                          ),
-                        };
-                      },
+                      fields: ({fieldWithHooks}) => ({
+                        [inflection.nodeIdFieldName()]: fieldWithHooks(
+                          {fieldName: inflection.nodeIdFieldName()},
+                          () => ({
+                            description: build.wrapDescription(
+                              `The node id input field to connect ${remoteResource.name} in the ${relationName} relationship`,
+                              'field'
+                            ),
+                            type: new GraphQLNonNull(build.graphql.GraphQLID),
+                          })
+                        ),
+                      }),
                     }),
-                    `Creating relationship connect by node id input type for ${relationship.name} relationship`
+                    `Creating relationship connect by node id input type for ${relationName} relationship`
                   );
                   fields.connectable.byNodeId = {
                     name: fieldName,
                     type: typeName,
                   };
                 });
-              } else {
               }
             }
 
@@ -373,9 +371,8 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
               build.registerInputObjectType(
                 relationshipTypeName,
                 {
-                  name,
-                  isRelationshipInputType: true,
-                  remoteResource: remoteResource,
+                  relationName,
+                  isRelationInputType: true,
                 },
                 () => ({
                   assertStep: ObjectStep,
@@ -389,8 +386,7 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                           [fields.insertable.name]: fieldWithHooks(
                             {
                               fieldName: fields.insertable.name,
-                              isRelationshipCreateInputField: true,
-                              remoteResource,
+                              isRelationCreateField: true,
                             },
                             {
                               type: getType(
@@ -402,9 +398,9 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                               ),
                               autoApplyAfterParentApplyPlan: true,
                               applyPlan: EXPORTABLE(
-                                (build, getNestedCreatePlanResolver, relationship) =>
-                                  getNestedCreatePlanResolver(build, relationship),
-                                [build, getNestedCreatePlanResolver, relationship]
+                                (build, getNestedCreatePlanResolver, relation) =>
+                                  getNestedCreatePlanResolver(build, relation),
+                                [build, getNestedCreatePlanResolver, relation]
                               ),
                             }
                           ),
@@ -415,12 +411,11 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                           [fields.connectable.byNodeId.name]: fieldWithHooks(
                             {
                               fieldName: fields.connectable.byNodeId.name,
-                              remoteResource,
-                              isRelationshipNodeIdConnectField: true,
+                              isRelationConnectNodeField: true,
                             },
                             {
                               description: build.wrapDescription(
-                                `Connect ${remoteResource.name} by node id in the ${name} relationship`,
+                                `Connect ${remoteResource.name} by node id in the ${relationName} relationship`,
                                 'field'
                               ),
                               type: getType(
@@ -428,9 +423,9 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                               ),
                               autoApplyAfterParentApplyPlan: true,
                               applyPlan: EXPORTABLE(
-                                (build, getNestedConnectByIdPlanResolver, relationship) =>
-                                  getNestedConnectByIdPlanResolver(build, relationship),
-                                [build, getNestedConnectByIdPlanResolver, relationship]
+                                (build, getNestedConnectByIdPlanResolver, relation) =>
+                                  getNestedConnectByIdPlanResolver(build, relation),
+                                [build, getNestedConnectByIdPlanResolver, relation]
                               ),
                             }
                           ),
@@ -445,7 +440,7 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                     ...(fields.deletable.byKeys ? {} : {}),
                   }),
                 }),
-                `Creating input type for relationship ${name}`
+                `Creating input type for relationship ${relationName}`
               );
             });
           });
@@ -465,8 +460,8 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
             const relationships = getRelationships(build, resource);
             const connectorFields: GraphQLInputFieldConfigMap = relationships.reduce(
               (memo, relationship) => {
-                const fieldName = inflection.relationshipInputFieldName(relationship);
-                const typeName = inflection.relationshipInputType(relationship);
+                const fieldName = inflection.relationInputField(relationship);
+                const typeName = inflection.relationInputType(relationship);
                 const InputType = build.getInputTypeByName(typeName);
 
                 return {
@@ -474,11 +469,11 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                   [fieldName]: fieldWithHooks(
                     {
                       fieldName,
-                      isRelationshipInputType: true,
+                      isRelationInputType: true,
                     },
                     () => ({
                       description: wrapDescription(
-                        `Nested connector type for ${relationship.name}`,
+                        `Nested connector type for ${relationship.relationName}`,
                         'field'
                       ),
                       type: InputType,
@@ -571,7 +566,7 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
  */
 const mapPgRelationshipRootFields = <
   TFieldName extends string = string,
-  TResource extends PgResource = PgResource,
+  TResource extends PgTableResource = PgTableResource,
 >(
   build: GraphileBuild.Build,
   resource: TResource,

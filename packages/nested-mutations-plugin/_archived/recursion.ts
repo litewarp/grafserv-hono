@@ -6,7 +6,7 @@ import {
 } from '@dataplan/pg';
 import {__InputObjectStep} from 'postgraphile/grafast';
 import {insertOne} from './generators/insert.ts';
-import {type PgTableResource} from './helpers.ts';
+import {type PgTableResource} from '../helpers.ts';
 
 export function handleMutation(
   build: GraphileBuild.Build,

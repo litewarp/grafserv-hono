@@ -3,13 +3,12 @@ import {
   type PgUpdateSingleStep,
   pgInsertSingle,
 } from '@dataplan/pg';
-import type {} from 'graphql';
 import {
   type InputObjectFieldApplyPlanResolver,
   __InputListStep,
   __InputObjectStep,
 } from 'postgraphile/grafast';
-import type {PgRelationshipMutationsRelationshipData} from './relationships.ts';
+import type {PgRelationInputData} from '../relationships.ts';
 
 export function getNestedCreatePlanResolver<
   TFieldStep extends PgInsertSingleStep | PgUpdateSingleStep =
@@ -17,14 +16,14 @@ export function getNestedCreatePlanResolver<
     | PgUpdateSingleStep,
 >(
   build: GraphileBuild.Build,
-  relationship: PgRelationshipMutationsRelationshipData
+  relation: PgRelationInputData
 ): InputObjectFieldApplyPlanResolver<TFieldStep> {
   const {
     behavior: {pgCodecAttributeMatches},
     inflection,
   } = build;
 
-  const {remoteResource, localAttributes, remoteAttributes} = relationship;
+  const {remoteResource, localAttributes, remoteAttributes} = relation;
 
   const primaryUnique = remoteResource.uniques.find((u) => u.isPrimary);
 

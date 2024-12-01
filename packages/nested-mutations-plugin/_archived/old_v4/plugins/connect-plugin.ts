@@ -5,7 +5,7 @@
  */
 
 import {getNestedRelationships} from '../../get-nested-relationships.ts';
-import {isPgTableResource} from '../../helpers.ts';
+import {isPgTableResource} from '../../../helpers.ts';
 
 export const PostGraphileNestedMutationsConnectPlugin: GraphileConfig.Plugin = {
   name: 'PgNestedMutationConnectPlugin',

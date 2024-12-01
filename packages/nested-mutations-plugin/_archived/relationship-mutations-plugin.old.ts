@@ -1,23 +1,38 @@
-import {type PgResource} from '@dataplan/pg';
-import type {GraphQLInputFieldConfigMap, GraphQLInputObjectType} from 'graphql';
+import {
+  PgInsertSingleStep,
+  type PgResource,
+  PgUpdateSingleStep,
+  withPgClientTransaction,
+} from '@dataplan/pg';
+import type {
+  GraphQLInputField,
+  GraphQLInputFieldConfigMap,
+  GraphQLInputObjectType,
+  GraphQLSchema,
+} from 'graphql';
 import type {} from 'postgraphile';
 import {
+  type FieldArgs,
+  ListStep,
   ObjectStep,
+  SetterStep,
   type __InputObjectStep,
   type __TrackedValueStep,
 } from 'postgraphile/grafast';
-import {handleMutation} from './all-mutations.ts';
+import {relationshipInsertSingle} from './generators/insert.ts';
 import {
   type PgTableResource,
   isDeletable,
   isInsertable,
   isPgTableResource,
   isUpdatable,
-} from './helpers.ts';
-import {
-  type PgRelationshipMutationsRelationshipData,
-  getRelationships,
-} from './relationships.ts';
+} from '../helpers.ts';
+import {getRelationships} from '../relationships.ts';
+import {pgRelationshipForwardConnectByNodeIdStep} from './steps/forward-connect-by-id.ts';
+import {pgRelationshipForwardConnectByKeysStep} from './steps/forward-connect-by-keys.ts';
+import {pgRelationshipReverseConnectByNodeIdStep} from './steps/reverse-connect-by-id.ts';
+import {pgRelationshipReverseConnectByKeysStep} from './steps/reverse-connect-by-keys.ts';
+import {pgRelationshipReverseInsertStep} from './steps/reverse-insert.ts';
 
 export interface ResourceRelationshipMutationFields {
   insertable?: {name: string; type: string};
@@ -77,12 +92,6 @@ const mapPgRelationshipRootFields = <
     {} as Record<TFieldName, string[][]>
   );
 };
-interface PgRelationshipMutationFieldInfo {
-  fieldName: string;
-  typeName: string;
-  mode: 'node' | 'keys';
-  remoteResource: PgTableResource;
-}
 
 declare global {
   namespace GraphileBuild {
@@ -90,65 +99,63 @@ declare global {
       pgRelationshipMutationRootFields: Map<string, string[][]>;
       pgRootFieldNamesToCodec: Map<string, PgTableResource>;
       pgRelationshipMutationFieldsByType: Map<string, ResourceRelationshipMutationFields>;
-      pgRelationshipInputTypes: Record<string, PgRelationshipMutationsRelationshipData[]>;
-      pgRelationshipConnectorFields: Record<string, PgRelationshipMutationFieldInfo[]>;
     }
     interface Inflection {
       relationshipConnectByNodeIdFieldName(
         this: Inflection,
-        relationship: PgRelationshipMutationsRelationshipData
+        relationship: PgResourceRelationInput
       ): string;
       relationshipConnectByNodeIdInputType(
         this: Inflection,
-        relationship: PgRelationshipMutationsRelationshipData
+        relationship: PgResourceRelationInput
       ): string;
       relationshipConnectByKeysFieldName(
         this: Inflection,
-        relationship: PgRelationshipMutationsRelationshipData
+        relationship: PgResourceRelationInput
       ): string;
       relationshipConnectByKeysInputType(
         this: Inflection,
-        relationship: PgRelationshipMutationsRelationshipData
+        relationship: PgResourceRelationInput
       ): string;
       relationshipCreateFieldName(
         this: Inflection,
-        relationship: PgRelationshipMutationsRelationshipData
+        relationship: PgResourceRelationInput
       ): string;
       relationshipCreateInputType(
         this: Inflection,
-        relationship: PgRelationshipMutationsRelationshipData
+        relationship: PgResourceRelationInput
       ): string;
       relationshipDeleteFieldName(
         this: Inflection,
-        relationship: PgRelationshipMutationsRelationshipData
+        relationship: PgResourceRelationInput
       ): string;
       relationshipDeleteInputType(
         this: Inflection,
-        relationship: PgRelationshipMutationsRelationshipData
+        relationship: PgResourceRelationInput
       ): string;
       relationshipInputFieldName(
         this: Inflection,
-        relationship: PgRelationshipMutationsRelationshipData
+        relationship: PgResourceRelationInput
       ): string;
       relationshipInputType(
         this: Inflection,
-        relationship: PgRelationshipMutationsRelationshipData
+        relationship: PgResourceRelationInput
       ): string;
       relationshipUpdateByNodeIdFieldName(
         this: Inflection,
-        relationship: PgRelationshipMutationsRelationshipData
+        relationship: PgResourceRelationInput
       ): string;
       relationshipUpdateByNodeIdInputType(
         this: Inflection,
-        relationship: PgRelationshipMutationsRelationshipData
+        relationship: PgResourceRelationInput
       ): string;
       relationshipUpdateByKeysFieldName(
         this: Inflection,
-        relationship: PgRelationshipMutationsRelationshipData
+        relationship: PgResourceRelationInput
       ): string;
       relationshipUpdateByKeysInputType(
         this: Inflection,
-        relationship: PgRelationshipMutationsRelationshipData
+        relationship: PgResourceRelationInput
       ): string;
     }
     interface ScopeInputObject {
@@ -228,8 +235,6 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
         /**
          * Instantiate the context properties on the build object
          */
-        build.pgRelationshipInputTypes = {};
-        build.pgRelationshipConnectorFields = {};
         build.pgRelationshipMutationRootFields = new Map();
         build.pgRootFieldNamesToCodec = new Map();
         build.pgRelationshipMutationFieldsByType = new Map();
@@ -242,6 +247,7 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
           inflection,
           graphql: {GraphQLList, GraphQLNonNull, GraphQLID},
           wrapDescription,
+          EXPORTABLE,
         } = build;
 
         const relationshipInputTypes = new Set<string>();
@@ -252,8 +258,6 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
 
         tableResources.forEach((resource) => {
           const relationships = getRelationships(build, resource);
-
-          build.pgRelationshipInputTypes[resource.name] = relationships;
 
           relationships.forEach((relationship) => {
             const {isReferencee, isUnique, remoteResource, name} = relationship;
@@ -269,6 +273,7 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
             const insertable = isInsertable(build, remoteResource);
             const updateable = isUpdatable(build, remoteResource);
             const deletable = isDeletable(build, remoteResource);
+            // TODO: Move out of conditional once behaviors are implemented
             // for now, if you're updateable, you are connectable
             const connectable = updateable;
 
@@ -339,7 +344,7 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                   () => ({
                     assertStep: ObjectStep,
                     description: wrapDescription(
-                      `Relationship connect by node id for ${name}`,
+                      `Relationship connect by node id for ${remoteResource.name} in the ${name} relationship`,
                       'type'
                     ),
                     fields: ({fieldWithHooks}) => {
@@ -364,6 +369,8 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                   type: connectByNodeIdTypeName,
                 };
               });
+
+              // TODO: ADD TO BEHAVIORS
 
               const connectByKeysName =
                 inflection.relationshipConnectByKeysFieldName(relationship);
@@ -406,6 +413,14 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                               'field'
                             ),
                             type: new GraphQLNonNull(AttributeType),
+                            applyPlan: EXPORTABLE(
+                              (attributeName) =>
+                                function plan($insert, val) {
+                                  $insert.set(attributeName, val.get());
+                                },
+                              [a.name]
+                            ),
+                            autoApplyAfterParentApplyPlan: true,
                           })),
                         };
                       }, {});
@@ -466,6 +481,75 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                                 `A ${inflection.tableType(remoteResource.codec)} created and linked to this object`,
                                 'type'
                               ),
+                              autoApplyAfterParentApplyPlan: true,
+                              applyPlan: EXPORTABLE(
+                                (
+                                  build,
+                                  isReferencee,
+                                  isUnique,
+                                  pgRelationshipReverseInsertStep,
+                                  relationship,
+                                  relationshipInsertSingle,
+                                  resource,
+                                  withPgClientTransaction
+                                ) =>
+                                  function plan(
+                                    $parent: PgInsertSingleStep | PgUpdateSingleStep,
+                                    args: FieldArgs,
+                                    _info: {
+                                      schema: GraphQLSchema;
+                                      entity: GraphQLInputField;
+                                    }
+                                  ) {
+                                    if (isUnique || !isReferencee) {
+                                      const $data = withPgClientTransaction(
+                                        resource.executor,
+                                        build.grafast.list([
+                                          build.grafast.object({id: $parent.get('id')}),
+                                          args.get(),
+                                        ]),
+                                        async (client, [parent, input]) => {
+                                          const result = relationshipInsertSingle(
+                                            build,
+                                            relationship,
+                                            input,
+                                            parent
+                                          );
+                                          console.log(build.sql.compile(result));
+
+                                          const res = await client.withTransaction((tx) =>
+                                            tx.query(build.sql.compile(result))
+                                          );
+
+                                          return res.rows[0];
+                                        }
+                                      );
+                                      // pgRelationshipForwardInsertStep(
+                                      //   build,
+                                      //   args.get() as ObjectStep,
+                                      //   $parent,
+                                      //   relationship
+                                      // );
+                                    } else {
+                                      pgRelationshipReverseInsertStep(
+                                        build,
+                                        args.get() as ListStep<__InputObjectStep[]>,
+                                        $parent,
+                                        relationship
+                                      );
+                                    }
+                                  },
+                                [
+                                  build,
+                                  isReferencee,
+                                  isUnique,
+                                  pgRelationshipReverseInsertStep,
+                                  relationship,
+                                  relationshipInsertSingle,
+                                  resource,
+                                  withPgClientTransaction,
+                                ]
+                              ),
                             }
                           ),
                         }
@@ -495,6 +579,61 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                                         )
                                       )
                                     ),
+                              applyPlan: EXPORTABLE(
+                                (
+                                  build,
+                                  inflection,
+                                  isReferencee,
+                                  isUnique,
+                                  pgRelationshipForwardConnectByNodeIdStep,
+                                  pgRelationshipReverseConnectByNodeIdStep,
+                                  relationship,
+                                  remoteResource
+                                ) =>
+                                  function plan(
+                                    $object: PgUpdateSingleStep | PgInsertSingleStep,
+                                    args: FieldArgs
+                                  ) {
+                                    const handler =
+                                      build.getNodeIdHandler &&
+                                      build.getNodeIdHandler(
+                                        inflection.tableType(remoteResource.codec)
+                                      );
+                                    if (!handler) {
+                                      throw new Error(
+                                        `Could not find node handler for ${inflection.tableType(remoteResource.codec)}`
+                                      );
+                                    }
+                                    if (isUnique || !isReferencee) {
+                                      pgRelationshipForwardConnectByNodeIdStep(
+                                        build,
+                                        handler,
+                                        args.get() as ObjectStep,
+                                        $object,
+                                        relationship
+                                      );
+                                    } else {
+                                      pgRelationshipReverseConnectByNodeIdStep(
+                                        build,
+                                        handler,
+                                        args.get() as ListStep<__InputObjectStep[]>,
+                                        $object,
+                                        relationship
+                                      );
+                                    }
+                                  },
+                                [
+                                  build,
+                                  inflection,
+                                  isReferencee,
+                                  isUnique,
+                                  pgRelationshipForwardConnectByNodeIdStep,
+                                  pgRelationshipReverseConnectByNodeIdStep,
+                                  relationship,
+                                  remoteResource,
+                                ]
+                              ),
+                              autoApplyAfterParentApplyPlan: true,
                             }
                           ),
                         }
@@ -524,6 +663,45 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                                         )
                                       )
                                     ),
+                              applyPlan: EXPORTABLE(
+                                (
+                                  build,
+                                  isReferencee,
+                                  isUnique,
+                                  pgRelationshipForwardConnectByKeysStep,
+                                  pgRelationshipReverseConnectByKeysStep,
+                                  relationship
+                                ) =>
+                                  function plan(
+                                    $object: PgUpdateSingleStep | PgInsertSingleStep,
+                                    args: FieldArgs
+                                  ) {
+                                    if (isUnique || !isReferencee) {
+                                      pgRelationshipForwardConnectByKeysStep(
+                                        build,
+                                        args.get() as ObjectStep,
+                                        $object,
+                                        relationship
+                                      );
+                                    } else {
+                                      pgRelationshipReverseConnectByKeysStep(
+                                        build,
+                                        args.get() as ListStep<__InputObjectStep[]>,
+                                        $object,
+                                        relationship
+                                      );
+                                    }
+                                  },
+                                [
+                                  build,
+                                  isReferencee,
+                                  isUnique,
+                                  pgRelationshipForwardConnectByKeysStep,
+                                  pgRelationshipReverseConnectByKeysStep,
+                                  relationship,
+                                ]
+                              ),
+                              autoApplyAfterParentApplyPlan: true,
                             }
                           ),
                         }
@@ -560,17 +738,6 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                 const fieldName = inflection.relationshipInputFieldName(relationship);
                 const typeName = inflection.relationshipInputType(relationship);
                 const InputType = build.getInputTypeByName(typeName);
-
-                build.pgRelationshipConnectorFields[pgCodec.name] = [
-                  ...(build.pgRelationshipConnectorFields[pgCodec.name] ?? []),
-                  {
-                    fieldName,
-                    typeName,
-                    mode: 'node',
-                    remoteResource: relationship.remoteResource,
-                  },
-                ];
-
                 return {
                   ...memo,
                   [fieldName]: fieldWithHooks(
@@ -587,13 +754,21 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                       type: InputType,
                       autoApplyAfterParentApplyPlan: true,
                       applyPlan: EXPORTABLE(
-                        () =>
-                          function plan($obj, fieldArgs, info) {
-                            const $args = fieldArgs.getRaw();
-                            const _args = ($args as __InputObjectStep).evalKeys();
-                            fieldArgs.apply($obj, _args);
+                        (PgInsertSingleStep, PgUpdateSingleStep) =>
+                          function plan(
+                            $object: SetterStep,
+                            args: FieldArgs,
+                            _info: {entity: GraphQLInputField; schema: GraphQLSchema}
+                          ) {
+                            if (
+                              $object instanceof PgInsertSingleStep ||
+                              $object instanceof PgUpdateSingleStep
+                            ) {
+                              args.apply($object);
+                            } else {
+                            }
                           },
-                        []
+                        [PgInsertSingleStep, PgUpdateSingleStep]
                       ),
                     })
                   ),
@@ -624,46 +799,39 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
       },
 
       GraphQLObjectType_fields_field(field, build, context) {
-        const {EXPORTABLE} = build;
+        const {EXPORTABLE, pgRelationshipMutationRootFields} = build;
         const {
           scope: {isRootMutation, fieldName},
         } = context;
 
         if (isRootMutation) {
-          const resource = build.pgRootFieldNamesToCodec.get(fieldName);
-          if (!resource) return field;
-          const inputTypes = build.pgRelationshipInputTypes[resource.name] ?? [];
-          const rootFields = build.pgRelationshipMutationRootFields.get(fieldName);
-          if (!rootFields || !inputTypes) return field;
-
+          const rootFields = pgRelationshipMutationRootFields.get(fieldName);
           return {
             ...field,
             plan: EXPORTABLE(
-              (build, field, handleMutation, inputTypes, resource) =>
+              (field, rootFields) =>
                 function plan($parent: __TrackedValueStep, fieldArgs, info) {
                   if (!field.plan) {
                     return $parent;
                   }
 
-                  const $mutes = handleMutation(
-                    build,
-                    resource,
-                    fieldArgs.getRaw('input') as __InputObjectStep
-                  );
-                  const $obj = field.plan($parent, fieldArgs, info);
-                  const $result = $obj.get('result');
+                  const $resolved = field.plan($parent, fieldArgs, info);
 
-                  inputTypes
-                    .filter((r) => !r.isReferencee)
-                    .forEach((r) => {
-                      r.localAttributes.forEach((attr) => {
-                        $result.set(attr.name, build.grafast.access($mutes, attr.name));
-                      });
-                    });
+                  // apply field args to all connector fields in the relationship mutation input
+                  if (!rootFields) {
+                    return $resolved;
+                  }
 
-                  return $obj;
+                  const $result = $resolved.get('result');
+
+                  rootFields.forEach((path) => {
+                    fieldArgs.apply($result, path);
+                  });
+
+                  return $resolved;
                 },
-              [build, field, handleMutation, inputTypes, resource]
+
+              [field, rootFields]
             ),
           };
         }

@@ -5,7 +5,7 @@ import type {
 } from 'grafast';
 import {__InputListStep} from 'grafast';
 import type {GraphileConfig} from 'graphile-build';
-import {isPgTableResource} from '../../helpers.ts';
+import {isPgTableResource} from '../../../helpers.ts';
 import {buildConnectByNodeIdField} from '../../type-definitions/build-connect-by-node-id-field.ts';
 import {buildCreateField} from '../../type-definitions/build-create-field.ts';
 import {buildUpdateByNodeIdField} from '../../type-definitions/build-update-by-node-id-field.ts';

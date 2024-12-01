@@ -1,4 +1,4 @@
-import {PgNestedMutationsInitSchemaPlugin} from './relationship-mutations-plugin.ts';
+import {PgNestedMutationsInitSchemaPlugin} from './plugin.ts';
 
 export const RelationshipMutationsPreset: GraphileConfig.Preset = {
   plugins: [PgNestedMutationsInitSchemaPlugin],

@@ -56,10 +56,7 @@ export const isNestedMutableResource = (
   );
 };
 
-export const isInsertable = (
-  build: GraphileBuild.Build,
-  resource: PgResource<any, any, any, any, any>
-) => {
+export const isInsertable = (build: GraphileBuild.Build, resource: PgTableResource) => {
   if (resource.parameters) return false;
   if (!resource.codec.attributes) return false;
   if (resource.codec.polymorphism) return false;
@@ -67,10 +64,7 @@ export const isInsertable = (
   return build.behavior.pgResourceMatches(resource, 'resource:insert') === true;
 };
 
-export const isUpdatable = (
-  build: GraphileBuild.Build,
-  resource: PgResource<any, any, any, any, any>
-) => {
+export const isUpdatable = (build: GraphileBuild.Build, resource: PgTableResource) => {
   if (resource.parameters) return false;
   if (!resource.codec.attributes) return false;
   if (resource.codec.polymorphism) return false;
@@ -79,10 +73,7 @@ export const isUpdatable = (
   return Boolean(build.behavior.pgResourceMatches(resource, 'resource:update'));
 };
 
-export const isDeletable = (
-  build: GraphileBuild.Build,
-  resource: PgResource<any, any, any, any, any>
-) => {
+export const isDeletable = (build: GraphileBuild.Build, resource: PgTableResource) => {
   if (resource.parameters) return false;
   if (!resource.codec.attributes) return false;
   if (resource.codec.polymorphism) return false;

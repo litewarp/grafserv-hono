@@ -9,12 +9,12 @@ export interface PgCodecAttributeWithName extends PgCodecAttribute {
   name: string;
 }
 
-export interface PgRelationshipMutationsRelationshipData
+export interface PgRelationInputData
   extends Omit<
     PgCodecRelation<PgCodecWithAttributes, PgTableResource>,
     'localCodec' | 'localAttributes' | 'remoteAttributes'
   > {
-  name: string;
+  relationName: string;
   fieldName: string;
   localResource: PgTableResource;
   localAttributes: PgCodecAttributeWithName[];
@@ -24,8 +24,8 @@ export interface PgRelationshipMutationsRelationshipData
 export const getRelationships = (
   build: GraphileBuild.Build,
   localResource: PgTableResource
-): PgRelationshipMutationsRelationshipData[] =>
-  Object.entries(localResource.getRelations()).reduce((memo, [name, details]) => {
+): PgRelationInputData[] =>
+  Object.entries(localResource.getRelations()).reduce((memo, [relationName, details]) => {
     const {remoteResource, isUnique, isReferencee} = details;
 
     if (!isNestedMutableResource(build, details.remoteResource)) return memo;
@@ -43,7 +43,7 @@ export const getRelationships = (
     });
 
     const relationship = {
-      name,
+      relationName,
       fieldName: '', // append it after object is created
       localResource,
       localAttributes,
@@ -57,7 +57,7 @@ export const getRelationships = (
       ...memo,
       {
         ...relationship,
-        fieldName: build.inflection.relationshipInputFieldName(relationship),
+        fieldName: build.inflection.relationInputField(relationship),
       },
     ];
-  }, [] as PgRelationshipMutationsRelationshipData[]);
+  }, [] as PgRelationInputData[]);

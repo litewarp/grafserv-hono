@@ -7,7 +7,7 @@
     "defaultBranch": "main"
   },
   "files": {
-    "ignore": ["old_v4/**", "node_modules", "dist", "tests/__snapshots__/**"]
+    "ignore": ["_archived", "node_modules", "dist", "tests/__snapshots__/**"]
   },
   "formatter": {
     "enabled": true,

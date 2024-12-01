@@ -1,4 +1,7 @@
-export let inspect: (obj: any, options?: {colors?: boolean; depth?: number}) => string;
+export let inspect: (
+  obj: unknown,
+  options?: {colors?: boolean; depth?: number}
+) => string;
 
 try {
   // biome-ignore lint/nursery/noCommonJs: for now
