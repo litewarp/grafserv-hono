@@ -28,7 +28,8 @@ export const getNestedCreatePlanResolver = (
 
   const {remoteResource, localAttributes, remoteAttributes} = relationship;
 
-  const remoteUniq = remoteResource.uniques.find((u) => u.isPrimary);
+  const primaryUnique = remoteResource.uniques.find((u) => u.isPrimary);
+
   const relFieldNames = (build.pgRelationshipInputTypes[remoteResource.name] ?? []).map(
     (r) => r.fieldName
   );
@@ -39,21 +40,31 @@ export const getNestedCreatePlanResolver = (
         [remoteResource.codec, name],
         'attribute:insert'
       );
-      const isPrimaryKey = remoteUniq?.attributes.find(
-        (a) => a === name && remoteResource.codec.attributes[a]?.hasDefault
-      );
 
       if (!isInsertable) return memo;
 
-      if (isPrimaryKey) {
-        return memo;
-      }
+      const isPrimaryAttribute = primaryUnique?.attributes.some((a) => a === name);
+      const inflectedName = inflection.attribute({
+        attributeName: name,
+        codec: remoteResource.codec,
+      });
 
+      if (isPrimaryAttribute) {
+        if (inflectedName === 'rowId') {
+          return memo;
+        }
+        // WARNING!! We have to eval the argument here
+        // and omit the value if it's not present
+        // otherwise, we won't be able to set it down the line
+        // because of the attribute check on PgInsertSingleStep
+        // and PgUpdateSingleStep
+        if (!$object.evalHas(inflectedName)) {
+          return memo;
+        }
+      }
       return {
         ...memo,
-        [name]: $object.get(
-          inflection.attribute({attributeName: name, codec: remoteResource.codec})
-        ),
+        [name]: $object.get(inflectedName),
       };
     }, Object.create(null));
   };

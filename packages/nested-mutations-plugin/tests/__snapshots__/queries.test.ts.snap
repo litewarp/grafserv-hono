@@ -1,5 +1,22 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`a query=forward-connect-by-id.graphql 1`] = `
+{
+  "data": {
+    "createChild": {
+      "child": {
+        "dadParent": {
+          "id": "WyJQYXJlbnQiLDJd",
+          "parentName": "dad",
+        },
+        "id": "WyJDaGlsZCIsM10=",
+        "name": "My baby",
+      },
+    },
+  },
+}
+`;
+
 exports[`a query=forward-create.graphql 1`] = `
 {
   "data": {
@@ -52,6 +69,29 @@ exports[`a query=mixed-multi-level-insert.graphql 1`] = `
 }
 `;
 
+exports[`a query=reverse-connect-by-id.graphql 1`] = `
+{
+  "data": {
+    "createParent": {
+      "parent": {
+        "childrenByDadParentId": {
+          "edges": [
+            {
+              "node": {
+                "id": "WyJDaGlsZCIsMl0=",
+                "name": "child 2",
+              },
+            },
+          ],
+        },
+        "id": "WyJQYXJlbnQiLDNd",
+        "parentName": "Daddy-O",
+      },
+    },
+  },
+}
+`;
+
 exports[`a query=reverse-create.graphql 1`] = `
 {
   "data": {
@@ -95,6 +135,35 @@ exports[`a query=reverse-create.graphql 1`] = `
 }
 `;
 
+exports[`a query=triple-nested-connect-by-id.graphql 1`] = `
+{
+  "data": {
+    "createChild": {
+      "child": {
+        "dadParent": {
+          "id": "WyJQYXJlbnQiLDJd",
+          "parentName": "dad",
+        },
+        "id": "WyJDaGlsZCIsM10=",
+        "name": "Sonia Sotomayor",
+        "studentsByStudentId": {
+          "nodes": [
+            {
+              "id": "WyJTdHVkZW50IiwyLDNd",
+              "school": {
+                "id": "WyJTY2hvb2wiLDJd",
+                "name": "pine",
+              },
+            },
+          ],
+          "totalCount": 1,
+        },
+      },
+    },
+  },
+}
+`;
+
 exports[`a query=triple-nested-create.graphql 1`] = `
 {
   "data": {
@@ -119,6 +188,9 @@ exports[`a query=triple-nested-create.graphql 1`] = `
                   "nodes": [
                     {
                       "id": "WyJTdHVkZW50IiwyLDRd",
+                      "school": {
+                        "id": "WyJTY2hvb2wiLDJd",
+                      },
                       "schoolId": 2,
                       "studentId": 4,
                     },

@@ -27,10 +27,7 @@ import {
   isPgTableResource,
   isUpdatable,
 } from './helpers.ts';
-import {
-  type PgRelationshipMutationsRelationshipData,
-  getRelationships,
-} from './relationships.ts';
+import {getRelationships} from './relationships.ts';
 import {pgRelationshipForwardConnectByNodeIdStep} from './steps/forward-connect-by-id.ts';
 import {pgRelationshipForwardConnectByKeysStep} from './steps/forward-connect-by-keys.ts';
 import {pgRelationshipReverseConnectByNodeIdStep} from './steps/reverse-connect-by-id.ts';
@@ -347,7 +344,7 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                   () => ({
                     assertStep: ObjectStep,
                     description: wrapDescription(
-                      `Relationship connect by node id for ${name}`,
+                      `Relationship connect by node id for ${remoteResource.name} in the ${name} relationship`,
                       'type'
                     ),
                     fields: ({fieldWithHooks}) => {

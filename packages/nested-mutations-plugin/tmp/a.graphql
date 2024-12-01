@@ -44,6 +44,16 @@ type Child implements Node {
   ): StudentConnection!
 }
 
+"""
+Relationship connect by node id input field for child in the childByMyStudentId relationship
+"""
+input ChildByMyStudentIdConnectByNodeIdInput {
+  """
+  The node id input field to connect child in the childByMyStudentId relationship
+  """
+  id: ID!
+}
+
 """The Child to be created by this mutation."""
 input ChildByMyStudentIdCreateInput {
   dadParentId: Int
@@ -63,6 +73,9 @@ input ChildByMyStudentIdCreateInput {
 
 """Relationship input type for childByMyStudentId"""
 input ChildByMyStudentIdInput {
+  """Connect child by node id in the childByMyStudentId relationship"""
+  connectById: ChildByMyStudentIdConnectByNodeIdInput
+
   """A Child created and linked to this object"""
   create: ChildByMyStudentIdCreateInput
 }
@@ -156,11 +169,21 @@ input ChildPatch {
   studentsByStudentId: StudentsByTheirStudentIdInput
 }
 
+"""
+Relationship connect by node id input field for child in the childrenByTheirDadParentId relationship
+"""
+input ChildrenByTheirDadParentIdConnectByNodeIdInput {
+  """
+  The node id input field to connect child in the childrenByTheirDadParentId relationship
+  """
+  id: ID!
+}
+
 """The Child to be created by this mutation."""
 input ChildrenByTheirDadParentIdCreateInput {
   dadParentId: Int
   momParentId: Int
-  name: String!
+  name: String
 
   """Nested connector type for parentByMyDadParentId"""
   parentByDadParentId: ParentByMyDadParentIdInput
@@ -175,15 +198,30 @@ input ChildrenByTheirDadParentIdCreateInput {
 
 """Relationship input type for childrenByTheirDadParentId"""
 input ChildrenByTheirDadParentIdInput {
+  """
+  Connect child by node id in the childrenByTheirDadParentId relationship
+  """
+  connectById: [ChildrenByTheirDadParentIdConnectByNodeIdInput!]
+
   """A Child created and linked to this object"""
   create: [ChildrenByTheirDadParentIdCreateInput!]
+}
+
+"""
+Relationship connect by node id input field for child in the childrenByTheirMomParentId relationship
+"""
+input ChildrenByTheirMomParentIdConnectByNodeIdInput {
+  """
+  The node id input field to connect child in the childrenByTheirMomParentId relationship
+  """
+  id: ID!
 }
 
 """The Child to be created by this mutation."""
 input ChildrenByTheirMomParentIdCreateInput {
   dadParentId: Int
   momParentId: Int
-  name: String!
+  name: String
 
   """Nested connector type for parentByMyDadParentId"""
   parentByDadParentId: ParentByMyDadParentIdInput
@@ -198,6 +236,11 @@ input ChildrenByTheirMomParentIdCreateInput {
 
 """Relationship input type for childrenByTheirMomParentId"""
 input ChildrenByTheirMomParentIdInput {
+  """
+  Connect child by node id in the childrenByTheirMomParentId relationship
+  """
+  connectById: [ChildrenByTheirMomParentIdConnectByNodeIdInput!]
+
   """A Child created and linked to this object"""
   create: [ChildrenByTheirMomParentIdCreateInput!]
 }
@@ -916,6 +959,16 @@ type Parent implements Node {
   rowId: Int!
 }
 
+"""
+Relationship connect by node id input field for parent in the parentByMyDadParentId relationship
+"""
+input ParentByMyDadParentIdConnectByNodeIdInput {
+  """
+  The node id input field to connect parent in the parentByMyDadParentId relationship
+  """
+  id: ID!
+}
+
 """The Parent to be created by this mutation."""
 input ParentByMyDadParentIdCreateInput {
   """Nested connector type for childrenByTheirDadParentId"""
@@ -929,8 +982,21 @@ input ParentByMyDadParentIdCreateInput {
 
 """Relationship input type for parentByMyDadParentId"""
 input ParentByMyDadParentIdInput {
+  """Connect parent by node id in the parentByMyDadParentId relationship"""
+  connectById: ParentByMyDadParentIdConnectByNodeIdInput
+
   """A Parent created and linked to this object"""
   create: ParentByMyDadParentIdCreateInput
+}
+
+"""
+Relationship connect by node id input field for parent in the parentByMyMomParentId relationship
+"""
+input ParentByMyMomParentIdConnectByNodeIdInput {
+  """
+  The node id input field to connect parent in the parentByMyMomParentId relationship
+  """
+  id: ID!
 }
 
 """The Parent to be created by this mutation."""
@@ -946,6 +1012,9 @@ input ParentByMyMomParentIdCreateInput {
 
 """Relationship input type for parentByMyMomParentId"""
 input ParentByMyMomParentIdInput {
+  """Connect parent by node id in the parentByMyMomParentId relationship"""
+  connectById: ParentByMyMomParentIdConnectByNodeIdInput
+
   """A Parent created and linked to this object"""
   create: ParentByMyMomParentIdCreateInput
 }
@@ -1294,6 +1363,16 @@ type School implements Node {
   ): TeacherConnection!
 }
 
+"""
+Relationship connect by node id input field for school in the schoolByMySchoolId relationship
+"""
+input SchoolByMySchoolIdConnectByNodeIdInput {
+  """
+  The node id input field to connect school in the schoolByMySchoolId relationship
+  """
+  id: ID!
+}
+
 """The School to be created by this mutation."""
 input SchoolByMySchoolIdCreateInput {
   name: String!
@@ -1308,6 +1387,9 @@ input SchoolByMySchoolIdCreateInput {
 
 """Relationship input type for schoolByMySchoolId"""
 input SchoolByMySchoolIdInput {
+  """Connect school by node id in the schoolByMySchoolId relationship"""
+  connectById: SchoolByMySchoolIdConnectByNodeIdInput
+
   """A School created and linked to this object"""
   create: SchoolByMySchoolIdCreateInput
 }
@@ -1468,6 +1550,16 @@ input StudentPatch {
   studentId: Int
 }
 
+"""
+Relationship connect by node id input field for student in the studentsByTheirSchoolId relationship
+"""
+input StudentsByTheirSchoolIdConnectByNodeIdInput {
+  """
+  The node id input field to connect student in the studentsByTheirSchoolId relationship
+  """
+  id: ID!
+}
+
 """The Student to be created by this mutation."""
 input StudentsByTheirSchoolIdCreateInput {
   """Nested connector type for childByMyStudentId"""
@@ -1476,13 +1568,26 @@ input StudentsByTheirSchoolIdCreateInput {
   """Nested connector type for schoolByMySchoolId"""
   schoolBySchoolId: SchoolByMySchoolIdInput
   schoolId: Int
-  studentId: Int!
+  studentId: Int
 }
 
 """Relationship input type for studentsByTheirSchoolId"""
 input StudentsByTheirSchoolIdInput {
+  """Connect student by node id in the studentsByTheirSchoolId relationship"""
+  connectById: [StudentsByTheirSchoolIdConnectByNodeIdInput!]
+
   """A Student created and linked to this object"""
   create: [StudentsByTheirSchoolIdCreateInput!]
+}
+
+"""
+Relationship connect by node id input field for student in the studentsByTheirStudentId relationship
+"""
+input StudentsByTheirStudentIdConnectByNodeIdInput {
+  """
+  The node id input field to connect student in the studentsByTheirStudentId relationship
+  """
+  id: ID!
 }
 
 """The Student to be created by this mutation."""
@@ -1492,12 +1597,17 @@ input StudentsByTheirStudentIdCreateInput {
 
   """Nested connector type for schoolByMySchoolId"""
   schoolBySchoolId: SchoolByMySchoolIdInput
-  schoolId: Int!
+  schoolId: Int
   studentId: Int
 }
 
 """Relationship input type for studentsByTheirStudentId"""
 input StudentsByTheirStudentIdInput {
+  """
+  Connect student by node id in the studentsByTheirStudentId relationship
+  """
+  connectById: [StudentsByTheirStudentIdConnectByNodeIdInput!]
+
   """A Student created and linked to this object"""
   create: [StudentsByTheirStudentIdCreateInput!]
 }
@@ -1585,9 +1695,19 @@ input TeacherPatch {
   schoolId: Int
 }
 
+"""
+Relationship connect by node id input field for teacher in the teachersByTheirSchoolId relationship
+"""
+input TeachersByTheirSchoolIdConnectByNodeIdInput {
+  """
+  The node id input field to connect teacher in the teachersByTheirSchoolId relationship
+  """
+  id: ID!
+}
+
 """The Teacher to be created by this mutation."""
 input TeachersByTheirSchoolIdCreateInput {
-  name: String!
+  name: String
   otherId: Int
 
   """Nested connector type for schoolByMySchoolId"""
@@ -1597,6 +1717,9 @@ input TeachersByTheirSchoolIdCreateInput {
 
 """Relationship input type for teachersByTheirSchoolId"""
 input TeachersByTheirSchoolIdInput {
+  """Connect teacher by node id in the teachersByTheirSchoolId relationship"""
+  connectById: [TeachersByTheirSchoolIdConnectByNodeIdInput!]
+
   """A Teacher created and linked to this object"""
   create: [TeachersByTheirSchoolIdCreateInput!]
 }

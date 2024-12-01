@@ -1,4 +1,9 @@
-import {PgInsertSingleStep, type PgResource, PgUpdateSingleStep} from '@dataplan/pg';
+import {
+  PgInsertSingleStep,
+  type PgResource,
+  PgUpdateSingleStep,
+  pgUpdateSingle,
+} from '@dataplan/pg';
 import {
   type GraphQLInputField,
   type GraphQLInputFieldConfigMap,
@@ -10,7 +15,10 @@ import {
   type FieldArgs,
   ObjectStep,
   SetterStep,
+  __InputListStep,
+  __InputObjectStep,
   type __TrackedValueStep,
+  specFromNodeId,
 } from 'postgraphile/grafast';
 import {getNestedCreatePlanResolver} from './dorothy.ts';
 import {
@@ -223,8 +231,15 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
           const inputFields: {name: string; type: string}[] = [];
 
           relationships.forEach((relationship) => {
-            const {isReferencee, isUnique, remoteResource, name, remoteAttributes} =
-              relationship;
+            const {
+              isReferencee,
+              isUnique,
+              remoteResource,
+              name,
+              remoteAttributes,
+              localAttributes,
+              localResource,
+            } = relationship;
 
             inputFields.push({
               name: inflection.relationshipInputFieldName(relationship),
@@ -280,14 +295,16 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                           (TableType as GraphQLInputObjectType).getFields()
                         ).reduce((memo, [name, field]) => {
                           if (
-                            isReferencee &&
-                            remoteAttributes.find(
-                              (a) =>
-                                inflection.attribute({
-                                  attributeName: a.name,
-                                  codec: remoteResource.codec,
-                                }) === name
-                            )
+                            isReferencee
+                            // TODO: add validation so that if the remote attribute is not present, the create field is present
+                            // &&
+                            // remoteAttributes.find(
+                            //   (a) =>
+                            //     inflection.attribute({
+                            //       attributeName: a.name,
+                            //       codec: remoteResource.codec,
+                            //     }) === name
+                            // )
                           ) {
                             return {
                               ...memo,
@@ -324,9 +341,56 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
             if (deletable) {
             }
             if (connectable) {
+              // use update for now
+              // const mode = getUniqueMode(build, remoteResource, 'update');
+              const mode = 'node';
+
+              if (mode === 'node') {
+                const fieldName =
+                  inflection.relationshipConnectByNodeIdFieldName(relationship);
+                const typeName =
+                  inflection.relationshipConnectByNodeIdInputType(relationship);
+
+                build.recoverable(null, () => {
+                  build.registerInputObjectType(
+                    typeName,
+                    {isRelationshipNodeIdConnectInputType: true},
+                    () => ({
+                      description: build.wrapDescription(
+                        `Relationship connect by node id input field for ${remoteResource.name} in the ${relationship.name} relationship`,
+                        `type`
+                      ),
+                      fields: ({fieldWithHooks}) => {
+                        return {
+                          [inflection.nodeIdFieldName()]: fieldWithHooks(
+                            {fieldName: inflection.nodeIdFieldName()},
+                            () => ({
+                              description: build.wrapDescription(
+                                `The node id input field to connect ${remoteResource.name} in the ${relationship.name} relationship`,
+                                'field'
+                              ),
+                              type: new GraphQLNonNull(build.graphql.GraphQLID),
+                            })
+                          ),
+                        };
+                      },
+                    }),
+                    `Creating relationship connect by node id input type for ${relationship.name} relationship`
+                  );
+                  fields.connectable.byNodeId = {
+                    name: fieldName,
+                    type: typeName,
+                  };
+                });
+              } else {
+              }
             }
 
             build.recoverable(null, () => {
+              const relFieldNames = (
+                build.pgRelationshipInputTypes[remoteResource.name] ?? []
+              ).map((r) => r.fieldName);
+
               build.pgRelationshipInputTypes[remoteResource.name] ?? [];
               build.registerInputObjectType(
                 relationshipTypeName,
@@ -375,7 +439,144 @@ export const PgNestedMutationsInitSchemaPlugin: GraphileConfig.Plugin = {
                           ),
                         }
                       : {}),
-                    ...(fields.connectable.byNodeId ? {} : {}),
+                    ...(fields.connectable.byNodeId
+                      ? {
+                          [fields.connectable.byNodeId.name]: fieldWithHooks(
+                            {
+                              fieldName: fields.connectable.byNodeId.name,
+                              remoteResource,
+                              isRelationshipNodeIdConnectField: true,
+                            },
+                            {
+                              description: build.wrapDescription(
+                                `Connect ${remoteResource.name} by node id in the ${name} relationship`,
+                                'field'
+                              ),
+                              type:
+                                isUnique || !isReferencee
+                                  ? build.getInputTypeByName(
+                                      fields.connectable.byNodeId.type
+                                    )
+                                  : new GraphQLList(
+                                      new GraphQLNonNull(
+                                        build.getInputTypeByName(
+                                          fields.connectable.byNodeId.type
+                                        )
+                                      )
+                                    ),
+                              autoApplyAfterParentApplyPlan: true,
+                              applyPlan: EXPORTABLE(
+                                (
+                                  __InputListStep,
+                                  __InputObjectStep,
+                                  build,
+                                  inflection,
+                                  localAttributes,
+                                  pgUpdateSingle,
+                                  relFieldNames,
+                                  remoteAttributes,
+                                  remoteResource,
+                                  specFromNodeId
+                                ) =>
+                                  function plan(
+                                    $object: PgUpdateSingleStep | PgInsertSingleStep,
+                                    args: FieldArgs
+                                  ) {
+                                    const $rawArgs = args.getRaw();
+                                    const nodeIdHandler =
+                                      build.getNodeIdHandler &&
+                                      build.getNodeIdHandler(
+                                        inflection.tableType(remoteResource.codec)
+                                      );
+                                    if (!nodeIdHandler) {
+                                      throw new Error(
+                                        `No nodeIdHandler found for ${remoteResource.name}`
+                                      );
+                                    }
+                                    if ($rawArgs instanceof __InputObjectStep) {
+                                      // key to add is on the parent
+                                      // set it and return
+                                      const spec = specFromNodeId(
+                                        nodeIdHandler,
+                                        $rawArgs.get(inflection.nodeIdFieldName())
+                                      );
+
+                                      Object.keys(spec).forEach((key) => {
+                                        const remoteAttrIdx = remoteAttributes
+                                          .map((a) => a.name)
+                                          .indexOf(key);
+
+                                        const local = localAttributes[remoteAttrIdx];
+                                        if (local) {
+                                          $object.set(local.name, spec[key]);
+                                        }
+                                      });
+
+                                      // Since we're setting fields on the parent object
+                                      // we can just return it
+                                      return $object;
+                                    } else if ($rawArgs instanceof __InputListStep) {
+                                      // do something
+                                      // keys are on the children
+                                      const length = $rawArgs.evalLength() ?? 0;
+                                      for (let i = 0; i < length; i++) {
+                                        const $rawArg = $rawArgs.at(i);
+                                        if (!($rawArg instanceof __InputObjectStep)) {
+                                          console.warn(
+                                            `Unexpected args type: ${$rawArg.constructor.name}`
+                                          );
+                                          continue;
+                                        }
+                                        const attrs = remoteAttributes.reduce(
+                                          (memo, remote, idx) => {
+                                            const local = localAttributes[idx];
+                                            if (!local || !remote) return memo;
+                                            return {
+                                              ...memo,
+                                              [remote.name]: $object.get(local.name),
+                                            };
+                                          },
+                                          {}
+                                        );
+
+                                        const spec = specFromNodeId(
+                                          nodeIdHandler,
+                                          $rawArg.get(inflection.nodeIdFieldName())
+                                        );
+                                        const $item = pgUpdateSingle(
+                                          remoteResource,
+                                          spec,
+                                          attrs
+                                        );
+
+                                        relFieldNames.forEach((field) =>
+                                          args.apply($item, [i, field])
+                                        );
+                                      }
+                                    } else {
+                                      console.warn(
+                                        `Unexpected args type: ${$rawArgs.constructor.name}`
+                                      );
+                                      return;
+                                    }
+                                  },
+                                [
+                                  __InputListStep,
+                                  __InputObjectStep,
+                                  build,
+                                  inflection,
+                                  localAttributes,
+                                  pgUpdateSingle,
+                                  relFieldNames,
+                                  remoteAttributes,
+                                  remoteResource,
+                                  specFromNodeId,
+                                ]
+                              ),
+                            }
+                          ),
+                        }
+                      : {}),
                     ...(fields.connectable.byKeys ? {} : {}),
 
                     ...(fields.updateable.byNodeId ? {} : {}),
@@ -540,14 +741,12 @@ const mapPgRelationshipRootFields = <
 ): Record<TFieldName, string[][]> => {
   const fieldNames: string[] = [];
   const paths: string[][] = [];
-  const isLocalResourceInsertable = isInsertable(build, resource);
-  // const isLocalResourceUpdatable = isUpdatable(build, resource);
 
-  if (isLocalResourceInsertable) {
+  if (isInsertable(build, resource)) {
     fieldNames.push(build.inflection.createField(resource));
     paths.push(['input', build.inflection.tableFieldName(resource)]);
   }
-  // if (isLocalResourceUpdatable) {
+  // if (isUpdateable(build, resource)) {
   //   fieldNames.push(
   //     build.inflection.patchField(build.inflection.tableFieldName(resource))
   //   );
