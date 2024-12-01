@@ -8,7 +8,7 @@
     "format-and-lint": "biome check",
     "format-and-lint:fix": "biome check --fix",
     "format-and-lint:staged": "biome check --error-on-warnings --no-errors-on-unmatched --staged",
-    "sync:list": "syncpack list",
+    "sync:list": "syncpack list-mismatches",
     "sync:fix": "syncpack fix-mismatches"
   },
   "devDependencies": {
